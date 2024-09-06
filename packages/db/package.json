@@ -8,6 +8,6 @@
     "prisma": "^5.19.1"
   },
   "exports": {
-    ".": "./index.ts"
+    "./client": "./index.ts"
   }
 }

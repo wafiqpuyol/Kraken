@@ -5,12 +5,17 @@
     "build": "turbo build",
     "dev": "turbo dev",
     "lint": "turbo lint",
-    "format": "prettier --write \"**/*.{ts,tsx,md}\""
+    "format": "prettier --write \"**/*.{ts,tsx,md}\"",
+    "postinstall": "prisma generate",
+    "migrate": "npx prisma migrate dev"
   },
   "devDependencies": {
     "prettier": "^3.2.5",
     "turbo": "^2.1.1",
     "typescript": "^5.4.5"
+  },
+  "prisma": {
+    "schema": "./packages/db/prisma/schema.prisma"
   },
   "engines": {
     "node": ">=18"
