@@ -5,23 +5,24 @@ import { Form, FormField, FormItem, FormLabel, FormControl, FormMessage } from '
 import { signUpPayload } from '@repo/forms/signupSchema'
 import { userFormSignup } from "@repo/forms/signup"
 import { useToast } from "../molecules/Toaster/use-toast"
+import { useRouter } from "next/navigation"
 
 interface SignUpFormProps {
-    func: (arg: signUpPayload) => Promise<string>,
-    isSignUp: React.Dispatch<React.SetStateAction<boolean>>
+    signUpAction: (arg: signUpPayload) => Promise<string>,
 }
 
-export const SignUpForm: React.FC<SignUpFormProps> = ({ func, isSignUp }) => {
+export const SignUpForm: React.FC<SignUpFormProps> = ({ signUpAction }) => {
     const { toast } = useToast()
+    const router = useRouter()
     const { handleSubmit, control, ...form } = userFormSignup()
     const submit = async (payload: signUpPayload) => {
         try {
-            const res = await func(payload)
+            const res = await signUpAction(payload)
             toast({
                 title: `${res}`,
                 variant: "default"
             })
-            isSignUp(true);
+            router.push("/login");
         } catch (err: any) {
             toast({
                 title: `${err.message}`,
