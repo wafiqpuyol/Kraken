@@ -5,7 +5,7 @@ import { Form, FormField, FormItem, FormLabel, FormControl, FormMessage } from '
 import { loginPayload } from '@repo/forms/loginSchema'
 import { userFormSignIn } from "@repo/forms/signin"
 import { useToast } from "../molecules/Toaster/use-toast"
-
+import { signIn } from "next-auth/react"
 interface SignInFormProps {
     func: (arg: loginPayload) => void,
     isLoginSuccessful: React.Dispatch<React.SetStateAction<boolean>>
@@ -16,7 +16,7 @@ export const SignInForm: React.FC<SignInFormProps> = ({ func, isLoginSuccessful 
     const { handleSubmit, control, ...form } = userFormSignIn()
     const submit = async (payload: loginPayload) => {
         try {
-            func(payload)
+            signIn("credentials", { ...payload, callbackUrl: "/main" })
             toast({
                 title: `Login Successful`,
                 variant: "default"
@@ -42,10 +42,10 @@ export const SignInForm: React.FC<SignInFormProps> = ({ func, isLoginSuccessful 
                     >
                         <FormField
                             control={control}
-                            name="email"
+                            name="phone_number"
                             render={({ field }) => (
                                 <FormItem>
-                                    <FormLabel>* Number (required)</FormLabel>
+                                    <FormLabel>* Phone Number (required)</FormLabel>
                                     <FormControl>
                                         <Input type="text" {...field} />
                                     </FormControl>

@@ -1,9 +1,12 @@
 
+import { isValidPhoneNumber, parsePhoneNumber } from "libphonenumber-js";
 import z from "zod";
 
 export const SignUpSchema = z.object({
     name: z.string().describe("name"),
-    number: z.string().describe("number"),
+    phone_number: z.string()
+        .refine(isValidPhoneNumber, "Please specify a valid phone number (include the international prefix).")
+        .transform((value) => parsePhoneNumber(value).number.toString()),
     email: z.string().describe("Email").email({ message: "Email is required" }),
     password: z
         .string()

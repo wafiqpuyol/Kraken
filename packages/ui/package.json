@@ -41,6 +41,7 @@
     "./SignUpForm": "./src/components/templates/SignUp.tsx",
     "./SignInForm": "./src/components/templates/SignIn.tsx",
     "./Toaster": "./src/components/molecules/Toaster/toaster.tsx",
-    "./Navbar": "./src/components/organisms/Navbar.tsx"
+    "./Navbar": "./src/components/organisms/Navbar.tsx",
+    "./SessionProvider": "./src/components/molecules/SessionProvider.tsx"
   }
 }

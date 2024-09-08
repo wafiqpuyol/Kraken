@@ -41,10 +41,10 @@ export const SignUpForm: React.FC<SignUpFormProps> = ({ func, isSignUp }) => {
                     >
                         <FormField
                             control={control}
-                            name="number"
+                            name="phone_number"
                             render={({ field }) => (
                                 <FormItem>
-                                    <FormLabel>* Number (required)</FormLabel>
+                                    <FormLabel>* Phone Number (required)</FormLabel>
                                     <FormControl>
                                         <Input type="text" {...field} />
                                     </FormControl>
