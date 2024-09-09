@@ -1,7 +1,6 @@
 "use client"
 import React from 'react'
-import { SignUpForm } from "@repo/ui/SignUpForm"
-import { signUpAction } from "../../../lib/action"
+import { SignInForm } from "@repo/ui/SignInForm"
 import { useSession } from "next-auth/react"
 import { redirect } from 'next/navigation'
 
@@ -12,7 +11,7 @@ const page = () => {
     }
     return (
         <div>
-            <SignUpForm signUpAction={signUpAction} />
+            <SignInForm />
         </div>
     )
 }

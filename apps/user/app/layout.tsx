@@ -1,6 +1,9 @@
 import type { Metadata } from "next";
 import localFont from "next/font/local";
 import "./globals.css";
+import { Toaster } from "@repo/ui/Toaster"
+import { Navbar } from "@repo/ui/Navbar"
+import { SessionProvider } from "@repo/ui/SessionProvider"
 
 const geistSans = localFont({
   src: "./fonts/GeistVF.woff",
@@ -21,10 +24,15 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+
   return (
     <html lang="en">
-      <body className={`${geistSans.variable} ${geistMono.variable}`}>
-        {children}
+      <body className={`${geistSans.variable} bg-[#f2f1f5] ${geistMono.variable}`}>
+        <SessionProvider>
+          <Navbar />
+          {children}
+          <Toaster />
+        </SessionProvider>
       </body>
     </html>
   );

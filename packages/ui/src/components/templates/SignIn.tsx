@@ -6,22 +6,20 @@ import { loginPayload } from '@repo/forms/loginSchema'
 import { userFormSignIn } from "@repo/forms/signin"
 import { useToast } from "../molecules/Toaster/use-toast"
 import { signIn } from "next-auth/react"
-interface SignInFormProps {
-    func: (arg: loginPayload) => void,
-    isLoginSuccessful: React.Dispatch<React.SetStateAction<boolean>>
-}
+import { useRouter } from "next/navigation"
 
-export const SignInForm: React.FC<SignInFormProps> = ({ func, isLoginSuccessful }) => {
+export const SignInForm = () => {
+    const router = useRouter()
     const { toast } = useToast()
     const { handleSubmit, control, ...form } = userFormSignIn()
     const submit = async (payload: loginPayload) => {
         try {
-            signIn("credentials", { ...payload, callbackUrl: "/main" })
+            signIn("credentials", { ...payload, redirect: false })
             toast({
                 title: `Login Successful`,
                 variant: "default"
             })
-            isLoginSuccessful(true);
+            router.push("/dashboard/home");
         } catch (err: any) {
             toast({
                 title: `${err.message}`,
