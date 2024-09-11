@@ -14,7 +14,7 @@ datasource db {
 }
 
 model User {
-  id                Int                 @id @default(autoincrement())
+  id                Int              @id 
   email             String?             @unique
   name              String?
   number            String              @unique
