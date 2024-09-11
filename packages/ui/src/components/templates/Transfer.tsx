@@ -1,0 +1,27 @@
+"use client"
+
+import { Button } from "../atoms/Button"
+import Link from "next/link"
+import { usePathname } from 'next/navigation'
+import { cn } from "../../lib/utils"
+
+interface TransferProps {
+    children: React.ReactNode
+}
+export const Transfer: React.FC<TransferProps> = ({ children }) => {
+    const pathName = usePathname();
+    return (
+        <div className="w-screen">
+            <div className="text-4xl text-[#6a51a6] pt-8 mb-8 font-bold">
+                Transfer
+            </div>
+            <div className="flex gap-5">
+                <Button className={cn("rounded-lg px-4 py-3 text-lg ", pathName.endsWith("/deposit") ? `bg-white text-black/85` : `bg-gray-100 text-gray-500/90`)}><Link href="deposit">Deposit</Link></Button>
+                <Button className={cn("rounded-lg px-4 py-3 text-lg ", pathName.endsWith("/withdraw") ? `bg-white text-black/85` : `bg-gray-100 text-gray-500/90`)}><Link href="withdraw">Withdraw</Link></Button>
+            </div>
+            <div className="mt-10">
+                {children}
+            </div>
+        </div>
+    )
+}
