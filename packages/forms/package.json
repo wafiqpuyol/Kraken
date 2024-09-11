@@ -18,7 +18,9 @@
   "exports": {
     "./loginSchema": "./src/loginSchema.ts",
     "./signupSchema": "./src/signupSchema.ts",
+    "./addMoneySchema": "./src/addMoneySchema.ts",
     "./signup": "./src/signup.tsx",
-    "./signin": "./src/signin.tsx"
+    "./signin": "./src/signin.tsx",
+    "./addMoney": "./src/addMoney.tsx"
   }
 }
