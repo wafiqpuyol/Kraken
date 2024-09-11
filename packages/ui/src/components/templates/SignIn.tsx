@@ -14,7 +14,14 @@ export const SignInForm = () => {
     const { handleSubmit, control, ...form } = userFormSignIn()
     const submit = async (payload: loginPayload) => {
         try {
-            signIn("credentials", { ...payload, redirect: false })
+            signIn("credentials", { ...payload, redirect: false }).then((response) => {
+                if (!response?.ok || response.error) {
+                    return toast({
+                        title: response.error || "Email or Password is incorrect",
+                        variant: "destructive"
+                    })
+                }
+            })
             toast({
                 title: `Login Successful`,
                 variant: "default"
