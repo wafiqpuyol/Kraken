@@ -32,7 +32,7 @@ export const SideBar = () => {
             <div>
                 <SidebarItem href={"/dashboard/home"} icon={<HomeIcon />} title="Home" />
                 <SidebarItem href={"/dashboard/transfer/deposit"} icon={<TransferIcon />} title="Transfer" />
-                <SidebarItem href={"/dashboard/transactions"} icon={<TransactionsIcon />} title="Transactions" />
+                <SidebarItem href={"/dashboard/transactions/history"} icon={<TransactionsIcon />} title="Transactions" />
             </div>
         </div>
     )
