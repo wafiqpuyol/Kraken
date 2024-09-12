@@ -11,8 +11,8 @@ interface TransferProps {
 export const Transfer: React.FC<TransferProps> = ({ children }) => {
     const pathName = usePathname();
     return (
-        <div className="w-screen">
-            <div className="text-4xl text-[#6a51a6] pt-8 mb-8 font-bold">
+        <div className="w-screen p-8">
+            <div className="text-4xl text-purple-600 mb-8 font-bold">
                 Transfer
             </div>
             <div className="flex gap-5">
