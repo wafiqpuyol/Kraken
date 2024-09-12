@@ -21,12 +21,12 @@ export const SignInForm = () => {
                         variant: "destructive"
                     })
                 }
+                toast({
+                    title: `Login Successful`,
+                    variant: "default"
+                })
+                router.push("/dashboard/home");
             })
-            toast({
-                title: `Login Successful`,
-                variant: "default"
-            })
-            router.push("/dashboard/home");
         } catch (err: any) {
             toast({
                 title: `${err.message}`,
