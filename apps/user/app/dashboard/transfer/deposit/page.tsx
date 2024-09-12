@@ -3,11 +3,10 @@ import { Deposit } from "@repo/ui/Deposit"
 import { addMoneyAction } from '../../../../lib/deposit'
 import { getServerSession } from "next-auth"
 import { prisma } from '@repo/db/client'
-import { Balance, OnRampTransaction } from '@repo/db/type'
-
+import { Balance } from '@repo/db/type'
+import { authOptions } from "@repo/network"
 const page = async () => {
-    const session = await getServerSession();
-
+    const session = await getServerSession(authOptions);
     let getBalance = await prisma.balance.findFirst({
         where: {
             userId: session?.user?.uid
@@ -19,21 +18,8 @@ const page = async () => {
         locked: getBalance?.locked || 0,
         userId: getBalance?.userId || 0
     }
-
-    const getOnRampTransactions: OnRampTransaction[] = await prisma.onRampTransaction.findMany({
-        where: {
-            userId: session?.user?.uid
-        }
-    });
-
-    const onRamps = getOnRampTransactions.map((obj: OnRampTransaction) => ({
-        time: obj.startTime,
-        amount: obj.amount,
-        status: obj.status,
-        provider: obj.provider
-    }))
     return (
-        <Deposit userBalance={userBalance} addMoneyAction={addMoneyAction} onRamps={onRamps} />
+        <Deposit userBalance={userBalance} addMoneyAction={addMoneyAction} />
     )
 }
 
