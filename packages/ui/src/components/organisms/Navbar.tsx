@@ -5,6 +5,7 @@ import Link from "next/link"
 import { useSession } from "next-auth/react"
 import { Button } from "@repo/ui/Button"
 import { signOut } from "next-auth/react"
+import { Profile } from "../organisms/Profile"
 
 export const Navbar = () => {
     const pathName = usePathname()
@@ -16,7 +17,7 @@ export const Navbar = () => {
                 {
                     session.data?.user
                         ?
-                        <Button className='bg-white' onClick={() => signOut()}>Logout</Button>
+                        <Profile><Button className='bg-white font-medium text-slate-500 px-2 hover:bg-slate-100' onClick={() => signOut()}>Logout</Button></Profile>
                         :
                         (
                             (pathName === "/")
@@ -35,7 +36,6 @@ export const Navbar = () => {
                                 )
                         )
                 }
-
             </div>
         </nav>
     )
