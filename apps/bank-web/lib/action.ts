@@ -51,6 +51,6 @@ export const transactionAction = async (userId: number, token: string): Promise<
     } catch (error: any) {
         console.log("--------------->", error.message);
         webHookCall({ amount: 0, userId, token, tokenValidation: "Failure" })
-        return { message: "ok", statusCode: 403 }
+        return { message: "token is invalid", statusCode: 403 }
     }
 }
