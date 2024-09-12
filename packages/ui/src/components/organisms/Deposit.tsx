@@ -6,16 +6,10 @@ import { OnRampStatus } from "@repo/db/type"
 import { OnRampTransaction } from "../molecules/OnRampTransaction"
 
 interface DepositProps {
-    addMoneyAction: (args: addMoneyPayload) => void
+    addMoneyAction: (args: addMoneyPayload, token: string) => Promise<{ message: string; statusCode: number; }>
     userBalance: Omit<UserBalance, "id" | "userId">
-    onRamps: {
-        time: Date,
-        amount: number,
-        status: OnRampStatus,
-        provider: string
-    }[]
 }
-export const Deposit: React.FC<DepositProps> = ({ addMoneyAction, userBalance, onRamps }) => {
+export const Deposit: React.FC<DepositProps> = ({ addMoneyAction, userBalance }) => {
     return (
         <>
             <div className='flex gap-10'>
