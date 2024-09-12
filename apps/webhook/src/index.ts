@@ -1,0 +1,53 @@
+import express from "express";
+import cors from "cors";
+import { prisma } from "@repo/db/client"
+import { IWebhookPayload } from "./type"
+import { PORT } from "./config"
+
+const app = express()
+
+app.use(express.json())
+app.use(cors({ origin: ["http://localhost:3001"] }))
+app.use(cors({
+    origin: ["http://localhost:3001"],
+}))
+
+
+
+app.post("/api/v1/webhook", async (req, res) => {
+    try {
+        const payload: IWebhookPayload = req.body;
+        await prisma.$transaction([
+            prisma.balance.update({
+                where: {
+                    userId: payload.userId
+                },
+                data: {
+                    amount: {
+                        // You can also get this from your DB
+                        increment: Number(payload.amount)
+                    }
+                }
+            }),
+            prisma.onRampTransaction.update({
+                where: {
+                    token: payload.token
+                },
+                data: {
+                    status: payload.tokenValidation,
+                }
+            })
+        ]);
+
+        res.json({
+            message: "Successful"
+        })
+    } catch (error) {
+        console.log(error);
+    }
+})
+
+
+app.listen(PORT, () => {
+    console.log(`Listening on port ${PORT}`)
+})
