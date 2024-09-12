@@ -1,6 +1,6 @@
 "use client"
 import { usePathname, useRouter } from "next/navigation";
-import { HomeIcon, TransactionsIcon, TransferIcon } from "../../icons/index"
+import { HomeIcon, TransactionsIcon, TransferIcon, Send } from "../../icons/index"
 
 interface SidebarProps {
     href: string
@@ -33,6 +33,7 @@ export const SideBar = () => {
                 <SidebarItem href={"/dashboard/home"} icon={<HomeIcon />} title="Home" />
                 <SidebarItem href={"/dashboard/transfer/deposit"} icon={<TransferIcon />} title="Transfer" />
                 <SidebarItem href={"/dashboard/transactions/history"} icon={<TransactionsIcon />} title="Transactions" />
+                <SidebarItem href={"/dashboard/p2p"} icon={<Send />} title="Send Money" />
             </div>
         </div>
     )
