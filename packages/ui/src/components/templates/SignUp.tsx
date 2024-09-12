@@ -8,7 +8,10 @@ import { useToast } from "../molecules/Toaster/use-toast"
 import { useRouter } from "next/navigation"
 
 interface SignUpFormProps {
-    signUpAction: (arg: signUpPayload) => Promise<string>,
+    signUpAction: (arg: signUpPayload) => Promise<{
+        message: string;
+        status: number;
+    }>
 }
 
 export const SignUpForm: React.FC<SignUpFormProps> = ({ signUpAction }) => {
@@ -18,17 +21,43 @@ export const SignUpForm: React.FC<SignUpFormProps> = ({ signUpAction }) => {
     const submit = async (payload: signUpPayload) => {
         try {
             const res = await signUpAction(payload)
-            toast({
-                title: `${res}`,
-                variant: "default"
-            })
-            router.push("/login");
+            switch (res.status) {
+                case 201:
+                    toast({
+                        title: res.message,
+                        variant: "default"
+                    })
+                    router.push("/login");
+                    break;
+
+                case 409:
+                    toast({
+                        title: res.message,
+                        variant: "destructive"
+                    })
+                    break;
+
+                case 500:
+                    toast({
+                        title: res.message,
+                        variant: "destructive"
+                    })
+                    break;
+
+                default:
+                    toast({
+                        title: res.message,
+                        variant: "destructive"
+                    })
+                    break;
+            }
         } catch (err: any) {
             toast({
                 title: `${err.message}`,
                 variant: "destructive"
             })
         }
+
     }
     return (
         <div className="flex flex-col items-center justify-center min-h-screen bg-background p-4">
@@ -49,7 +78,7 @@ export const SignUpForm: React.FC<SignUpFormProps> = ({ signUpAction }) => {
                                     <FormControl>
                                         <Input type="text" {...field} />
                                     </FormControl>
-                                    <FormMessage />
+                                    <FormMessage className='text-red-500' />
                                 </FormItem>
                             )}
                         />
@@ -62,7 +91,7 @@ export const SignUpForm: React.FC<SignUpFormProps> = ({ signUpAction }) => {
                                     <FormControl>
                                         <Input type="text" placeholder="e.g. John Smith" {...field} />
                                     </FormControl>
-                                    <FormMessage />
+                                    <FormMessage className='text-red-500' />
                                 </FormItem>
                             )}
                         />
@@ -79,7 +108,7 @@ export const SignUpForm: React.FC<SignUpFormProps> = ({ signUpAction }) => {
                                             {...field}
                                         />
                                     </FormControl>
-                                    <FormMessage />
+                                    <FormMessage className='text-red-500' />
                                 </FormItem>
                             )}
                         />
@@ -92,7 +121,7 @@ export const SignUpForm: React.FC<SignUpFormProps> = ({ signUpAction }) => {
                                     <FormControl>
                                         <Input type="password" placeholder="e.g. ********" {...field} />
                                     </FormControl>
-                                    <FormMessage />
+                                    <FormMessage className='text-red-500' />
                                 </FormItem>
                             )}
                         />

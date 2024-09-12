@@ -7,7 +7,7 @@ export const SignUpSchema = z.object({
     phone_number: z.string()
         .refine(isValidPhoneNumber, "Please specify a valid phone number (include the international prefix).")
         .transform((value) => parsePhoneNumber(value).number.toString()),
-    email: z.string().describe("Email").email({ message: "Email is required" }),
+    email: z.string().email().describe("Email").email({ message: "Email is required" }),
     password: z
         .string()
         .describe("Password")

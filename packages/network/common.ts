@@ -1,8 +1,6 @@
-import { prisma } from "@repo/db/client"
-import { signUpPayload } from "@repo/forms/signupSchema"
 import { genSalt, hash } from "bcryptjs"
 
-const generateHash = async (rawPassword: string) => {
+export const generateHash = async (rawPassword: string) => {
     return await new Promise((resolve, reject) => {
         genSalt(12, (err, salt) => {
             if (err) {
@@ -18,18 +16,8 @@ const generateHash = async (rawPassword: string) => {
     }) as string
 }
 
-export const signUp = async (payload: signUpPayload) => {
-    const isUser = await prisma.user.findUnique({ where: { email: payload.email } })
-    if (isUser) { throw new Error("User already exists") }
-
-    payload.password = await generateHash(payload.password);
-    const user = await prisma.user.create({
-        data: {
-            number: payload.phone_number,
-            password: payload.password,
-            email: payload.email,
-            name: payload.name,
-        }
-    });
-    return "Signup Successfully";
+export function generateRandomNumber() {
+    const min = 10000000
+    const max = 99999999
+    return Math.floor(Math.random() * (max - min + 1)) + min;
 }
