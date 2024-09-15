@@ -18,7 +18,7 @@ export const addMoneyAction = async (payload: addMoneyPayload, token: string): P
         })
         if (!isUserExist) return { message: "User not found. Please login", statusCode: 404 }
 
-        await prisma.onRampTransaction.create({
+        await prisma.onramptransaction.create({
             data: {
                 token: token,
                 status: "Processing",

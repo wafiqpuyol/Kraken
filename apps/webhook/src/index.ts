@@ -24,12 +24,11 @@ app.post("/api/v1/webhook", async (req, res) => {
                 },
                 data: {
                     amount: {
-                        // You can also get this from your DB
                         increment: Number(payload.amount)
                     }
                 }
             }),
-            prisma.onRampTransaction.update({
+            prisma.onramptransaction.update({
                 where: {
                     token: payload.token
                 },
