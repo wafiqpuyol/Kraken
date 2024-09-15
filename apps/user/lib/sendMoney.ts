@@ -36,10 +36,14 @@ export const sendMoneyAction = async (payload: sendMoneyPayload) => {
         }
         const senderBalance = await prisma.balance.findFirst({ where: { userId: isUserExist.id } })
         if (!senderBalance) {
-            return { message: "Please depost atleast $10", status: 404 }
+            return { message: "Please deposit atleast $10", status: 404 }
         }
         if (senderBalance?.amount < parseInt(payload.amount)) {
             return { message: "Insufficient balance", status: 401 }
+        }
+        const deductedAmount = (senderBalance?.amount - (parseInt(payload.amount) * 100)) / 100
+        if (deductedAmount <= 10) {
+            return { message: "Insufficient funds; you must have at least $10 remaining after the transfer.”", status: 403 }
         }
 
         await prisma.$transaction(async (tx) => {
@@ -49,7 +53,7 @@ export const sendMoneyAction = async (payload: sendMoneyPayload) => {
                 },
                 data: {
                     amount: {
-                        decrement: parseInt(payload.amount)
+                        decrement: parseInt(payload.amount) * 100
                     }
                 }
             })
@@ -59,8 +63,16 @@ export const sendMoneyAction = async (payload: sendMoneyPayload) => {
                 },
                 data: {
                     amount: {
-                        increment: parseInt(payload.amount)
+                        increment: parseInt(payload.amount) * 100
                     }
+                }
+            })
+            await prisma.p2ptransfer.create({
+                data: {
+                    amount: parseInt(payload.amount),
+                    timestamp: new Date(),
+                    fromUserId: isUserExist.id,
+                    toUserId: isRecipientExist.id
                 }
             })
         })
