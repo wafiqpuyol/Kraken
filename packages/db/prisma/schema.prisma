@@ -1,9 +1,3 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
-// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
-
 generator client {
   provider = "prisma-client-js"
 }
@@ -13,49 +7,66 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model User {
-  id                Int              @id 
-  email             String?             @unique
-  name              String?
-  number            String              @unique
-  password          String
-  OnRampTransaction OnRampTransaction[]
-  Balance           Balance[]
+model balance {
+  id     Int  @id @default(autoincrement())
+  userId Int  @unique(map: "Balance_userId_key")
+  amount Int
+  locked Int
+  user   user @relation(fields: [userId], references: [id], map: "Balance_userId_fkey")
 }
 
-model Merchant {
-  id        Int      @id @default(autoincrement())
-  email     String   @unique
+model merchant {
+  id        Int                @id @default(autoincrement())
+  email     String             @unique(map: "Merchant_email_key")
   name      String?
-  auth_type AuthType
+  auth_type merchant_auth_type
 }
 
-model OnRampTransaction {
-  id        Int          @id @default(autoincrement())
-  status    OnRampStatus
-  token     String       @unique
+model onramptransaction {
+  id        Int                      @id @default(autoincrement())
+  status    onramptransaction_status
+  token     String                   @unique(map: "OnRampTransaction_token_key")
   provider  String
   amount    Int
   startTime DateTime
   userId    Int
-  user      User         @relation(fields: [userId], references: [id])
+  user      user                     @relation(fields: [userId], references: [id], map: "OnRampTransaction_userId_fkey")
+
+  @@index([userId], map: "OnRampTransaction_userId_fkey")
 }
 
-model Balance {
-  id     Int  @id @default(autoincrement())
-  userId Int  @unique
-  amount Int
-  locked Int
-  user   User @relation(fields: [userId], references: [id])
+model p2ptransfer {
+  id                                Int      @id @default(autoincrement())
+  amount                            Int
+  timestamp                         DateTime
+  fromUserId                        Int
+  toUserId                          Int
+  user_p2ptransfer_fromUserIdTouser user     @relation("p2ptransfer_fromUserIdTouser", fields: [fromUserId], references: [id], map: "P2pTransfer_fromUserId_fkey")
+  user_p2ptransfer_toUserIdTouser   user     @relation("p2ptransfer_toUserIdTouser", fields: [toUserId], references: [id], map: "P2pTransfer_toUserId_fkey")
+
+  @@index([fromUserId], map: "P2pTransfer_fromUserId_fkey")
+  @@index([toUserId], map: "P2pTransfer_toUserId_fkey")
 }
 
-enum AuthType {
-  Google
-  Github
+model user {
+  id                                       Int                 @id
+  email                                    String?             @unique(map: "User_email_key")
+  name                                     String?
+  number                                   String              @unique(map: "User_number_key")
+  password                                 String
+  balance                                  balance?
+  onramptransaction                        onramptransaction[]
+  p2ptransfer_p2ptransfer_fromUserIdTouser p2ptransfer[]       @relation("p2ptransfer_fromUserIdTouser")
+  p2ptransfer_p2ptransfer_toUserIdTouser   p2ptransfer[]       @relation("p2ptransfer_toUserIdTouser")
 }
 
-enum OnRampStatus {
+enum onramptransaction_status {
   Success
   Failure
   Processing
+}
+
+enum merchant_auth_type {
+  Google
+  Github
 }
