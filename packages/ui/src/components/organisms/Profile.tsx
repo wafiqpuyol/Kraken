@@ -15,9 +15,8 @@ export const Profile = ({ children }: { children: React.ReactNode }) => {
                 <DropdownMenuLabel>My Account</DropdownMenuLabel>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem className='flex items-center hover:bg-slate-100 cursor-pointer'>
-                    <Link href="/account/settings"></Link>
                     <GoGear />
-                    <span className='font-medium text-slate-500 ml-2'>Settings</span>
+                    <Link href="/dashboard/account-settings/settings" className='font-medium text-slate-500 ml-2'>Settings</Link>
                 </DropdownMenuItem>
                 <DropdownMenuItem className='flex items-center hover:bg-slate-100'>
                     <VscSignOut />
