@@ -23,7 +23,7 @@ export const addMoneyAction = async (payload: addMoneyPayload, token: string): P
                 token: token,
                 status: "Processing",
                 userId: isUserExist.id,
-                amount: parseInt(payload.amount),
+                amount: parseInt(payload.amount) * 100,
                 provider: payload.bankURL || "unknown",
                 startTime: new Date()
             }

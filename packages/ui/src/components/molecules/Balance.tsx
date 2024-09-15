@@ -11,11 +11,11 @@ export const Balance: React.FC<BalanceProps> = ({ userBalance }) => {
                 <div className="mt-4">
                     <div className="flex justify-between py-2 border-b border-border font-medium text-gray-500">
                         <span>Unlocked balance</span>
-                        <span className="text-black/85">{userBalance.amount} BDT</span>
+                        <span className="text-black/85">{userBalance.amount / 100} BDT</span>
                     </div>
                     <div className="flex justify-between py-2 border-b border-border font-medium text-gray-500">
                         <span>Unlocked balance</span>
-                        <span className="text-black/85">{userBalance.locked}  BDT</span>
+                        <span className="text-black/85">{userBalance.locked / 100}  BDT</span>
                     </div>
                     <div className="flex justify-between py-2 font-medium text-gray-500">
                         <span >Total balance</span>
