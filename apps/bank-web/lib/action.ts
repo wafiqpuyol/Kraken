@@ -31,7 +31,7 @@ export const transactionAction = async (userId: number, token: string): Promise<
         if (!tokenDecodedData || tokenDecodedData !== isUserExist.id) {
             return { message: "Invalid Token", statusCode: 400 }
         }
-        const isOnRampExist = await prisma.onRampTransaction.findFirst({
+        const isOnRampExist = await prisma.onramptransaction.findFirst({
             where: {
                 AND: [
                     {

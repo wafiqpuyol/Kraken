@@ -1,8 +1,7 @@
 import { AddMoney } from '../molecules/Addmoney'
 import { Balance } from '../molecules/Balance'
-import { Balance as UserBalance } from "@repo/db/type"
+import { balance as UserBalance } from "@repo/db/type"
 import { addMoneyPayload } from "@repo/forms/addMoneySchema"
-import { OnRampStatus } from "@repo/db/type"
 import { OnRampTransaction } from "../molecules/OnRampTransaction"
 
 interface DepositProps {
