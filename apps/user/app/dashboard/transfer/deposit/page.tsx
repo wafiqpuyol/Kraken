@@ -5,8 +5,13 @@ import { getServerSession } from "next-auth"
 import { prisma } from '@repo/db/client'
 import { balance } from '@repo/db/type'
 import { authOptions } from "@repo/network"
-const page = async () => {
+import { redirect } from 'next/navigation'
+
+async function page() {
     const session = await getServerSession(authOptions);
+    if (!session?.user?.uid) {
+        redirect("/login")
+    }
     let getBalance = await prisma.balance.findFirst({
         where: {
             userId: session?.user?.uid

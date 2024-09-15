@@ -1,12 +1,13 @@
-"use client"
+
 import React from 'react'
 import { SignInForm } from "@repo/ui/SignInForm"
-import { useSession } from "next-auth/react"
+import { getServerSession } from "next-auth"
 import { redirect } from 'next/navigation'
+import { authOptions } from '@repo/network'
 
-const page = () => {
-    const session = useSession()
-    if (session.status === "authenticated") {
+async function page() {
+    const session = await getServerSession(authOptions)
+    if (session?.user || session?.user?.uid) {
         redirect("/dashboard/home")
     }
     return (

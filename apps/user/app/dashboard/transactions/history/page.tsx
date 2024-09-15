@@ -4,9 +4,14 @@ import { onramptransaction } from "@repo/db/type"
 import { getServerSession } from "next-auth"
 import { authOptions } from "@repo/network"
 import { History } from "@repo/ui/History"
+import { redirect } from 'next/navigation'
 
-const page = async () => {
+
+async function page() {
     const session = await getServerSession(authOptions)
+    if (!session?.user?.uid) {
+        redirect("/login")
+    }
     const getOnRampTransactions: onramptransaction[] = await prisma.onramptransaction.findMany({
         where: {
             userId: session?.user?.uid
