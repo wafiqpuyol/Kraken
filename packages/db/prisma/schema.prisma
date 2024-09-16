@@ -58,6 +58,17 @@ model user {
   onramptransaction                        onramptransaction[]
   p2ptransfer_p2ptransfer_fromUserIdTouser p2ptransfer[]       @relation("p2ptransfer_fromUserIdTouser")
   p2ptransfer_p2ptransfer_toUserIdTouser   p2ptransfer[]       @relation("p2ptransfer_toUserIdTouser")
+  resetPassword                            resetPassword[]
+}
+
+model resetPassword {
+  id          Int      @id @default(autoincrement())
+  userId      Int
+  token       String
+  tokenExpiry DateTime
+  user        user     @relation(fields: [userId], references: [id], map: "ResetPassword_userId_fkey")
+
+  @@index([userId], map: "ResetPassword_userId_fkey")
 }
 
 enum onramptransaction_status {
