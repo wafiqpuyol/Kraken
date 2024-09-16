@@ -21,6 +21,14 @@
     "./addMoneySchema": "./src/addMoneySchema.ts",
     "./signup": "./src/signup.tsx",
     "./signin": "./src/signin.tsx",
-    "./addMoney": "./src/addMoney.tsx"
+    "./addMoney": "./src/addMoney.tsx",
+    "./sendMoney": "./src/sendMoney.tsx",
+    "./sendMoneySchema": "./src/sendMoneySchema.ts",
+    "./changePasswordSchema": "./src/changePasswordSchema.ts",
+    "./changePassword": "./src/changePassword.tsx",
+    "./forgotPassword": "./src/forgotPassword.tsx",
+    "./forgotPasswordSchema": "./src/forgotPasswordSchema.ts",
+    "./resetPassword": "./src/resetPassword.tsx",
+    "./resetPasswordSchema": "./src/resetPasswordSchema.ts"
   }
 }

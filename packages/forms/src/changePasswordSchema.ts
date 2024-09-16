@@ -4,7 +4,7 @@ const PasswordSchema = {
     currentPassword: z.string().min(1, { message: "Current Password is required" }),
 }
 
-const PasswordMatchSchema = z.object({
+export const PasswordMatchSchema = z.object({
     newPassword: z.string().min(1, { message: "New Password is required" }),
     ConfirmPassword: z.string()
 }).superRefine(({ newPassword, ConfirmPassword }, ctx) => {
