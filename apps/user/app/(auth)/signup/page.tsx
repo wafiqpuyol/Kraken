@@ -1,4 +1,3 @@
-"use client"
 import React from 'react'
 import { SignUpForm } from "@repo/ui/SignUpForm"
 import { signUpAction } from "../../../lib/auth"
