@@ -1,2 +1,2 @@
 export { authOptions } from "./auth"
-export { generateHash, generateRandomNumber } from "./common"
+export { generateHash, generateRandomNumber, comparePassword } from "./common"

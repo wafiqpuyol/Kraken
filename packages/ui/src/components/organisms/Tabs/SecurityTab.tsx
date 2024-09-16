@@ -4,9 +4,11 @@ import { Button } from "../../atoms/Button"
 import { Card, CardContent } from "../../atoms/Card"
 import { Badge } from "../../atoms/Badge"
 import { useSession } from "next-auth/react"
+import { useRouter } from "next/navigation"
 
 export const SecurityTab = () => {
     const session = useSession()
+    const router = useRouter()
     console.log(session.data);
 
     return (
@@ -36,7 +38,7 @@ export const SecurityTab = () => {
                                 <h3 className="text-sm font-medium ">Password</h3>
                                 <p className="mt-1 text-sm">Protect your account with a unique, strong password not used elsewhere.</p>
                             </div>
-                            <Button variant="outline" className="text-purple-600 bg-purple-200">Change</Button>
+                            <Button variant="outline" className="text-purple-600 bg-purple-200" onClick={() => router.push("/change-password")}>Change</Button>
                         </div>
                         <div className="flex justify-between items-start">
                             <div className="flex items-center justify-between space-x-36">
