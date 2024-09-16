@@ -5,11 +5,53 @@ import { Card, CardContent } from "../../atoms/Card"
 import { Badge } from "../../atoms/Badge"
 import { useSession } from "next-auth/react"
 import { useRouter } from "next/navigation"
+import { TwoFAEnableDialog } from "../../molecules/TwoFAEnableModal"
+import { TwoFADisableDialog } from "../../molecules/TwoFADisableDialog"
+import { useToast } from "../../molecules/Toaster/use-toast"
+import { useState } from "react"
 
-export const SecurityTab = () => {
+
+interface SecurityTabProps {
+    isTwoFaEnabled: boolean
+    getTwoFASecret: () => Promise<{
+        message?: string;
+        status?: number;
+        twoFactorSecret?: string | undefined;
+    }>
+    activate2fa: (otp: string) => Promise<{
+        message: string;
+        status: number;
+    }>
+
+}
+export const SecurityTab: React.FC<SecurityTabProps> = ({ getTwoFASecret, isTwoFaEnabled, activate2fa }) => {
     const session = useSession()
     const router = useRouter()
+    const { toast } = useToast()
+    const [code, setCode] = useState("");
     console.log(session.data);
+
+    const handleClick = async () => {
+        const res = await getTwoFASecret()
+        console.log(res);
+        switch (res.status) {
+            case 200:
+                setCode(res.twoFactorSecret as string)
+                break
+            case 401:
+                toast({
+                    title: res.message,
+                    variant: "destructive"
+                })
+                break
+            case 500:
+                toast({
+                    title: res.message,
+                    variant: "destructive"
+                })
+                break
+        }
+    }
 
     return (
         <div className="space-y-6 bg-white">
@@ -81,7 +123,12 @@ export const SecurityTab = () => {
                                     <a href="#" className="text-purple-600 hover:underline font-medium">Learn more</a>
                                 </p>
                             </div>
-                            <Button variant="outline" className="text-purple-600 bg-purple-200">Enable</Button>
+                            {
+                                isTwoFaEnabled ?
+                                    <TwoFADisableDialog ><Button variant="outline" className="text-purple-600 bg-purple-200" onClick={handleClick}>Remove</Button></TwoFADisableDialog>
+                                    :
+                                    <TwoFAEnableDialog code={code} activate2fa={activate2fa}><Button variant="outline" className="text-purple-600 bg-purple-200" onClick={handleClick}>Enable</Button></TwoFAEnableDialog>
+                            }
                         </div>
                     </div>
                 </CardContent>
