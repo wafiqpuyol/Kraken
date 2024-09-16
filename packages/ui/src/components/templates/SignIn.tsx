@@ -7,6 +7,7 @@ import { userFormSignIn } from "@repo/forms/signin"
 import { useToast } from "../molecules/Toaster/use-toast"
 import { signIn } from "next-auth/react"
 import { useRouter } from "next/navigation"
+import Link from "next/link"
 
 export const SignInForm = () => {
     const router = useRouter()
@@ -75,6 +76,11 @@ export const SignInForm = () => {
                         <Button type="submit" className="bg-[#7132F5] w-full text-white text-lg">Continue</Button>
                     </form>
                 </ Form>
+
+                <div className='ml-1 flex gap-1 mt-2 justify-center'>
+                    <span className='text-sm font-medium text-slate-500'>Forgot</span>
+                    <Link href="/forgot-password" className='text-sm text-purple-400 font-medium'>password?</Link>
+                </div>
 
             </div>
 
