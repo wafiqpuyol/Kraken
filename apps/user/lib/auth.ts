@@ -174,3 +174,22 @@ export const resetPasswordAction = async (payload: resetPasswordPayload, token: 
         return { message: "Something went wrong while resetting password", status: 500 }
     }
 }
+
+export const disable2fa = async () => {
+    const session = await getServerSession(authOptions)
+    if (!session?.user?.uid) {
+        return
+    }
+    const user = await prisma.user.findFirst({ where: { id: session.user.uid } })
+    if (!user) return
+    if (user.twoFactorActivated) {
+        await prisma.user.update({
+            where: {
+                id: session.user.uid
+            },
+            data: {
+                twoFactorActivated: false
+            }
+        })
+    }
+}

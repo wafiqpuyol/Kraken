@@ -7,9 +7,18 @@ import { Button } from "@repo/ui/Button"
 import { signOut } from "next-auth/react"
 import { Profile } from "../organisms/Profile"
 
-export const Navbar = () => {
+
+interface NavbarProps {
+    disable2fa: () => Promise<void>
+}
+export const Navbar: React.FC<NavbarProps> = ({ disable2fa }) => {
     const pathName = usePathname()
     const session = useSession();
+
+    const handleClick = async () => {
+        await disable2fa();
+        signOut()
+    }
     return (
         <nav className="bg-purple-600 p-4 flex justify-between items-center">
             <div className="text-white text-2xl font-bold">Kraken</div>
@@ -17,7 +26,7 @@ export const Navbar = () => {
                 {
                     session.data?.user
                         ?
-                        <Profile><Button className='bg-white font-medium text-slate-500 px-2 hover:bg-slate-100' onClick={() => signOut()}>Logout</Button></Profile>
+                        <Profile><Button className='bg-white font-medium text-slate-500 px-2 hover:bg-slate-100' onClick={handleClick}>Logout</Button></Profile>
                         :
                         (
                             (pathName === "/")

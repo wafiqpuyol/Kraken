@@ -4,6 +4,7 @@ import "./globals.css";
 import { Toaster } from "@repo/ui/Toaster"
 import { Navbar } from "@repo/ui/Navbar"
 import { SessionProvider } from "@repo/ui/SessionProvider"
+import { disable2fa } from "../lib/auth"
 
 const geistSans = localFont({
   src: "./fonts/GeistVF.woff",
@@ -29,7 +30,7 @@ export default function RootLayout({
     <html lang="en">
       <body className={`${geistSans.variable} bg-[#f2f1f5] ${geistMono.variable}`}>
         <SessionProvider>
-          <Navbar />
+          <Navbar disable2fa={disable2fa} />
           {children}
           <Toaster />
         </SessionProvider>
