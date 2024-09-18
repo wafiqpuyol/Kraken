@@ -20,13 +20,17 @@ export const Navbar: React.FC<NavbarProps> = ({ disable2fa }) => {
         signOut()
     }
     return (
-        <nav className="bg-purple-600 p-4 flex justify-between items-center">
-            <div className="text-white text-2xl font-bold">Kraken</div>
-            <div className="flex space-x-4">
+        <nav className="bg-purple-600 px-8 py-6 flex justify-between items-center relative">
+            <Link href="/"><img className="w-32" src='./kraken.webp' alt="Kraken Logo" /></Link>
+            <div className="flex space-x-4 sticky">
                 {
                     session.data?.user
                         ?
-                        <Profile><Button className='bg-white font-medium text-slate-500 px-2 hover:bg-slate-100' onClick={handleClick}>Logout</Button></Profile>
+                        pathName.endsWith("/")
+                            ?
+                            <Button className="bg-white text-purple-600 px-4 py-2 rounded-lg hover:bg-zinc-200"><Link href="/dashboard/home">My Account</Link></Button>
+                            :
+                            <Profile><Button className='bg-white font-medium text-slate-500 px-2 hover:bg-slate-100' onClick={handleClick}>Logout</Button></Profile>
                         :
                         (
                             (pathName === "/")

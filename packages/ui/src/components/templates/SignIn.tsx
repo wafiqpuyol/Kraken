@@ -55,7 +55,7 @@ export const SignInForm: React.FC<LoginProps> = ({ isTwoFAEnabled, activate2fa }
         <div className="flex flex-col items-center justify-center min-h-screen bg-background p-4">
             <div className="flex flex-col bg-card rounded-lg shadow-lg p-6 max-w-md w-full">
                 {/* @ts-ignore */}
-                {!isTwoFormShow &&
+                {!isTwoFAFormShow &&
                     <>
                         < Form {...form}>
                             <form
