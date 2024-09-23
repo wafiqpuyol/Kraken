@@ -6,6 +6,10 @@ import { signUpPayload } from '@repo/forms/signupSchema'
 import { userFormSignup } from "@repo/forms/signup"
 import { useToast } from "../molecules/Toaster/use-toast"
 import { useRouter } from "next/navigation"
+import { CountrySelector } from 'react-international-phone';
+import { useState } from 'react'
+import { usePhoneInput } from 'react-international-phone';
+import 'react-international-phone/style.css';
 
 interface SignUpFormProps {
     signUpAction: (arg: signUpPayload) => Promise<{
@@ -18,6 +22,11 @@ export const SignUpForm: React.FC<SignUpFormProps> = ({ signUpAction }) => {
     const { toast } = useToast()
     const router = useRouter()
     const { handleSubmit, control, ...form } = userFormSignup()
+    const { country, setCountry } = usePhoneInput({
+        defaultCountry: 'us',
+        value: '+1 (234)',
+    })
+    const [countryCode, setCountryCode] = useState(`+${country.dialCode}`)
     const submit = async (payload: signUpPayload) => {
         try {
             const res = await signUpAction(payload)
@@ -59,35 +68,52 @@ export const SignUpForm: React.FC<SignUpFormProps> = ({ signUpAction }) => {
         }
 
     }
+
     return (
         <div className="flex flex-col items-center justify-center min-h-screen bg-background p-4">
-            <div className="flex flex-col bg-card rounded-lg shadow-lg p-6 max-w-md w-full">
+            <div className="w-[600px] bg-white rounded-lg shadow-lg p-6">
+                <div className='self-start mb-7'>
+                    <h1 className='font-medium text-3xl text-gray-800'>Create a personal account</h1>
+                </div>
                 {/* @ts-ignore */}
                 < Form {...form}>
                     <form
                         onSubmit={handleSubmit(submit)}
-                        className="max-w-[400px] space-y-8"
+                        className="w-full space-y-8"
                         autoComplete="false"
                     >
                         <FormField
                             control={control}
                             name="phone_number"
-                            render={({ field }) => (
-                                <FormItem>
-                                    <FormLabel>* Phone Number (required)</FormLabel>
-                                    <FormControl>
-                                        <Input type="text" {...field} />
-                                    </FormControl>
-                                    <FormMessage className='text-red-500' />
-                                </FormItem>
-                            )}
+                            render={({ field }) => {
+                                return (
+                                    <FormItem>
+                                        <FormLabel className='text-gray-600'>Phone Number</FormLabel>
+                                        <FormControl>
+                                            <div className='flex gap-1 items-center'>
+                                                <CountrySelector flagStyle={{ width: "35px", height: "35px" }} selectedCountry={country.iso2} onSelect={(e) => {
+                                                    setCountry(e.iso2);
+                                                    field.onChange(() => `+${e.dialCode}`)
+                                                    setCountryCode(e.dialCode || "")
+                                                }} />
+                                                <Input type="text" {...field} defaultValue={countryCode} value={field.value} onChange={(e) => {
+                                                    setCountryCode(field.value)
+                                                    field.onChange(e.target.value)
+                                                }} />
+                                            </div>
+                                        </FormControl>
+                                        <FormMessage className='text-red-500' />
+                                    </FormItem>
+                                )
+                            }
+                            }
                         />
                         <FormField
                             control={control}
                             name="name"
                             render={({ field }) => (
                                 <FormItem className='space-y-0'>
-                                    <FormLabel>* Name (required)</FormLabel>
+                                    <FormLabel className='text-gray-600'>Name </FormLabel>
                                     <FormControl>
                                         <Input type="text" placeholder="e.g. John Smith" {...field} />
                                     </FormControl>
@@ -100,7 +126,7 @@ export const SignUpForm: React.FC<SignUpFormProps> = ({ signUpAction }) => {
                             name="email"
                             render={({ field }) => (
                                 <FormItem>
-                                    <FormLabel>* Email (required)</FormLabel>
+                                    <FormLabel>Email </FormLabel>
                                     <FormControl>
                                         <Input
                                             type="email"
@@ -117,7 +143,7 @@ export const SignUpForm: React.FC<SignUpFormProps> = ({ signUpAction }) => {
                             name="password"
                             render={({ field }) => (
                                 <FormItem>
-                                    <FormLabel>* Password (required)</FormLabel>
+                                    <FormLabel className='text-gray-600'>Password </FormLabel>
                                     <FormControl>
                                         <Input type="password" placeholder="e.g. ********" {...field} />
                                     </FormControl>
@@ -134,4 +160,8 @@ export const SignUpForm: React.FC<SignUpFormProps> = ({ signUpAction }) => {
 
         </div>
     )
+}
+
+const A = () => {
+    <div></div>
 }
