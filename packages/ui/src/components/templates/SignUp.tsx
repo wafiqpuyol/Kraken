@@ -12,7 +12,7 @@ import { usePhoneInput } from 'react-international-phone';
 import 'react-international-phone/style.css';
 
 interface SignUpFormProps {
-    signUpAction: (arg: signUpPayload) => Promise<{
+    signUpAction: (arg: signUpPayload, countryName: string) => Promise<{
         message: string;
         status: number;
     }>
@@ -29,7 +29,7 @@ export const SignUpForm: React.FC<SignUpFormProps> = ({ signUpAction }) => {
     const [countryCode, setCountryCode] = useState(`+${country.dialCode}`)
     const submit = async (payload: signUpPayload) => {
         try {
-            const res = await signUpAction(payload)
+            const res = await signUpAction(payload, country.name)
             switch (res.status) {
                 case 201:
                     toast({

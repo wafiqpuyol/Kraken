@@ -13,7 +13,7 @@ import { resetPasswordPayload } from "@repo/forms/resetPasswordSchema"
 import { PasswordMatchSchema } from "@repo/forms/changePasswordSchema"
 
 
-export const signUpAction = async (payload: signUpPayload): Promise<{ message: string, status: number }> => {
+export const signUpAction = async (payload: signUpPayload, countryName: string): Promise<{ message: string, status: number }> => {
     try {
         const isUser = await prisma.user.findUnique({ where: { email: payload.email } })
         if (isUser) {
@@ -29,6 +29,7 @@ export const signUpAction = async (payload: signUpPayload): Promise<{ message: s
                     password: payload.password,
                     email: payload.email,
                     name: payload.name,
+                    country: countryName
                 }
             });
             await prisma.balance.create({

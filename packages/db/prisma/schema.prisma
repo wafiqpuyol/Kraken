@@ -54,16 +54,17 @@ model user {
   name                                     String?
   number                                   String              @unique(map: "User_number_key")
   password                                 String
-  twoFactorSecret                          String?
   twoFactorActivated                       Boolean             @default(false)
+  twoFactorSecret                          String?
+  country                                  String?
   balance                                  balance?
   onramptransaction                        onramptransaction[]
   p2ptransfer_p2ptransfer_fromUserIdTouser p2ptransfer[]       @relation("p2ptransfer_fromUserIdTouser")
   p2ptransfer_p2ptransfer_toUserIdTouser   p2ptransfer[]       @relation("p2ptransfer_toUserIdTouser")
-  resetPassword                            resetPassword[]
+  resetpassword                            resetpassword[]
 }
 
-model resetPassword {
+model resetpassword {
   id          Int      @id @default(autoincrement())
   userId      Int
   token       String
