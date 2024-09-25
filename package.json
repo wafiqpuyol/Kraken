@@ -7,7 +7,8 @@
     "lint": "turbo lint",
     "format": "prettier --write \"**/*.{ts,tsx,md}\"",
     "postinstall": "prisma generate",
-    "migrate": "npx prisma migrate dev"
+    "db:migrate": "npx prisma migrate dev",
+    "db:seed": "npx prisma db seed"
   },
   "devDependencies": {
     "prettier": "^3.2.5",
