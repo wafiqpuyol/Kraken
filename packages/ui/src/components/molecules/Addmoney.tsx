@@ -10,9 +10,10 @@ import { Button } from '../atoms/Button'
 import { Form, FormField, FormItem, FormLabel, FormControl, FormMessage } from '../molecules/Form'
 import { addMoneyPayload } from "@repo/forms/addMoneySchema"
 import { userFormAddMoney } from "@repo/forms/addMoney"
-import { Balance as UserBalance } from "@repo/db/type"
+import { balance as UserBalance } from "@repo/db/type"
 import { useToast } from "@repo/ui/useToast"
 import axios from 'axios';
+import { useLocale, useTranslations } from 'next-intl';
 
 
 interface AddMoneyProps {
@@ -28,6 +29,8 @@ interface IInputError {
 }
 
 export const AddMoney: React.FC<AddMoneyProps> = ({ addMoneyAction, userBalance }) => {
+    const locale = useLocale()
+    const t = useTranslations("AddMoney")
     const { toast } = useToast()
     const router = useRouter()
     const session = useSession()
@@ -37,7 +40,7 @@ export const AddMoney: React.FC<AddMoneyProps> = ({ addMoneyAction, userBalance 
     const submit = async (payload: addMoneyPayload) => {
         try {
             if (session.status === "unauthenticated" || session.data === null || !session.data.user) {
-                return router.push("/login");
+                return router.push(`/${locale}/login`);
             }
 
             if (payload.phone_number !== session.data.user.number) {
@@ -51,7 +54,7 @@ export const AddMoney: React.FC<AddMoneyProps> = ({ addMoneyAction, userBalance 
                     title: res.message,
                     variant: "destructive",
                 })
-                return router.push("/login");
+                return router.push(`/${locale}/login`);
             }
             router.push(`${process.env.NEXT_PUBLIC_BANK_FRONTEND_URL}?token=${token.data.token}`)
 
@@ -65,7 +68,7 @@ export const AddMoney: React.FC<AddMoneyProps> = ({ addMoneyAction, userBalance 
 
         <div className="flex items-center">
             <div className="bg-white dark:bg-card-foreground text-card-foreground dark:text-card p-6 rounded-lg shadow-lg w-[700px]">
-                <h2 className="text-xl font-medium mb-4">Deposit</h2>
+                <h2 className="text-xl font-medium mb-4">{t("title")}</h2>
 
                 {/* @ts-ignore */}
                 < Form {...form}>
@@ -79,7 +82,7 @@ export const AddMoney: React.FC<AddMoneyProps> = ({ addMoneyAction, userBalance 
                             name="amount"
                             render={({ field }) => (
                                 <FormItem>
-                                    <FormLabel>Enter Amount</FormLabel>
+                                    <FormLabel>{t("enter_amount")}</FormLabel>
                                     <FormControl>
                                         <Input type="number" {...field} />
                                     </FormControl>
@@ -92,7 +95,7 @@ export const AddMoney: React.FC<AddMoneyProps> = ({ addMoneyAction, userBalance 
                             name="phone_number"
                             render={({ field }) => (
                                 <FormItem className='space-y-0'>
-                                    <FormLabel> Enter Your Phone Number</FormLabel>
+                                    <FormLabel> {t("phone_number")}</FormLabel>
                                     <FormControl>
                                         <Input type="text" {...field} />
                                     </FormControl>
@@ -106,16 +109,16 @@ export const AddMoney: React.FC<AddMoneyProps> = ({ addMoneyAction, userBalance 
                             control={control} name="bankURL"
                             render={({ field }) => (
                                 <FormItem>
-                                    <FormLabel className='pl-2'>Bank</FormLabel>
+                                    <FormLabel className='pl-2'>{t("bank")}</FormLabel>
                                     <Select value={field.value} onValueChange={field.onChange}>
                                         <FormControl className="mt-7">
                                             <SelectTrigger >
-                                                <SelectValue placeholder="Please choose a bank" />
+                                                <SelectValue placeholder={t("select_bank_placeholder")} />
                                             </SelectTrigger>
                                         </FormControl>
                                         <SelectContent className="bg-white">
                                             {
-                                                BANK.map((item, idx) => <SelectItem key={idx} value={item.url}>{item.name}</SelectItem>)
+                                                BANK.map((item, idx) => <SelectItem key={idx} value={item.url}>{t(`${item.name}.name`)}</SelectItem>)
                                             }
                                         </SelectContent>
                                     </Select>
@@ -127,7 +130,7 @@ export const AddMoney: React.FC<AddMoneyProps> = ({ addMoneyAction, userBalance 
                         <Button type="submit"
                             className={cn("text-white", formState.isSubmitting ? "bg-gray-500" : "bg-black hover:bg-black/80")} disabled={formState.isSubmitting}
                         >
-                            Add Money
+                            {t("addMoney_button")}
                         </Button>
                     </form>
                 </ Form>

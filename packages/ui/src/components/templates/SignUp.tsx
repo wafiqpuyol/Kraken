@@ -10,6 +10,8 @@ import { CountrySelector } from 'react-international-phone';
 import { useState } from 'react'
 import { usePhoneInput } from 'react-international-phone';
 import 'react-international-phone/style.css';
+import { useTranslations } from 'next-intl';
+import { useLocale } from 'next-intl';
 
 interface SignUpFormProps {
     signUpAction: (arg: signUpPayload, countryName: string) => Promise<{
@@ -22,11 +24,14 @@ export const SignUpForm: React.FC<SignUpFormProps> = ({ signUpAction }) => {
     const { toast } = useToast()
     const router = useRouter()
     const { handleSubmit, control, ...form } = userFormSignup()
+    const locale = useLocale();
     const { country, setCountry } = usePhoneInput({
         defaultCountry: 'us',
         value: '+1 (234)',
     })
     const [countryCode, setCountryCode] = useState(`+${country.dialCode}`)
+    const t = useTranslations("SignUpForm")
+
     const submit = async (payload: signUpPayload) => {
         try {
             const res = await signUpAction(payload, country.name)
@@ -36,7 +41,7 @@ export const SignUpForm: React.FC<SignUpFormProps> = ({ signUpAction }) => {
                         title: res.message,
                         variant: "default"
                     })
-                    router.push("/login");
+                    router.push(`/${locale}/login`);
                     break;
 
                 case 409:
@@ -73,7 +78,7 @@ export const SignUpForm: React.FC<SignUpFormProps> = ({ signUpAction }) => {
         <div className="flex flex-col items-center justify-center min-h-screen bg-background p-4">
             <div className="w-[600px] bg-white rounded-lg shadow-lg p-6">
                 <div className='self-start mb-7'>
-                    <h1 className='font-medium text-3xl text-gray-800'>Create a personal account</h1>
+                    <h1 className='font-medium text-3xl text-gray-800'>{t("title")}</h1>
                 </div>
                 {/* @ts-ignore */}
                 < Form {...form}>
@@ -88,7 +93,7 @@ export const SignUpForm: React.FC<SignUpFormProps> = ({ signUpAction }) => {
                             render={({ field }) => {
                                 return (
                                     <FormItem>
-                                        <FormLabel className='text-gray-600'>Phone Number</FormLabel>
+                                        <FormLabel className='text-gray-600'>{t("phone_number")}</FormLabel>
                                         <FormControl>
                                             <div className='flex gap-1 items-center'>
                                                 <CountrySelector flagStyle={{ width: "35px", height: "35px" }} selectedCountry={country.iso2} onSelect={(e) => {
@@ -113,7 +118,7 @@ export const SignUpForm: React.FC<SignUpFormProps> = ({ signUpAction }) => {
                             name="name"
                             render={({ field }) => (
                                 <FormItem className='space-y-0'>
-                                    <FormLabel className='text-gray-600'>Name </FormLabel>
+                                    <FormLabel className='text-gray-600'>{t("name")}</FormLabel>
                                     <FormControl>
                                         <Input type="text" placeholder="e.g. John Smith" {...field} />
                                     </FormControl>
@@ -126,7 +131,7 @@ export const SignUpForm: React.FC<SignUpFormProps> = ({ signUpAction }) => {
                             name="email"
                             render={({ field }) => (
                                 <FormItem>
-                                    <FormLabel>Email </FormLabel>
+                                    <FormLabel>{t("email")}</FormLabel>
                                     <FormControl>
                                         <Input
                                             type="email"
@@ -143,7 +148,7 @@ export const SignUpForm: React.FC<SignUpFormProps> = ({ signUpAction }) => {
                             name="password"
                             render={({ field }) => (
                                 <FormItem>
-                                    <FormLabel className='text-gray-600'>Password </FormLabel>
+                                    <FormLabel className='text-gray-600'>{t("password")}</FormLabel>
                                     <FormControl>
                                         <Input type="password" placeholder="e.g. ********" {...field} />
                                     </FormControl>
@@ -152,7 +157,7 @@ export const SignUpForm: React.FC<SignUpFormProps> = ({ signUpAction }) => {
                             )}
                         />
 
-                        <Button type="submit" className="bg-[#7132F5] w-full text-white text-lg">Create Account</Button>
+                        <Button type="submit" className="bg-[#7132F5] w-full text-white text-lg">{t("create_button")}</Button>
                     </form>
                 </ Form>
 
@@ -160,8 +165,4 @@ export const SignUpForm: React.FC<SignUpFormProps> = ({ signUpAction }) => {
 
         </div>
     )
-}
-
-const A = () => {
-    <div></div>
 }

@@ -10,6 +10,7 @@ import { Form, FormField, FormItem, FormLabel, FormControl, FormMessage } from '
 import { useSession } from "next-auth/react"
 import { useRouter } from "next/navigation"
 import { useToast } from "../molecules/Toaster/use-toast"
+import { useLocale, useTranslations } from 'next-intl';
 
 
 interface SendMoneyProps {
@@ -25,6 +26,8 @@ interface SendMoneyProps {
 }
 
 export const SendMoneyPage: React.FC<SendMoneyProps> = ({ sendMoneyAction }) => {
+    const t = useTranslations("SendMoneyPage")
+    const locale = useLocale()
     const { handleSubmit, control, formState, ...form } = userFormSendMoney()
     const router = useRouter()
     const session = useSession()
@@ -33,7 +36,7 @@ export const SendMoneyPage: React.FC<SendMoneyProps> = ({ sendMoneyAction }) => 
     const submit = async (payload: sendMoneyPayload) => {
         try {
             if (!session.data?.user) {
-                router.push("/login")
+                router.push(`/${locale}/login`)
             }
             const res = await sendMoneyAction(payload)
 
@@ -91,8 +94,8 @@ export const SendMoneyPage: React.FC<SendMoneyProps> = ({ sendMoneyAction }) => 
         <div className="min-h-screen flex items-start justify-center p-4 w-full mt-20">
             <Card className="w-full max-w-md bg-white">
                 <CardHeader>
-                    <CardTitle>Send Money</CardTitle>
-                    <CardDescription className='text-slate-500'>Transfer funds to another user securely.</CardDescription>
+                    <CardTitle>{t("title")}</CardTitle>
+                    <CardDescription className='text-slate-500'>{t("desc")}</CardDescription>
                 </CardHeader>
                 <CardContent>
                     {/* @ts-ignore */}
@@ -104,7 +107,7 @@ export const SendMoneyPage: React.FC<SendMoneyProps> = ({ sendMoneyAction }) => 
                                 name="phone_number"
                                 render={({ field }) => (
                                     <FormItem>
-                                        <FormLabel>Recipient's Number</FormLabel>
+                                        <FormLabel>{t("recipient_number")}</FormLabel>
                                         <FormControl>
                                             <Input type="tel" {...field} />
                                         </FormControl>
@@ -118,7 +121,7 @@ export const SendMoneyPage: React.FC<SendMoneyProps> = ({ sendMoneyAction }) => 
                                 name="amount"
                                 render={({ field }) => (
                                     <FormItem>
-                                        <FormLabel>Amount</FormLabel>
+                                        <FormLabel>{t("amount")}</FormLabel>
                                         <FormControl>
                                             <Input type="number" {...field} />
                                         </FormControl>
@@ -128,7 +131,7 @@ export const SendMoneyPage: React.FC<SendMoneyProps> = ({ sendMoneyAction }) => 
                             />
 
                             <Button type="submit" className="w-full mt-6 bg-black text-white" disabled={formState.isSubmitting}>
-                                {formState.isSubmitting ? 'Sending...' : 'Send Money'}
+                                {formState.isSubmitting ? t("sending") : t('send_money')}
                                 <ArrowRight className="ml-2 h-4 w-4" />
                             </Button>
                         </form>
