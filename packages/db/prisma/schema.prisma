@@ -57,10 +57,12 @@ model user {
   twoFactorActivated                       Boolean             @default(false)
   twoFactorSecret                          String?
   country                                  String?
+  otpVerified                              Boolean             @default(false)
   balance                                  balance?
   onramptransaction                        onramptransaction[]
   p2ptransfer_p2ptransfer_fromUserIdTouser p2ptransfer[]       @relation("p2ptransfer_fromUserIdTouser")
   p2ptransfer_p2ptransfer_toUserIdTouser   p2ptransfer[]       @relation("p2ptransfer_toUserIdTouser")
+  preference                               preference?
   resetpassword                            resetpassword[]
 }
 
@@ -72,6 +74,17 @@ model resetpassword {
   user        user     @relation(fields: [userId], references: [id], map: "ResetPassword_userId_fkey")
 
   @@index([userId], map: "ResetPassword_userId_fkey")
+}
+
+model preference {
+  id       Int    @id @default(autoincrement())
+  userId   Int    @unique(map: "Preference_userId_key")
+  language String @default("U.S. English")
+  currency String @default("USD")
+  timezone String @default("[-04:00 EDT] New York, N. America")
+  user     user   @relation(fields: [userId], references: [id], map: "Preference_userId_fkey")
+
+  @@index([userId], map: "Preference_userId_fkey")
 }
 
 enum onramptransaction_status {
