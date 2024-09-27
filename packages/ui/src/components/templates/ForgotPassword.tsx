@@ -5,7 +5,7 @@ import { Form, FormField, FormItem, FormLabel, FormControl, FormMessage } from '
 import { forgotPasswordPayload } from '@repo/forms/forgotPasswordSchema'
 import { useFormForgotPassword } from "@repo/forms/forgotPassword"
 import { useToast } from "../molecules/Toaster/use-toast"
-import { useRouter } from "next/navigation"
+import { useTranslations } from "next-intl"
 
 
 interface forgotPasswordProps {
@@ -17,6 +17,7 @@ interface forgotPasswordProps {
 export const ForgotPasswordForm: React.FC<forgotPasswordProps> = ({ forgotPasswordAction }) => {
     const { toast } = useToast()
     const { handleSubmit, control, ...form } = useFormForgotPassword()
+    const t = useTranslations("ForgotPasswordForm");
     const submit = async (payload: forgotPasswordPayload) => {
         try {
             const res = await forgotPasswordAction(payload)
@@ -62,8 +63,8 @@ export const ForgotPasswordForm: React.FC<forgotPasswordProps> = ({ forgotPasswo
 
         <div className="flex flex-col items-center justify-center min-h-screen bg-background p-4">
             <div className="bg-white flex flex-col bg-card rounded-lg shadow-lg p-6 max-w-md w-full">
-                <h1 className='text-2xl font-medium'>Forgot password</h1>
-                <p className='text-slate-500 text-sm font-normal mt-3 mb-4'>Enter your email address. If it’s correct, we’ll send you an email with password reset instructions.</p>
+                <h1 className='text-2xl font-medium'>{t("title")}</h1>
+                <p className='text-slate-500 text-sm font-normal mt-3 mb-4'>{t("desc")}</p>
                 {/* @ts-ignore */}
                 < Form {...form}>
                     <form
@@ -76,15 +77,15 @@ export const ForgotPasswordForm: React.FC<forgotPasswordProps> = ({ forgotPasswo
                             name="email"
                             render={({ field }) => (
                                 <FormItem>
-                                    <FormLabel>Email</FormLabel>
+                                    <FormLabel>{t("email")}</FormLabel>
                                     <FormControl>
                                         <Input type="text" {...field} />
                                     </FormControl>
-                                    <FormMessage />
+                                    <FormMessage className='text-red-500' />
                                 </FormItem>
                             )}
                         />
-                        <Button type="submit" className="bg-[#7132F5] w-full text-white text-lg">Send Email</Button>
+                        <Button type="submit" className="bg-[#7132F5] w-full text-white text-lg">{t("send_button")}</Button>
                     </form>
                 </ Form>
             </div>

@@ -6,6 +6,7 @@ import { resetPasswordPayload } from '@repo/forms/resetPasswordSchema'
 import { userFormResetPassword } from "@repo/forms/resetPassword"
 import { useToast } from "../molecules/Toaster/use-toast"
 import { useRouter } from "next/navigation"
+import { useLocale, useTranslations } from "next-intl"
 
 
 interface resetPasswordProps {
@@ -19,6 +20,8 @@ export const ResetPasswordForm: React.FC<resetPasswordProps> = ({ resetPasswordA
     const router = useRouter()
     const { toast } = useToast()
     const { handleSubmit, control, ...form } = userFormResetPassword()
+    const locale = useLocale()
+    const t = useTranslations("ResetPasswordForm")
     console.log(resetPasswordToken);
     const submit = async (payload: resetPasswordPayload) => {
         try {
@@ -29,7 +32,7 @@ export const ResetPasswordForm: React.FC<resetPasswordProps> = ({ resetPasswordA
                         title: `${res.message}`,
                         variant: "default"
                     })
-                    router.push("/dashboard/home");
+                    router.push(`${locale}/dashboard/home`);
                     break;
                 case 400:
                     toast({
@@ -66,8 +69,8 @@ export const ResetPasswordForm: React.FC<resetPasswordProps> = ({ resetPasswordA
 
         <div className="flex flex-col items-center justify-center min-h-screen bg-background p-4">
             <div className="bg-white flex flex-col bg-card rounded-lg shadow-lg p-6 max-w-md w-full">
-                <h1 className='text-2xl font-medium'>Forgot password</h1>
-                <p className='text-slate-500 text-sm font-normal mt-3 mb-4'>Enter your email address. If it’s correct, we’ll send you an email with password reset instructions.</p>
+                <h1 className='text-2xl font-medium'>{t("title")}</h1>
+                <p className='text-slate-500 text-sm font-normal mt-3 mb-4'>{t("desc")}</p>
                 {/* @ts-ignore */}
                 < Form {...form}>
                     <form
@@ -80,9 +83,9 @@ export const ResetPasswordForm: React.FC<resetPasswordProps> = ({ resetPasswordA
                             name="newPassword"
                             render={({ field }) => (
                                 <FormItem>
-                                    <FormLabel>New Password</FormLabel>
+                                    <FormLabel>{t("new_password")}</FormLabel>
                                     <FormControl>
-                                        <Input type="password" {...field} />
+                                        <Input type="password" {...field} placeholder={t("password_placeholder_text")} />
                                     </FormControl>
                                     <FormMessage className='text-red-500' />
                                 </FormItem>
@@ -93,15 +96,15 @@ export const ResetPasswordForm: React.FC<resetPasswordProps> = ({ resetPasswordA
                             name="ConfirmPassword"
                             render={({ field }) => (
                                 <FormItem>
-                                    <FormLabel>Confirm Password</FormLabel>
+                                    <FormLabel>{t("confirm_new_password")}</FormLabel>
                                     <FormControl>
-                                        <Input type="password" {...field} />
+                                        <Input type="password" {...field} placeholder={t("password_placeholder_text")} />
                                     </FormControl>
                                     <FormMessage className='text-red-500' />
                                 </FormItem>
                             )}
                         />
-                        <Button type="submit" className="bg-[#7132F5] w-full text-white text-lg">Send Email</Button>
+                        <Button type="submit" className="bg-[#7132F5] w-full text-white text-lg">{t("save_button")}</Button>
                     </form>
                 </ Form>
             </div>
