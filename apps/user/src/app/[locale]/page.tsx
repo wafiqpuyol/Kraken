@@ -1,35 +1,27 @@
-import { getServerSession } from "next-auth"
-import { authOptions } from "@repo/network"
-import { redirect } from "next/navigation"
-import { assets } from "../lib/constants"
-import Link from "next/link"
+import { assets } from "../../lib/constants"
+import { useTranslations } from 'next-intl';
 
-
-export default async function Home() {
-  const session = await getServerSession(authOptions);
-  if (session?.user?.uid) {
-    redirect("/dashboard/transfer/deposit")
-  }
+export default function Home() {
+  const t = useTranslations("Home")
   return (
     <main className="w-full bg-[#EEECFB]">
       <section className="flex justify-center items-center py-16">
         <div className="md:w-1/2 mb-8 md:mb-0">
-          <h1 className="text-6xl md:text-6xl font-semibold text-gray-900 mb-8">Invest in your future</h1>
-          <p className="text-[29px] text-gray-900 mb-8">Grow your portfolio in a fair and open
-            <br />
-            financial system.
+          <h1 className="text-6xl md:text-6xl font-semibold text-gray-900 mb-8">{t("title")}</h1>
+          <p className="text-[29px] text-gray-900 mb-8">{t.rich("desc", {
+            br: () => <br />
+          })}
           </p>
           <div className="flex items-center space-x-4">
             <div className="flex items-center space-x-2">
               <img src={assets.QR} alt="QR Code" className="w-12 h-12" />
-              <span className="text-gray-600">Get the Kraken app</span>
+              <span className="text-gray-600">{t("qr_text")}</span>
             </div>
           </div>
         </div>
         <div className="flex self-end items-center flex-col">
           <div className="relative mb-2.5">
-            <video autoPlay loop playsInline className="w-[278px] h-[579px]" src="https://assets-cms.kraken.com/files/51n36hrp/facade/514d4a19b477dec279e57a3188b49aec83c92c17.mp4">
-              <source src="https://assets-cms.kraken.com/files/51n36hrp/facade/514d4a19b477dec279e57a3188b49aec83c92c17.mp4" type="video/mp4" />
+            <video className="w-[278px] h-[579px]" src="https://assets-cms.kraken.com/files/51n36hrp/facade/514d4a19b477dec279e57a3188b49aec83c92c17.mp4" autoPlay loop playsInline muted  >
             </video>
           </div>
         </div>
@@ -39,20 +31,20 @@ export default async function Home() {
       <section className="py-16">
         <div className="container mx-auto px-4">
           <h2 className="text-3xl font-normal text-center mb-8">
-            Accelerating the global adoption of crypto since 2011
+            {t("state_section_title")}
           </h2>
           <div className="flex flex-wrap justify-center gap-64">
             <div className="text-center">
-              <p className="text-5xl font-medium mb-3">10M+</p>
-              <p className="text-gray-900 font-medium">Clients</p>
+              <p className="text-5xl font-medium mb-3">{t("client_number")}</p>
+              <p className="text-gray-900 font-medium">{t("client_text")}</p>
             </div>
             <div className="text-center">
-              <p className="text-5xl font-medium mb-3">190+</p>
-              <p className="text-gray-900 font-medium">Countries supported</p>
+              <p className="text-5xl font-medium mb-3">{t("country_number")}</p>
+              <p className="text-gray-900 font-medium">{t("country_text")}</p>
             </div>
             <div className="text-center">
-              <p className="text-5xl font-medium mb-3">$207B+</p>
-              <p className="text-gray-900 font-medium">Quarterly trading volume</p>
+              <p className="text-5xl font-medium mb-3">{t("trade_volume_number")}</p>
+              <p className="text-gray-900 font-medium">{t("trade_volume_text")}</p>
             </div>
           </div>
         </div>
@@ -66,91 +58,95 @@ export default async function Home() {
               <img src="./stats.webp" alt="Kraken platform" className="w-full h-auto rounded-lg shadow-lg" />
             </div>
             <div className="md:w-1/2 md:pl-8">
-              <h3 className="text-xl text-gray-600 mb-2">Crypto platform</h3>
-              <h2 className="text-4xl font-medium mb-6">Buy crypto in minutes</h2>
+              <h3 className="text-xl text-gray-600 mb-2">{t("crypto_section_header")}</h3>
+              <h2 className="text-4xl font-medium mb-6">{t("crypto_section_title")}</h2>
               <ol className="space-y-4 mb-8">
                 <li className="flex items-center">
-                  <span className="border-2 border-purple-600 text-purple-600 text-xl rounded-full w-9 h-9 flex items-center justify-center mr-4">1</span>
-                  <span className="text-xl text-gray-800">Create your free Kraken account</span>
+                  <span className="border-2 border-purple-600 text-purple-600 text-xl rounded-full w-9 h-9 flex items-center justify-center mr-4">{t("crypto_buy_instruction_1_number")}</span>
+                  <span className="text-xl text-gray-800">{t("crypto_buy_instruction_1_text")}</span>
                 </li>
                 <li className="flex items-center">
-                  <span className="border-2 border-purple-600 text-purple-600 text-xl rounded-full w-9 h-9 flex items-center justify-center mr-4">2</span>
-                  <span className="text-xl text-gray-800">Connect your funding method</span>
+                  <span className="border-2 border-purple-600 text-purple-600 text-xl rounded-full w-9 h-9 flex items-center justify-center mr-4">{t("crypto_buy_instruction_2_number")}</span>
+                  <span className="text-xl text-gray-800">{t("crypto_buy_instruction_2_text")}</span>
                 </li>
                 <li className="flex items-center">
-                  <span className="border-2 border-purple-600 text-purple-600 text-xl rounded-full w-9 h-9 flex items-center justify-center mr-4">3</span>
-                  <span className="text-xl text-gray-800">Buy and sell 200+ cryptocurrencies</span>
+                  <span className="border-2 border-purple-600 text-purple-600 text-xl rounded-full w-9 h-9 flex items-center justify-center mr-4">{t("crypto_buy_instruction_3_number")}</span>
+                  <span className="text-xl text-gray-800">{t("crypto_buy_instruction_3_text")}</span>
                 </li>
               </ol>
               <button className="bg-purple-600 text-white font-medium px-6 py-3 rounded-full hover:bg-purple-700">
-                Buy crypto
+                {t("crypto_buy_button")}
               </button>
             </div>
           </div>
         </div>
       </section>
 
+
       {/* Why Kraken */}
       <section className="bg-white py-16">
         <div className="container mx-auto px-4">
-          <h2 className="text-5xl font-medium text-center mb-12">Why Kraken?</h2>
+          <h2 className="text-5xl font-medium text-center mb-12">{t("whyKraken_section_title")}</h2>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             <Feature
               img={
                 <img src="./simplicity.webp" alt="Simplicity" className="w-44 h-44" />
               }
-              title="Simplicity"
+              title={t("whyKraken_section_simplicity_title")}
               description={
                 <>
-                  Kraken makes it easy to buy and trade crypto, from your desktop or via our{' '}
-                  <span className="text-purple-600">mobile apps</span>.
+                  {t("whyKraken_section_simplicity_desc")}
+                  <span className="text-purple-600">{t("whyKraken_section_simplicity_span")}</span>.
                 </>
               }
             />
             <Feature
               img={
-                <img src="./magnify.webp" alt="Simplicity" className="w-44 h-44" />
+                <img src="./magnify.webp" alt="Education" className="w-44 h-44" />
               }
-              title="Education"
+              title={t("whyKraken_section_education_title")}
               description={
                 <>
-                  Not sure where to start? Head to our{' '}
-                  <span className="text-purple-600">Learn Center</span> and learn about all things crypto.
+                  <span> {t("whyKraken_section_education_desc1")}</span>
+                  <span className="text-purple-600">{t("whyKraken_section_education_span")}</span>
+                  <span>{t("whyKraken_section_education_desc2")}</span>
                 </>
               }
             />
             <Feature
               img={
-                <img src="./service.webp" alt="Simplicity" className="w-44 h-44" />
+                <img src="./service.webp" alt="Service" className="w-44 h-44" />
               }
-              title="Service"
+              title={t("whyKraken_section_service_title")}
               description={
                 <>
-                  Find answers instantly in our{' '}
-                  <span className="text-purple-600">Support Center</span>. Or reach us 24/7/365 on live chat, phone or by email.
+                  <span>{t("whyKraken_section_service_desc1")}</span>
+                  <span className="text-purple-600">{t("whyKraken_section_service_span")}</span>.
+                  <span> {t("whyKraken_section_service_desc2")}</span>
                 </>
               }
             />
           </div>
           <div className="text-center mt-12">
             <button className="bg-purple-600 text-white px-6 py-3 rounded-full hover:bg-purple-700 transition duration-300 font-medium">
-              Get started with Kraken
+              {t("whyKraken_section_button")}
             </button>
           </div>
         </div>
       </section>
 
-      {/* Footer */}
 
+      {/* Footer */}
       <footer className="bg-purple-600 text-white py-16">
         <div className="container mx-auto px-4">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-8 mb-10">
+
             {/* Logo and Account Section */}
             <div className="lg:col-span-2">
               <FooterLogo className="w-28 mb-4" />
-              <p className="mb-4 text-xl text-purple-200 font-medium">Take your crypto trading to the next level.</p>
+              <p className="mb-4 text-xl text-purple-200 font-medium">{t("account_section_title")}</p>
               <button className="bg-white text-purple-600 px-6 py-2 rounded-full hover:bg-purple-100 transition duration-300 mb-6 font-medium">
-                My account
+                {t("account_section_button")}
               </button>
               <div className="flex space-x-4">
                 <div>
@@ -166,34 +162,13 @@ export default async function Home() {
             </div>
 
             {/* Features Column */}
-            <div>
-              <h3 className="font-bold mb-4 text-2xl text-purple-200">Features</h3>
-              <ul className="space-y-2">
-                {["NFT Marketplace", "Margin Trading", "Futures Trading", "OTC Trading", "Institutions", "API Trading", "Staking Rewards", "All features"].map((item) => (
-                  <li key={item}><a href="#" className="hover:underline">{item}</a></li>
-                ))}
-              </ul>
-            </div>
+            <FooterFeature translate={t} />
 
             {/* Browse Prices Column */}
-            <div>
-              <h3 className="font-bold mb-4 text-2xl text-purple-200">Browse Prices</h3>
-              <ul className="space-y-2">
-                {["Bitcoin Price", "Ethereum Price", "Dogecoin Price", "XRP Price", "Cardano Price", "Solana Price", "Litecoin Price", "All crypto prices"].map((item) => (
-                  <li key={item}><a href="#" className="hover:underline">{item}</a></li>
-                ))}
-              </ul>
-            </div>
+            <BrowsePrice translate={t} />
 
             {/* Buying Guides Column */}
-            <div>
-              <h3 className="font-bold mb-4 text-2xl text-purple-200">Buying Guides</h3>
-              <ul className="space-y-2">
-                {["Buy Bitcoin", "Buy Ethereum", "Buy Dogecoin", "Buy XRP", "Buy Cardano", "Buy Solana", "Buy Litecoin", "All crypto guides"].map((item) => (
-                  <li key={item}><a href="#" className="hover:underline">{item}</a></li>
-                ))}
-              </ul>
-            </div>
+            <BuyingGuide translate={t} />
           </div>
 
 
@@ -202,25 +177,12 @@ export default async function Home() {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-8">
             {/* Company and Popular Markets Columns */}
             <div className="lg:col-span-2"></div>
-            <div>
-              <h3 className="font-bold mb-4 text-2xl text-purple-200">Company</h3>
-              <ul className="space-y-2 mb-8">
-                {["Kraken Security", "Kraken Careers", "Kraken Blog", "Kraken Labs", "Press Room", "Affiliate Program", "Asset Listings", "Kraken Status", "Support Center"].map((item) => (
-                  <li key={item}><a href="#" className="hover:underline">{item}</a></li>
-                ))}
-              </ul>
-            </div>
+            {/* Company */}
+            <Company translate={t} />
             {/* Popular Markets */}
+            <PopularMarket translate={t} />
             <div>
-              <h3 className="font-bold mb-4 text-2xl text-purple-200">Popular Markets</h3>
-              <ul className="space-y-2">
-                {["BTC to USD", "ETH to USD", "DOGE to USD", "XRP to USD", "ADA to USD", "SOL to USD", "LTC to USD", "All crypto markets"].map((item) => (
-                  <li key={item}><a href="#" className="hover:underline">{item}</a></li>
-                ))}
-              </ul>
-            </div>
-            <div>
-              <h3 className="font-bold mb-4 text-2xl text-purple-200">Community</h3>
+              <h3 className="font-bold mb-4 text-2xl text-purple-200">{t("community_title")}</h3>
               <div className="flex space-x-4">
                 <Instagram />
                 <Facebook />
@@ -234,31 +196,23 @@ export default async function Home() {
           </div>
 
 
-
-
-
-
           {/* ------------------------------------------------------------------------------------ */}
           {/* Legal Links */}
           <div className="mt-12 pt-8 border-t border-purple-500">
             <div className="flex flex-wrap justify-between items-center">
-              <p className="text-sm">&copy; 2011 - 2024 Payward, Inc.</p>
+              <p className="text-sm">&copy; {t("date")}</p>
               <div className="flex space-x-4 text-sm">
-                <a href="#" className="hover:underline">Privacy Notice</a>
-                <a href="#" className="hover:underline">Terms of Service</a>
-                <a href="#" className="hover:underline">Cookie Settings</a>
-                <a href="#" className="hover:underline">Disclosures</a>
+                <a href="#" className="hover:underline">{t("privacy_notice")}</a>
+                <a href="#" className="hover:underline">{t("terms_of_service")}</a>
+                <a href="#" className="hover:underline">{t("cookie_settings")}</a>
+                <a href="#" className="hover:underline">{t("disclosures")}</a>
               </div>
             </div>
           </div>
 
           {/* Disclaimer */}
           <p className="mt-8 text-xs opacity-80">
-            These materials are for general information purposes only and are not investment advice or a recommendation or solicitation to buy, sell, stake or hold any cryptoasset or to
-            engage in any specific trading strategy. Kraken does not and will not work to increase or decrease the price of any particular cryptoasset it makes available. Some crypto
-            products and markets are unregulated, and you may not be protected by government compensation and/or regulatory protection schemes. The unpredictable nature of the
-            cryptoasset markets can lead to loss of funds. Tax may be payable on any return and/or on any increase in the value of your cryptoassets and you should seek independent
-            advice on your taxation position. Geographic restrictions may apply.
+            {t("footer_text")}
           </p>
         </div>
       </footer>
@@ -286,6 +240,63 @@ const FooterLogo = ({ className }: { className?: string }) => {
     <img className={className} src='./footer-logo.svg' loading='lazy' alt="Kraken Logo" />
   )
 }
+
+const FooterFeature = ({ translate }: { translate: any }) => (
+  <div>
+    <h3 className="font-bold mb-4 text-2xl text-purple-200">{translate("FooterFeature.title")}</h3>
+    <ul className="space-y-2">
+      {["NFT Marketplace", "Margin Trading", "Futures Trading", "OTC Trading", "Institutions", "API Trading", "Staking Rewards", "All features"].map((item) => (
+        <li key={item}><a href="#" className="hover:underline">{translate(`FooterFeature.${item}.title`)}</a></li>
+      ))}
+    </ul>
+  </div>
+)
+
+const BrowsePrice = ({ translate }: { translate: any }) => (
+  <div>
+    <h3 className="font-bold mb-4 text-2xl text-purple-200">{translate("BrowsePrice.title")}</h3>
+    <ul className="space-y-2">
+      {["Bitcoin Price", "Ethereum Price", "Dogecoin Price", "XRP Price", "Cardano Price", "Solana Price", "Litecoin Price", "All crypto prices"].map((item) => (
+        <li key={item}><a href="#" className="hover:underline">{translate(`BrowsePrice.${item}.title`)}</a></li>
+      ))}
+    </ul>
+  </div>
+)
+
+const BuyingGuide = ({ translate }: { translate: any }) => (
+  <div>
+    <h3 className="font-bold mb-4 text-2xl text-purple-200">{translate("BuyingGuide.title")}</h3>
+    <ul className="space-y-2">
+      {["Buy Bitcoin", "Buy Ethereum", "Buy Dogecoin", "Buy XRP", "Buy Cardano", "Buy Solana", "Buy Litecoin", "All crypto guides"].map((item) => (
+        <li key={item}><a href="#" className="hover:underline">{translate(`BuyingGuide.${item}.title`)}</a></li>
+      ))}
+    </ul>
+  </div>
+)
+
+const Company = ({ translate }: { translate: any }) => (
+  <div>
+    <h3 className="font-bold mb-4 text-2xl text-purple-200">{translate("Company.title")}</h3>
+    <ul className="space-y-2 mb-8">
+      {["Kraken Security", "Kraken Careers", "Kraken Blog", "Kraken Labs", "Affiliate Program", "Asset Listings", "Kraken Status", "Support Center"].map((item) => (
+        <li key={item}><a href="#" className="hover:underline">{translate(`Company.${item}.title`)}</a></li>
+      ))}
+    </ul>
+  </div>
+)
+
+const PopularMarket = ({ translate }: { translate: any }) => (
+  <div>
+    <h3 className="font-bold mb-4 text-2xl text-purple-200">{translate("PopularMarket.title")}</h3>
+    <ul className="space-y-2">
+      {["BTC to USD", "ETH to USD", "DOGE to USD", "XRP to USD", "ADA to USD", "SOL to USD", "LTC to USD", "All crypto markets"].map((item) => (
+        <li key={item}><a href="#" className="hover:underline">{translate(`PopularMarket.${item}.title`)}</a></li>
+      ))}
+    </ul>
+  </div>
+)
+
+
 
 
 const Instagram = () => (

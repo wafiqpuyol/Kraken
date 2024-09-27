@@ -5,7 +5,10 @@ const PasswordSchema = {
 }
 
 export const PasswordMatchSchema = z.object({
-    newPassword: z.string().min(1, { message: "New Password is required" }),
+    newPassword: z.string()
+        .describe("Password")
+        .min(6, { message: "Password must be atleast 6 characters" })
+        .max(14, { message: "Password must be within 14 characters" }),
     ConfirmPassword: z.string()
 }).superRefine(({ newPassword, ConfirmPassword }, ctx) => {
     if (newPassword !== ConfirmPassword) {
