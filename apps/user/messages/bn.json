@@ -1,0 +1,387 @@
+{
+  "Home": {
+    "title": "আপনার ভবিষ্যতে বিনিয়োগ করুন",
+    "desc": "একটি ন্যায্য এবং উন্মুক্ত <br></br> আর্থিক ব্যবস্থায় আপনার পোর্টফোলিও বাড়ান।",
+    "qr_text": "ক্রাকেন অ্যাপ পান",
+    "state_section_title": "২০১১ সাল থেকে বিশ্বব্যাপী ক্রিপ্টো গ্রহণকে ত্বরান্বিত করা",
+    "client_text": "ক্লায়েন্ট",
+    "client_number": "১০ মিলিয়ন +",
+    "country_text": "সমর্থিত দেশগুলো ",
+    "country_number": "১৯০+",
+    "trade_volume_number": "২০৭ বিলিয়ন+",
+    "trade_volume_text": "ত্রৈমাসিক ট্রেডিং ভলিউম",
+    "crypto_section_header": "ক্রিপ্টো প্ল্যাটফর্ম",
+    "crypto_section_title": "মিনিটের মধ্যে ক্রিপ্টো কিনুন",
+    "crypto_buy_instruction_1_number": "১",
+    "crypto_buy_instruction_1_text": "আপনার বিনামূল্যে ক্রাকেন অ্যাকাউন্ট তৈরি করুন",
+    "crypto_buy_instruction_2_number": "২",
+    "crypto_buy_instruction_2_text": "আপনার তহবিল পদ্ধতি সংযুক্ত করুন",
+    "crypto_buy_instruction_3_number": "৩",
+    "crypto_buy_instruction_3_text": "২০০+ ক্রিপ্টোকারেন্সি কিনুন এবং বিক্রি করুন",
+    "crypto_buy_button": "ক্রিপ্টো কিনুন",
+    "whyKraken_section_title": "কেন ক্রাকেন?",
+    "whyKraken_section_simplicity_title": "সরলতা",
+    "whyKraken_section_simplicity_desc": "ক্র্যাকেন আপনার ডেস্কটপ থেকে বা আমাদের মোবাইল অ্যাপের মাধ্যমে ক্রিপ্টো কেনা এবং বাণিজ্য করা সহজ করে তোলে।",
+    "whyKraken_section_simplicity_span": "মোবাইল অ্যাপস",
+    "whyKraken_section_education_title": "শিক্ষা",
+    "whyKraken_section_education_desc1": "কোথায় শুরু করবেন তা নিশ্চিত নন? আমাদের মাথা",
+    "whyKraken_section_education_span": "কেন্দ্র শিখুন",
+    "whyKraken_section_education_desc2": "এবং সমস্ত কিছু ক্রিপ্টো সম্পর্কে জানুন।",
+    "whyKraken_section_service_title": "সেবা",
+    "whyKraken_section_service_desc1": "আমাদের মধ্যে অবিলম্বে উত্তর খুঁজুন",
+    "whyKraken_section_service_span": "সাপোর্ট সেন্টার",
+    "whyKraken_section_service_desc2": "অথবা আমাদের সাথে 24/7/365 লাইভ চ্যাট, ফোন বা ইমেলের মাধ্যমে যোগাযোগ করুন।",
+    "whyKraken_section_button": "ক্রাকেন দিয়ে শুরু করুন",
+    "account_section_title": "আপনার ক্রিপ্টো ট্রেডিংকে পরবর্তী স্তরে নিয়ে যান।",
+    "account_section_button": "আমার অ্যাকাউন্ট",
+    "PopularMarket": {
+      "title": "জনপ্রিয় মার্কেট",
+      "BTC to USD": {
+        "title": "বিটিসি থেকে ইউএসডি"
+      },
+      "ETH to USD": {
+        "title": "ইথ থেকে ইউএসডি"
+      },
+      "DOGE to USD": {
+        "title": "ডজ থেকে ইউএসডি"
+      },
+      "XRP to USD": {
+        "title": "এক্সরপি থেকে ইউএসডি"
+      },
+      "ADA to USD": {
+        "title": "এডিএ থেকে ইউএসডি"
+      },
+      "SOL to USD": {
+        "title": "সোল থেকে ইউএসডি"
+      },
+      "LTC to USD": {
+        "title": "এলটিসি থেকে ইউএসডি"
+      },
+      "All crypto markets": {
+        "title": "সমস্ত ক্রিপ্টো বাজার"
+      }
+    },
+    "Company": {
+      "title": "কোম্পানি",
+      "Kraken Security": {
+        "title": "ক্রাকেন সিকিউরিটি"
+      },
+      "Kraken Careers": {
+        "title": "ক্রাকেন কেরিয়ার"
+      },
+      "Kraken Blog": {
+        "title": "ক্রাকেন ব্লগ"
+      },
+      "Kraken Labs": {
+        "title": "ক্রাকেন ল্যাবস"
+      },
+      "Affiliate Program": {
+        "title": "অ্যাফিলিয়েট প্রোগ্রাম"
+      },
+      "Asset Listings": {
+        "title": "সম্পদ তালিকা"
+      },
+      "Kraken Status": {
+        "title": "ক্রাকেন স্ট্যাটাস"
+      },
+      "Support Center": {
+        "title": "সাপোর্ট সেন্টার"
+      }
+    },
+    "BuyingGuide": {
+      "title": " কেনার গাইড",
+      "Buy Bitcoin": {
+        "title": "বিটকয়েন কিনুন"
+      },
+      "Buy Ethereum": {
+        "title": "ইথিরিয়াম কিনুন"
+      },
+      "Buy Dogecoin": {
+        "title": "ডজকয়েন কিনুন"
+      },
+      "Buy XRP": {
+        "title": "এক্সরপি কিনুন"
+      },
+      "Buy Cardano": {
+        "title": "কার্ডানো কিনুন"
+      },
+      "Buy Solana": {
+        "title": "সোলানা কিনুন"
+      },
+      "Buy Litecoin": {
+        "title": "লাইটকয়েন কিনুন"
+      },
+      "All crypto guides": {
+        "title": "সমস্ত ক্রিপ্টো গাইড"
+      }
+    },
+    "FooterFeature": {
+      "title": "বৈশিষ্ট্য",
+      "NFT Marketplace": {
+        "title": "এনএফটি মার্কেটপ্লেস"
+      },
+      "Margin Trading": {
+        "title": "মার্জিন ট্রেডিং"
+      },
+      "Futures Trading": {
+        "title": "ফিউচার ট্রেডিং"
+      },
+      "OTC Trading": {
+        "title": "ওটিসি ট্রেডিং"
+      },
+      "Institutions": {
+        "title": "প্রতিষ্ঠান"
+      },
+      "Buy Litecoin": {
+        "title": "লাইটকয়েন কিনুন"
+      },
+      "API Trading": {
+        "title": "এপিআই ট্রেডিং"
+      },
+      "Staking Rewards": {
+        "title": "স্টকিং পুরস্কার"
+      },
+      "All features": {
+        "title": "Aসমস্ত বৈশিষ্ট্য"
+      }
+    },
+    "BrowsePrice": {
+      "title": "মূল্য ব্রাউজ করুন",
+      "Bitcoin Price": {
+        "title": "বিটকয়েন মূল্য"
+      },
+      "Ethereum Price": {
+        "title": "ইথিরিয়াম মূল্য"
+      },
+      "Dogecoin Price": {
+        "title": "ডজকয়েন মূল্য"
+      },
+      "XRP Price": {
+        "title": "এক্সরপি মূল্য"
+      },
+      "Cardano Price": {
+        "title": "কার্ডানো মূল্য"
+      },
+      "Solana Price": {
+        "title": "সোলানা মূল্য"
+      },
+      "Litecoin Price": {
+        "title": "লাইটকয়েন মূল্য"
+      },
+      "All crypto prices": {
+        "title": "সমস্ত ক্রিপ্টো মূল্য"
+      }
+    },
+    "community_title": "সম্প্রদায়",
+    "date": "২০১১ - ২০২৪ পেওয়াড, ইনকৄ.",
+    "privacy_notice": "গোপনীয়তা বিজ্ঞপ্তি",
+    "terms_of_service": "পরিষেবার শর্তাবলী",
+    "cookie_settings": "কুকি সেটিংস",
+    "disclosures": "প্রকাশ",
+    "footer_text": "এই উপকরণগুলি শুধুমাত্র সাধারণ তথ্যের উদ্দেশ্যে এবং বিনিয়োগের পরামর্শ বা কোনো ক্রিপ্টোঅ্যাসেট কেনা, বিক্রি, অংশীদারিত্ব বা ধারণ করার জন্য বা কোনো নির্দিষ্ট ট্রেডিং কৌশলে জড়িত থাকার জন্য সুপারিশ বা অনুরোধ নয়। ক্র্যাকেন কোনো নির্দিষ্ট ক্রিপ্টোসেটের দাম বাড়াতে বা কমাতে কাজ করে না এবং করবে না। কিছু ক্রিপ্টো পণ্য এবং বাজার অনিয়ন্ত্রিত, এবং আপনি সরকারী ক্ষতিপূরণ এবং/অথবা নিয়ন্ত্রক সুরক্ষা প্রকল্প দ্বারা সুরক্ষিত নাও হতে পারেন। ক্রিপ্টোঅ্যাসেট বাজারের অপ্রত্যাশিত প্রকৃতি তহবিলের ক্ষতি হতে পারে। যেকোন রিটার্নে এবং/অথবা আপনার ক্রিপ্টোঅ্যাসেটের মূল্য বৃদ্ধিতে ট্যাক্স প্রদেয় হতে পারে এবং আপনার ট্যাক্সেশন পজিশন সম্পর্কে আপনার স্বাধীন পরামর্শ নেওয়া উচিত। ভৌগলিক সীমাবদ্ধতা প্রযোজ্য হতে পারে।"
+  },
+  "Navbar": {
+    "my_account": "আমার অ্যাকাউন্ট",
+    "logout": "লগআউট",
+    "login": "লগইন",
+    "signUp": "সাইন আপ"
+  },
+  "Profile": {
+    "my_account": "আমার অ্যাকাউন্ট",
+    "settings": "সেটিংস"
+  },
+  "SignUpForm": {
+    "title": "একটি ব্যক্তিগত অ্যাকাউন্ট তৈরি করুন",
+    "phone_number": "ফোন নম্বর",
+    "name": "নাম",
+    "email": "ইমেইল",
+    "password": "পাসওয়ার্ড",
+    "create_button": "অ্যাকাউন্ট তৈরি করুন"
+  },
+  "SignInForm": {
+    "title": "ক্র্যাকেনে সাইন ইন করুন",
+    "phone_number": "ফোন নম্বর",
+    "password": "পাসওয়ার্ড",
+    "continue_button": "চালিয়ে যান",
+    "forgot": "ভুলে গেছেন"
+  },
+  "TwoFAForm": {
+    "title": "প্রমাণীকরণকারী অ্যাপ",
+    "desc": "আপনার প্রমাণীকরণকারী অ্যাপ থেকে সাইন-ইন 2FA কোড লিখুন।",
+    "enter_title": "2FA অ্যাপ থেকে কোড লিখুন",
+    "continue_button": "চালিয়ে যান"
+  },
+  "SideBar": {
+    "home": "হোম",
+    "transfer": "স্থানান্তর",
+    "transactions": "লেনদেন",
+    "send_money": "টাকা পাঠান"
+  },
+  "AccountSettings": {
+    "title": "হিসাব",
+    "settings_tab": "সেটিংস",
+    "security_tab": "নিরাপত্তা"
+  },
+  "PersonalInfo": {
+    "title": "ব্যক্তিগত তথ্য",
+    "public_id": "পাবলিক আইডি",
+    "public_id_info": "আপনি যখন অন্য ব্যবহারকারীর কাছে অর্থ স্থানান্তর করতে চান তখন এই আইডিটি ব্যবহার করুন",
+    "legal_name": "আইনি নাম",
+    "email": "ইমেইল",
+    "country": "দেশ",
+    "edit": "পরিবর্তন করুন"
+  },
+  "Preferences": {
+    "title": "পছন্দসমূহ",
+    "language": "ভাষা",
+    "currency": "মুদ্রা",
+    "timezone": "সময় অঞ্চল",
+    "auto_log_out": "অটো লগ-আউট",
+    "edit": "পরিবর্তন করুন",
+    "USD": {
+      "name": "ইউসি"
+    },
+    "EUR": {
+      "name": "ইউরো"
+    },
+    "AUD": {
+      "name": "এইউডি"
+    },
+    "U.S. English": {
+      "name": "মার্কিন ইংরেজি"
+    },
+    "Hindi": {
+      "name": "হিন্দি"
+    },
+    "Bengali": {
+      "name": "বাংলা"
+    },
+    "Japanese": {
+      "name": "জাপানিজ"
+    },
+    "Espanol": {
+      "name": "এস্পানল"
+    },
+    "French": {
+      "name": "ফরাসি"
+    },
+    "Portuguese": {
+      "name": "পর্তুগিজ"
+    }
+  },
+  "SecurityTab": {
+    "signIn_title": "সাইন ইন করুন",
+    "signIn_with": "সাইন ইন করুন",
+    "email": "ইমেইল",
+    "password": "পাসওয়ার্ড",
+    "password_text": "অন্য কোথাও ব্যবহার করা হয় না এমন একটি অনন্য, শক্তিশালী পাসওয়ার্ড দিয়ে আপনার অ্যাকাউন্ট সুরক্ষিত করুন।",
+    "change": "বদল করুন",
+    "auto_sign_out": "অটো সাইন-আউট",
+    "auto_sign_out_title": "৪৮০ মিনিট (ডিফল্ট)",
+    "auto_sign_out_text": "স্বয়ংক্রিয় সাইন-আউটের আগে অ্যাকাউন্ট নিষ্ক্রিয়তার সময়।",
+    "twoFA_title": "সাইন-ইন টু-ফ্যাক্টর প্রমাণীকরণ (2FA)",
+    "passkeys": "পাসকি",
+    "passkeys_text": "FIDO2 অনুগত ডিভাইস বায়োমেট্রিক্স বা একটি হার্ডওয়্যার নিরাপত্তা কী ব্যবহার করে। 5টি পর্যন্ত পাসকি যোগ করুন যা আপনাকে ফিশিং আক্রমণ থেকে রক্ষা করে।",
+    "learn_more": "আরও জানুন",
+    "recommended": "প্রস্তাবিত",
+    "authenticator_app": "প্রমাণীকরণকারী অ্যাপ",
+    "authenticator_app_text": "গুগল প্রমাণীকরণকারী বা অথি-এর মতো অ্যাপ থেকে একটি এককালীন কোড ব্যবহার করে।",
+    "add_passkey": "পাসকি যোগ করুন",
+    "remove": "বাতিল করুন",
+    "edit": "পরিবর্তন করুন"
+  },
+  "SupportedLangDialog": {
+    "title": "ভাষা",
+    "save": "সংরক্ষণ করুন",
+    "saving": "সংরক্ষণ হচ্ছে",
+    "US English": {
+      "name": "মার্কিন ইংরেজি"
+    },
+    "Hindi": {
+      "name": "হিন্দি"
+    },
+    "Bengali": {
+      "name": "বাংলা"
+    },
+    "Japanese": {
+      "name": "জাপানিজ"
+    },
+    "Espanol": {
+      "name": "এস্পানল"
+    },
+    "French": {
+      "name": "ফরাসি"
+    },
+    "Portuguese": {
+      "name": "পর্তুগিজ"
+    }
+  },
+  "SupportedCurrencyDialog": {
+    "title": "Languages",
+    "save": "সংরক্ষণ করুন",
+    "saving": "সংরক্ষণ হচ্ছে",
+    "US Dollar": {
+      "title": "মার্কিন ডলার",
+      "name": "ইউসডি"
+    },
+    "Euro": {
+      "title": "ইউরো",
+      "name": "ইউরো"
+    },
+    "Australian Dollar": {
+      "title": "অস্ট্রেলিয়ান ডলার",
+      "name": "এইউডি"
+    }
+  },
+  "Transfer": {
+    "title": "হিসাব",
+    "deposit_tab": "আমানত",
+    "withdraw_tab": "উঠান"
+  },
+  "AddMoney": {
+    "title": "আমানত",
+    "enter_amount": "পরিমাণ লিখুন",
+    "phone_number": "আপনার ফোন নম্বর লিখুন",
+    "bank": "ব্যাংক",
+    "addMoney_button": "টাকা যোগ করুন",
+    "select_bank_placeholder": "একটি ব্যাঙ্ক নির্বাচন করুন",
+    "IFIC Bank": {
+      "name": "আইএফআইসি ব্যাংক"
+    },
+    "Jamuna Bank": {
+      "name": "যমুনা ব্যাংক"
+    }
+  },
+  "Balance": {
+    "title": "হিসাব",
+    "unlocked_balance": "আনলক করা ব্যালেন্স",
+    "total_locked_balance": "মোট লকড ব্যালেন্স",
+    "total_balance": "মোট ব্যালেন্স",
+    "USD": {
+      "name": "ইউসি"
+    },
+    "EUR": {
+      "name": "ইউরো"
+    },
+    "AUD": {
+      "name": "এইউডি"
+    }
+  },
+  "OnRampTransaction": {
+    "title": "সাম্প্রতিক লেনদেন",
+    "view_transaction_button": "লেনদেন দেখুন"
+  },
+  "Transaction": {
+    "title": "লেনদেন",
+    "history_tab": "হিস্ট্রি",
+    "scheduled_tab": "তালিকাভুক্ত"
+  },
+  "SendMoneyPage": {
+    "title": "টাকা পাঠান",
+    "desc": "নিরাপদে অন্য ব্যবহারকারীর কাছে তহবিল স্থানান্তর করুন।",
+    "recipient_number": "প্রাপকের নম্বর",
+    "amount": "পরিমাণ",
+    "sending": "পাঠানো হচ্ছে....",
+    "send_money": "টাকা পাঠান"
+  }
+}

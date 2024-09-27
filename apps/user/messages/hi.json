@@ -1,0 +1,392 @@
+{
+  "Home": {
+    "title": "भविष्य में निवेश करें",
+    "desc": "अपना पोर्टफोलियो बढ़ाएं<br></br> उचित और खुला वित्तीय प्रणाली में।",
+    "qr_text": "Kraken ऐप प्राप्त करें",
+    "state_section_title": "क्रिप्टो के वैश्विक अपनाने को तेज करना",
+    "client_text": "ग्राहक",
+    "client_number": "10M+",
+    "country_number": "190+",
+    "country_text": "देशों का समर्थन",
+    "trade_volume_number": "207B+",
+    "trade_volume_text": "त्रैमासिक व्यापार आयतन",
+    "crypto_section_header": "क्रिप्टो प्लेटफॉर्म",
+    "crypto_section_title": "कुछ ही मिनटों में क्रिप्टो खरीदें",
+    "crypto_buy_instruction_1_number": "1",
+    "crypto_buy_instruction_1_text": "अपना निःशुल्क Kraken खाता बनाएं",
+    "crypto_buy_instruction_2_number": "2",
+    "crypto_buy_instruction_2_text": "अपना फंडिंग विधि कनेक्ट करें",
+    "crypto_buy_instruction_3_number": "3",
+    "crypto_buy_instruction_3_text": "200+ क्रिप्टोकरेंसी खरीदें और बेचें",
+    "crypto_buy_button": "क्रिप्टो खरीदें",
+    "whyKraken_section_title": "क्यों Kraken?",
+    "whyKraken_section_simplicity_title": "सरलता",
+    "whyKraken_section_simplicity_desc": "Kraken आपके डेस्कटॉप या हमारे मोबाइल ऐप्स के माध्यम से क्रिप्टो खरीदना और बेचना आसान बनाता है।",
+    "whyKraken_section_simplicity_span": "मोबाइल ऐप्स",
+    "whyKraken_section_education_title": "शिक्षा",
+    "whyKraken_section_education_desc1": "पता नहीं कहाँ से शुरू करें? हमारे",
+    "whyKraken_section_education_span": "सीखें केंद्र",
+    "whyKraken_section_education_desc2": "जाएं और सभी चीजों के बारे में जानें क्रिप्टो।",
+    "whyKraken_section_service_title": "सेवा",
+    "whyKraken_section_service_desc1": "हमारे में तुरंत उत्तर खोजें",
+    "whyKraken_section_service_span": "सहायता केंद्र",
+    "whyKraken_section_service_desc2": "या हमसे 24/7/365 लाइव चैट, फोन या ईमेल पर संपर्क करें।",
+    "whyKraken_section_button": "Kraken के साथ शुरुआत करें",
+    "account_section_title": "अपने क्रिप्टो ट्रेडिंग को अगले स्तर तक ले जाएं।",
+    "account_section_button": "मेरा खाता",
+    "PopularMarket": {
+      "title": "लोकप्रिय बाजार",
+      "BTC to USD": {
+        "title": "BTC से USD"
+      },
+      "ETH to USD": {
+        "title": "ETH से USD"
+      },
+      "DOGE to USD": {
+        "title": "DOGE से USD"
+      },
+      "XRP to USD": {
+        "title": "XRP से USD"
+      },
+      "ADA to USD": {
+        "title": "ADA से USD"
+      },
+      "SOL to USD": {
+        "title": "SOL से USD"
+      },
+      "LTC to USD": {
+        "title": "LTC से USD"
+      },
+      "All crypto markets": {
+        "title": "सभी क्रिप्टो बाजार"
+      }
+    },
+    "Company": {
+      "title": "कंपनी",
+      "Kraken Security": {
+        "title": "Kraken सुरक्षा"
+      },
+      "Kraken Careers": {
+        "title": "Kraken करियर"
+      },
+      "Kraken Blog": {
+        "title": "Kraken ब्लॉग"
+      },
+      "Kraken Labs": {
+        "title": "Kraken लैब्स"
+      },
+      "Press Room": {
+        "title": "प्रेस रूम"
+      },
+      "Affiliate Program": {
+        "title": "सहबद्ध कार्यक्रम"
+      },
+      "Asset Listings": {
+        "title": "संपत्ति लिस्टिंग"
+      },
+      "Kraken Status": {
+        "title": "Kraken स्थिति"
+      },
+      "Support Center": {
+        "title": "सहायता केंद्र"
+      }
+    },
+    "BuyingGuide": {
+      "title": "खरीद गाइड",
+      "Buy Bitcoin": {
+        "title": "बिटकॉइन खरीदें"
+      },
+      "Buy Ethereum": {
+        "title": "एथेरियम खरीदें"
+      },
+      "Buy Dogecoin": {
+        "title": "डोज़कॉइन खरीदें"
+      },
+      "Buy XRP": {
+        "title": "XRP खरीदें"
+      },
+      "Buy Cardano": {
+        "title": "कार्डानो खरीदें"
+      },
+      "Buy Solana": {
+        "title": "सोलना खरीदें"
+      },
+      "Buy Litecoin": {
+        "title": "लाइटकॉइन खरीदें"
+      },
+      "All crypto guides": {
+        "title": "सभी क्रिप्टो गाइड"
+      }
+    },
+    "FooterFeature": {
+      "title": "विशेषताएं",
+      "NFT Marketplace": {
+        "title": "NFT मार्केटप्लेस"
+      },
+      "Margin Trading": {
+        "title": "मार्जिन ट्रेडिंग"
+      },
+      "Futures Trading": {
+        "title": "फ्यूचर्स ट्रेडिंग"
+      },
+      "OTC Trading": {
+        "title": "OTC ट्रेडिंग"
+      },
+      "Institutions": {
+        "title": "संस्थाएं"
+      },
+      "Buy Litecoin": {
+        "title": "लाइटकॉइन खरीदें"
+      },
+      "API Trading": {
+        "title": "API ट्रेडिंग"
+      },
+      "Staking Rewards": {
+        "title": "स्टेकिंग पुरस्कार"
+      },
+      "All features": {
+        "title": "सभी विशेषताएं"
+      }
+    },
+    "BrowsePrice": {
+      "title": "ब्राउज़ मूल्य",
+      "Bitcoin Price": {
+        "title": "बिटकॉइन मूल्य"
+      },
+      "Ethereum Price": {
+        "title": "एथेरियम मूल्य"
+      },
+      "Dogecoin Price": {
+        "title": "डोज़कॉइन मूल्य"
+      },
+      "XRP Price": {
+        "title": "XRP मूल्य"
+      },
+      "Cardano Price": {
+        "title": "कार्डानो मूल्य"
+      },
+      "Solana Price": {
+        "title": "सोलना मूल्य"
+      },
+      "Litecoin Price": {
+        "title": "लाइटकॉइन मूल्य"
+      },
+      "All crypto prices": {
+        "title": "सभी क्रिप्टो मूल्य"
+      }
+    },
+    "community_title": "समुदाय",
+    "date": "2011 - 2024 पावर्ड, इंक.",
+    "privacy_notice": "गोपनीयता सूचना",
+    "terms_of_service": "सेवा की शर्तें",
+    "cookie_settings": "कुकी सेटिंग्स",
+    "disclosures": "प्रकटीकरण",
+    "footer_text": "ये सामग्री केवल सामान्य सूचना के उद्देश्यों के लिए हैं और निवेश सलाह या किसी भी क्रिप्टोएसेट खरीदने, बेचने, स्टेक करने या रखने या किसी विशिष्ट ट्रेडिंग रणनीति में शामिल होने की सिफारिश या अनुरोध नहीं हैं। Kraken किसी भी विशेष क्रिप्टोएसेट की कीमत बढ़ाने या घटाने के लिए काम नहीं करता है जो वह उपलब्ध कराता है। कुछ क्रिप्टो उत्पाद और बाजार अनियमित हैं, और आप सरकारी मुआवजा और/या नियामक सुरक्षा योजनाओं द्वारा सुरक्षित नहीं हो सकते हैं"
+  },
+  "Navbar": {
+    "my_account": "मेरा खाता",
+    "logout": "लॉग आउट",
+    "login": "लॉगिन",
+    "signUp": "साइन अप"
+  },
+  "Profile": {
+    "my_account": "मेरा खाता",
+    "settings": "सेटिंग्स"
+  },
+  "SignUpForm": {
+    "title": "व्यक्तिगत खाता बनाएं",
+    "phone_number": "फ़ोन नंबर",
+    "name": "नाम",
+    "email": "ईमेल",
+    "password": "पासवर्ड",
+    "create_button": "खाता बनाएँ",
+    "forgot": "भूल गए"
+  },
+  "SignInForm": {
+    "title": "Kraken में साइन इन करें",
+    "phone_number": "फ़ोन नंबर",
+    "password": "पासवर्ड",
+    "continue_button": "जारी रखें",
+    "forgot": "भूल गए"
+  },
+  "TwoFAForm": {
+    "title": "प्रमाणीकरण ऐप",
+    "desc": "अपने प्रमाणीकरण ऐप से साइन-इन 2FA कोड दर्ज करें।",
+    "enter_title": "2FA ऐप से कोड दर्ज करें",
+    "continue_button": "जारी रखें"
+  },
+  "SideBar": {
+    "home": "होम",
+    "transfer": "स्थानांतरण",
+    "transactions": "लेनदेन",
+    "send_money": "पैसा भेजें"
+  },
+  "AccountSettings": {
+    "title": "खाता",
+    "settings_tab": "सेटिंग्स",
+    "security_tab": "सुरक्षा"
+  },
+  "PersonalInfo": {
+    "title": "व्यक्तिगत जानकारी",
+    "public_id": "सार्वजनिक आईडी",
+    "public_id_info": "जब आपको किसी अन्य उपयोगकर्ता को धन स्थानांतरित करने की आवश्यकता हो तो इस आईडी का उपयोग करें",
+    "legal_name": "कानूनी नाम",
+    "email": "ईमेल",
+    "country": "देश",
+    "edit": "संपादित करें"
+  },
+  "Preferences": {
+    "title": "वरीयताएँ",
+    "language": "भाषा",
+    "currency": "मुद्रा",
+    "timezone": "समय क्षेत्र",
+    "auto_log_out": "स्वतः लॉग आउट",
+    "edit": "संपादित करें",
+    "USD": {
+      "name": "USD"
+    },
+    "EUR": {
+      "name": "EUR"
+    },
+    "AUD": {
+      "name": "AUD"
+    },
+    "US English": {
+      "name": "U.S. अंग्रेज़ी"
+    },
+    "Hindi": {
+      "name": "हिंदी"
+    },
+    "Bengali": {
+      "name": "बंगाली"
+    },
+    "Japanese": {
+      "name": "जापानी"
+    },
+    "Espanol": {
+      "name": "स्पेनिश"
+    },
+    "French": {
+      "name": "फ्रेंच"
+    },
+    "Portuguese": {
+      "name": "पुर्तगाली"
+    }
+  },
+  "SecurityTab": {
+    "signIn_title": "साइन-इन",
+    "signIn_with": "साइन-इन के साथ",
+    "email": "ईमेल",
+    "password": "पासवर्ड",
+    "password_text": "अपने खाते को कहीं और उपयोग नहीं किए जाने वाले अद्वितीय, मजबूत पासवर्ड से सुरक्षित करें।",
+    "change": "बदलें",
+    "auto_sign_out": "स्वतः लॉग आउट",
+    "auto_sign_out_title": "480 मिनट (डिफ़ॉल्ट)",
+    "auto_sign_out_text": "स्वचालित साइन-आउट से पहले खाता निष्क्रियता का समय।",
+    "twoFA_title": "साइन-इन टू-फैक्टर ऑथेंटिकेशन (2FA)",
+    "passkeys": "पासकी",
+    "passkeys_text": "FIDO2 संगत डिवाइस बायोमेट्रिक्स या हार्डवेयर सुरक्षा कुंजी का उपयोग करता है। फिशिंग हमलों से आपकी रक्षा करने के लिए 5 तक पासकी जोड़ें।",
+    "learn_more": "अधिक जानें",
+    "recommended": "अनुशंसित",
+    "authenticator_app": "प्रमाणीकर्ता ऐप",
+    "authenticator_app_text": "Google Authenticator या Authy जैसे ऐप से एक बार का कोड का उपयोग करता है।",
+    "add_passkey": "पासकी जोड़ें",
+    "remove": "हटाएं",
+    "edit": "संपादित करें"
+  },
+  "SupportedLangDialog": {
+    "title": "भाषाएँ",
+    "save": "सहेजें",
+    "US English": {
+      "name": "U.S. अंग्रेज़ी"
+    },
+    "Hindi": {
+      "name": "हिंदी"
+    },
+    "Bengali": {
+      "name": "बंगाली"
+    },
+    "Japanese": {
+      "name": "जापानी"
+    },
+    "Espanol": {
+      "name": "स्पेनिश"
+    },
+    "French": {
+      "name": "फ्रेंच"
+    },
+    "Portuguese": {
+      "name": "पुर्तगाली"
+    }
+  },
+  "SupportedCurrencyDialog": {
+    "title": "भाषाएँ",
+    "save": "सहेजें",
+    "saving": "सहेज रहा है",
+    "US Dollar": {
+      "title": "अमेरिकी डॉलर",
+      "name": "USD"
+    },
+    "Euro": {
+      "title": "यूरो",
+      "name": "EUR"
+    },
+    "Australian Dollar": {
+      "title": "ऑस्ट्रेलियन डॉलर",
+      "name": "AUD"
+    }
+  },
+  "Transfer": {
+    "title": "स्थानांतरण",
+    "deposit_tab": "जमा",
+    "withdraw_tab": "निकालना"
+  },
+  "AddMoney": {
+    "title": "जमा",
+    "enter_amount": "राशि दर्ज करें",
+    "phone_number": "अपना फोन नंबर दर्ज करें",
+    "bank": "बैंक",
+    "addMoney_button": "पैसा जोड़ें",
+    "select_bank_placeholder": "कृपया कोई बैंक चुनें",
+    "IFIC Bank": {
+      "name": "IFIC बैंक"
+    },
+    "Jamuna Bank": {
+      "name": "जमुना बैंक"
+    }
+  },
+  "Balance": {
+    "title": "शेष",
+    "unlocked_balance": "अनलॉक किया गया बैलेंस",
+    "total_locked_balance": "कुल लॉक किया गया बैलेंस",
+    "total_balance": "कुल बैलेंस",
+    "addMoney_button": "पैसा जोड़ें",
+    "select_bank_placeholder": "कृपया कोई बैंक चुनें",
+    "USD": {
+      "name": "USD"
+    },
+    "EUR": {
+      "name": "EUR"
+    },
+    "AUD": {
+      "name": "AUD"
+    }
+  },
+  "OnRampTransaction": {
+    "title": "हाल का लेनदेन",
+    "view_transaction_button": "लेनदेन देखें"
+  },
+  "Transaction": {
+    "title": "लेन-देन",
+    "history_tab": "इतिहास",
+    "scheduled_tab": "अनुसूचित"
+  },
+  "SendMoneyPage": {
+    "title": "पैसा भेजें",
+    "desc": "किसी अन्य उपयोगकर्ता को सुरक्षित रूप से धन स्थानांतरित करें।",
+    "recipient_number": "प्राप्तकर्ता का नंबर",
+    "amount": "मात्रा",
+    "sending": "भेजना",
+    "send_money": "पैसा भेजें"
+  }
+}

@@ -1,0 +1,392 @@
+{
+  "Home": {
+    "title": "Invista no seu futuro",
+    "desc": "Cresça seu portfólio em um sistema <br></br> financeiro justo e aberto.",
+    "qr_text": "Obtenha o aplicativo Kraken",
+    "state_section_title": "Acelerando a adoção global de cripto desde 2011",
+    "client_text": "Clientes",
+    "client_number": "10M+",
+    "country_number": "190+",
+    "country_text": "Países suportados",
+    "trade_volume_number": "207B+",
+    "trade_volume_text": "Volume de negociação trimestral",
+    "crypto_section_header": "Plataforma criptográfica",
+    "crypto_section_title": "Compre cripto em minutos",
+    "crypto_buy_instruction_1_number": "1",
+    "crypto_buy_instruction_1_text": "Crie sua conta Kraken gratuita",
+    "crypto_buy_instruction_2_number": "2",
+    "crypto_buy_instruction_2_text": "Conecte seu método de financiamento",
+    "crypto_buy_instruction_3_number": "3",
+    "crypto_buy_instruction_3_text": "Compre e venda mais de 200 criptomoedas",
+    "crypto_buy_button": "Comprar cripto",
+    "whyKraken_section_title": "Por que Kraken?",
+    "whyKraken_section_simplicity_title": "Simplicidade",
+    "whyKraken_section_simplicity_desc": "Kraken torna fácil comprar e negociar cripto, a partir do seu desktop ou através de nossos aplicativos móveis.",
+    "whyKraken_section_simplicity_span": "aplicativos móveis",
+    "whyKraken_section_education_title": "Educação",
+    "whyKraken_section_education_desc1": "Não sabe por onde começar? Vá para nosso",
+    "whyKraken_section_education_span": "Centro de Aprendizagem",
+    "whyKraken_section_education_desc2": "e aprenda sobre todas as coisas criptográficas.",
+    "whyKraken_section_service_title": "Serviço",
+    "whyKraken_section_service_desc1": "Encontre respostas instantaneamente em nosso",
+    "whyKraken_section_service_span": "Centro de Suporte",
+    "whyKraken_section_service_desc2": "Ou entre em contato conosco 24/7/365 por chat ao vivo, telefone ou e-mail.",
+    "whyKraken_section_button": "Comece com Kraken",
+    "account_section_title": "Leve sua negociação de cripto para o próximo nível.",
+    "account_section_button": "Minha conta",
+    "PopularMarket": {
+      "title": "Mercados Populares",
+      "BTC to USD": {
+        "title": "BTC para USD"
+      },
+      "ETH to USD": {
+        "title": "ETH para USD"
+      },
+      "DOGE to USD": {
+        "title": "DOGE para USD"
+      },
+      "XRP to USD": {
+        "title": "XRP para USD"
+      },
+      "ADA to USD": {
+        "title": "ADA para USD"
+      },
+      "SOL to USD": {
+        "title": "SOL para USD"
+      },
+      "LTC to USD": {
+        "title": "LTC para USD"
+      },
+      "All crypto markets": {
+        "title": "Todos os mercados de criptomoedas"
+      }
+    },
+    "Company": {
+      "title": "Companhia",
+      "Kraken Security": {
+        "title": "Segurança Kraken"
+      },
+      "Kraken Careers": {
+        "title": "Carreiras Kraken"
+      },
+      "Kraken Blog": {
+        "title": "Blog Kraken"
+      },
+      "Kraken Labs": {
+        "title": "Laboratórios Kraken"
+      },
+      "Press Room": {
+        "title": "Sala de Imprensa"
+      },
+      "Affiliate Program": {
+        "title": "Programa de Afiliados"
+      },
+      "Asset Listings": {
+        "title": "Listagens de Ativos"
+      },
+      "Kraken Status": {
+        "title": "Status Kraken"
+      },
+      "Support Center": {
+        "title": "Centro de Suporte"
+      }
+    },
+    "BuyingGuide": {
+      "title": "Guias de Compra",
+      "Buy Bitcoin": {
+        "title": "Comprar Bitcoin"
+      },
+      "Buy Ethereum": {
+        "title": "Comprar Ethereum"
+      },
+      "Buy Dogecoin": {
+        "title": "Comprar Dogecoin"
+      },
+      "Buy XRP": {
+        "title": "Comprar XRP"
+      },
+      "Buy Cardano": {
+        "title": "Comprar Cardano"
+      },
+      "Buy Solana": {
+        "title": "Comprar Solana"
+      },
+      "Buy Litecoin": {
+        "title": "Comprar Litecoin"
+      },
+      "All crypto guides": {
+        "title": "Todos os guias de criptomoedas"
+      }
+    },
+    "FooterFeature": {
+      "title": "Características",
+      "NFT Marketplace": {
+        "title": "Mercado NFT"
+      },
+      "Margin Trading": {
+        "title": "Negociação a Margem"
+      },
+      "Futures Trading": {
+        "title": "Negociação de Futuros"
+      },
+      "OTC Trading": {
+        "title": "Negociação OTC"
+      },
+      "Institutions": {
+        "title": "Instituições"
+      },
+      "Buy Litecoin": {
+        "title": "Comprar Litecoin"
+      },
+      "API Trading": {
+        "title": "Negociação API"
+      },
+      "Staking Rewards": {
+        "title": "Recompensas de Staking"
+      },
+      "All features": {
+        "title": "Todas as características"
+      }
+    },
+    "BrowsePrice": {
+      "title": "Navegar por Preços",
+      "Bitcoin Price": {
+        "title": "Preço do Bitcoin"
+      },
+      "Ethereum Price": {
+        "title": "Preço do Ethereum"
+      },
+      "Dogecoin Price": {
+        "title": "Preço do Dogecoin"
+      },
+      "XRP Price": {
+        "title": "Preço do XRP"
+      },
+      "Cardano Price": {
+        "title": "Preço do Cardano"
+      },
+      "Solana Price": {
+        "title": "Preço do Solana"
+      },
+      "Litecoin Price": {
+        "title": "Preço do Litecoin"
+      },
+      "All crypto prices": {
+        "title": "Todos os preços de criptomoedas"
+      }
+    },
+    "community_title": "Comunidade",
+    "date": "2011 - 2024 Payward, Inc.",
+    "privacy_notice": "Aviso de Privacidade",
+    "terms_of_service": "Termos de Serviço",
+    "cookie_settings": "Configurações de Cookies",
+    "disclosures": "Divulgações",
+    "footer_text": "Estes materiais são apenas para fins de informação geral e não constituem aconselhamento de investimento ou uma recomendação ou solicitação para comprar, vender, apostar ou manter qualquer criptoativo ou participar em qualquer estratégia de negociação específica. A Kraken não trabalha e não trabalhará para aumentar ou diminuir o preço de qualquer criptoativo que disponibiliza. Alguns produtos e mercados criptográficos são não regulamentados e você pode não estar protegido por compensação governamental ou esquemas de proteção regulatória. A natureza imprevisível dos mercados de criptoativos pode levar à perda de fundos. O imposto pode ser devido sobre qualquer retorno e/ou sobre qualquer aumento no valor de seus criptoativos e você deve procurar aconselhamento independente sobre sua posição fiscal. Restrições geográficas podem se aplicar."
+  },
+  "Navbar": {
+    "my_account": "Minha conta",
+    "logout": "Sair",
+    "login": "Login",
+    "signUp": "Inscrever-se"
+  },
+  "Profile": {
+    "my_account": "Minha conta",
+    "settings": "Configurações"
+  },
+  "SignUpForm": {
+    "title": "Criar uma conta pessoal",
+    "phone_number": "Número de telefone",
+    "name": "Nome",
+    "email": "E-mail",
+    "password": "Senha",
+    "create_button": "Criar conta",
+    "forgot": "Esqueceu"
+  },
+  "SignInForm": {
+    "title": "Faça login no Kraken",
+    "phone_number": "Número de telefone",
+    "password": "Senha",
+    "continue_button": "Continuar",
+    "forgot": "Esqueceu"
+  },
+  "TwoFAForm": {
+    "title": "Aplicativo de autenticação",
+    "desc": "Insira o código de autenticação de dois fatores (2FA) de seu aplicativo de autenticação.",
+    "enter_title": "Insira o código do aplicativo 2FA",
+    "continue_button": "Continuar"
+  },
+  "SideBar": {
+    "home": "Início",
+    "transfer": "Transferência",
+    "transactions": "Transações",
+    "send_money": "Enviar dinheiro"
+  },
+  "AccountSettings": {
+    "title": "Conta",
+    "settings_tab": "Configurações",
+    "security_tab": "Segurança"
+  },
+  "PersonalInfo": {
+    "title": "Informações pessoais",
+    "public_id": "ID público",
+    "public_id_info": "Use este ID quando precisar transferir dinheiro para outro usuário",
+    "legal_name": "Nome legal",
+    "email": "E-mail",
+    "country": "País",
+    "edit": "Editar"
+  },
+  "Preferences": {
+    "title": "Preferências",
+    "language": "Idioma",
+    "currency": "Moeda",
+    "timezone": "Fuso horário",
+    "auto_log_out": "Sair automaticamente",
+    "edit": "Editar",
+    "USD": {
+      "name": "USD"
+    },
+    "EUR": {
+      "name": "EUR"
+    },
+    "AUD": {
+      "name": "AUD"
+    },
+    "US English": {
+      "name": "Inglês americano"
+    },
+    "Hindi": {
+      "name": "Hindi"
+    },
+    "Bengali": {
+      "name": "Bengali"
+    },
+    "Japanese": {
+      "name": "Japonês"
+    },
+    "Espanol": {
+      "name": "Espanhol"
+    },
+    "French": {
+      "name": "Francês"
+    },
+    "Portuguese": {
+      "name": "Português"
+    }
+  },
+  "SecurityTab": {
+    "signIn_title": "Entrar",
+    "signIn_with": "Entrar com",
+    "email": "E-mail",
+    "password": "Senha",
+    "password_text": "Proteja sua conta com uma senha única e forte não usada em outro lugar.",
+    "change": "Mudar",
+    "auto_sign_out": "Sair automaticamente",
+    "auto_sign_out_title": "480 minutos (padrão)",
+    "auto_sign_out_text": "Tempo de inatividade da conta antes do logout automático.",
+    "twoFA_title": "Autenticação de dois fatores (2FA) de login",
+    "passkeys": "Chaves de passagem",
+    "passkeys_text": "Utiliza biometria de dispositivo compatível com FIDO2 ou uma chave de segurança de hardware. Adicione até 5 chaves de passagem que o protejam de ataques de phishing.",
+    "learn_more": "Saiba mais",
+    "recommended": "Recomendado",
+    "authenticator_app": "Aplicativo de autenticação",
+    "authenticator_app_text": "Utiliza um código de uso único de um aplicativo como Google Authenticator ou Authy.",
+    "add_passkey": "Adicionar chave de passagem",
+    "remove": "Remover",
+    "edit": "Editar"
+  },
+  "SupportedLangDialog": {
+    "title": "Idiomas",
+    "save": "Salvar",
+    "US English": {
+      "name": "Inglês americano"
+    },
+    "Hindi": {
+      "name": "Hindi"
+    },
+    "Bengali": {
+      "name": "Bengali"
+    },
+    "Japanese": {
+      "name": "Japonês"
+    },
+    "Espanol": {
+      "name": "Espanhol"
+    },
+    "French": {
+      "name": "Francês"
+    },
+    "Portuguese": {
+      "name": "Português"
+    }
+  },
+  "SupportedCurrencyDialog": {
+    "title": "Idiomas",
+    "save": "Salvar",
+    "saving": "Salvando",
+    "US Dollar": {
+      "title": "Dólar americano",
+      "name": "USD"
+    },
+    "Euro": {
+      "title": "Euro",
+      "name": "EUR"
+    },
+    "Australian Dollar": {
+      "title": "Dólar australiano",
+      "name": "AUD"
+    }
+  },
+  "Transfer": {
+    "title": "Transferência",
+    "deposit_tab": "Depósito",
+    "withdraw_tab": "Saque"
+  },
+  "AddMoney": {
+    "title": "Depósito",
+    "enter_amount": "Insira o valor",
+    "phone_number": "Insira seu número de telefone",
+    "bank": "Banco",
+    "addMoney_button": "Adicionar dinheiro",
+    "select_bank_placeholder": "Por favor, escolha um banco",
+    "IFIC Bank": {
+      "name": "IFIC Bank"
+    },
+    "Jamuna Bank": {
+      "name": "Jamuna Bank"
+    }
+  },
+  "Balance": {
+    "title": "Saldos",
+    "unlocked_balance": "Saldo desbloqueado",
+    "total_locked_balance": "Saldo total bloqueado",
+    "total_balance": "Saldo total",
+    "addMoney_button": "Adicionar dinheiro",
+    "select_bank_placeholder": "Por favor, escolha um banco",
+    "USD": {
+      "name": "USD"
+    },
+    "EUR": {
+      "name": "EUR"
+    },
+    "AUD": {
+      "name": "AUD"
+    }
+  },
+  "OnRampTransaction": {
+    "title": "Transação recente",
+    "view_transaction_button": "Ver transação"
+  },
+  "Transaction": {
+    "title": "Transação",
+    "history_tab": "Histórico",
+    "scheduled_tab": "Agendado"
+  },
+  "SendMoneyPage": {
+    "title": "Enviar dinheiro",
+    "desc": "Transfira fundos para outro usuário com segurança.",
+    "recipient_number": "Número do destinatário",
+    "amount": "Montante",
+    "sending": "Enviando...",
+    "send_money": "Enviar dinheiro"
+  }
+}
