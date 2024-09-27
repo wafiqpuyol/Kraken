@@ -5,6 +5,7 @@ import { InputOTP, InputOTPGroup, InputOTPSeparator, InputOTPSlot } from "../ato
 import { Button } from "../atoms/Button"
 import { useToast } from "../molecules/Toaster/use-toast"
 import { useRouter } from "next/navigation"
+import { useTranslations, useLocale } from 'next-intl';
 
 interface TwoFAFormProps {
     activate2fa: (otp: string) => Promise<{
@@ -16,6 +17,8 @@ export const TwoFAForm: React.FC<TwoFAFormProps> = ({ activate2fa }) => {
     const [otp, setOtp] = useState("");
     const { toast } = useToast()
     const router = useRouter()
+    const t = useTranslations("TwoFAForm")
+    const local = useLocale()
 
     const handleOTPSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
@@ -27,7 +30,7 @@ export const TwoFAForm: React.FC<TwoFAFormProps> = ({ activate2fa }) => {
                         title: "OTP verified successfully",
                         variant: "default"
                     })
-                    router.push("/dashboard/home")
+                    router.push(`/${local}/dashboard/home`)
                     break;
                 case 400:
                     toast({
@@ -59,19 +62,19 @@ export const TwoFAForm: React.FC<TwoFAFormProps> = ({ activate2fa }) => {
     return (
         <div>
             <div>
-                <img src="./authenticator-app.light.png" alt="authenticator app" className="w-72 ml-11" />
+                <img src="../authenticator-app.light.png" alt="authenticator app" className="w-72 ml-11" />
             </div>
             <div className="flex flex-col items-center">
                 <form onSubmit={handleOTPSubmit} className="flex flex-col gap-2">
                     <div className="mb-5">
-                        <h1 className="self-start font-medium text-lg text-slate-900">Authenticator app</h1>
+                        <h1 className="self-start font-medium text-lg text-slate-900">{t("title")}</h1>
                         <p className="text-sm font-medium text-slate-500">
-                            Enter the Sign-in 2FA code from your authenticator app.
+                            {t("desc")}
                         </p>
 
                     </div>
                     <p className="text-sm font-medium text-slate-500">
-                        Enter code from 2FA app
+                        {t("enter_title")}
                     </p>
                     <InputOTP maxLength={6} value={otp} onChange={setOtp} className="border-purple-500">
                         <InputOTPGroup>
@@ -87,7 +90,7 @@ export const TwoFAForm: React.FC<TwoFAFormProps> = ({ activate2fa }) => {
                         </InputOTPGroup>
                     </InputOTP>
                     <Button disabled={otp.length !== 6} type="submit" className="bg-purple-500 text-white mt-2">
-                        Continue
+                        {t("continue_button")}
                     </Button>
                 </form>
             </div>

@@ -1,22 +1,25 @@
 "use client"
 
 import { CopyIcon, CheckIcon } from "lucide-react"
-import { Input } from "../atoms/Input"
 import { Button } from "../atoms/Button"
 import { Label } from "../atoms/Label"
-import { useSession } from "next-auth/react"
 import { useState } from "react"
 import { useToast } from "../molecules/Toaster/use-toast"
+import { user } from "@repo/db/type"
+import { useTranslations } from 'next-intl';
 
+interface PersonalInfoProps {
+    userDetails: user
+}
 
-export const PersonalInfo = () => {
+export const PersonalInfo: React.FC<PersonalInfoProps> = ({ userDetails }) => {
     const [isCopied, setIsCopied] = useState<boolean>(false)
     const { toast } = useToast()
-    const session = useSession()
-    const publicId = session.data?.user.uid
+    const t = useTranslations("PersonalInfo")
+    const publicId = userDetails.id
     const handleClick = async () => {
         try {
-            await navigator.clipboard.writeText(publicId)
+            await navigator.clipboard.writeText(publicId.toString())
             setIsCopied(true)
             toast({
                 title: "Copied!",
@@ -40,16 +43,18 @@ export const PersonalInfo = () => {
 
     return (
         <div className="bg-white p-6 rounded-lg shadow">
-            <h2 className="text-2xl font-semibold mb-4">Personal info</h2>
+            <h2 className="text-2xl font-semibold mb-4">{t("title")}</h2>
             <div className="space-y-4">
                 {/* Public ID */}
                 <div className="flex justify-between items-center">
                     <div className="flex space-x-[108px] w-full">
-                        <Label htmlFor="publicId" className="mt-2 text-slate-500 w-24">Public ID</Label>
+                        <Label htmlFor="publicId" className="mt-2 text-slate-500 w-24">{t("public_id")}</Label>
                         <div className="flex justify-between w-full">
                             <div>
-                                <Input id="publicId" value={publicId} readOnly className="mr-2" />
-                                <p className="text-sm text-gray-500">Use this ID when you need to transfer to another user so your account is always secure.</p>
+                                <div className="mr-2">
+                                    <p className="font-base">{publicId}</p>
+                                </div>
+                                <p className="text-sm text-gray-500">{t("public_id_info")}</p>
 
                             </div>
                             <Button size="icon" variant="outline" onClick={handleClick}>
@@ -67,29 +72,34 @@ export const PersonalInfo = () => {
 
                 {/* Legal name */}
                 <div className="flex justify-between items-center w-full">
-                    <div className="flex space-x-28">
-                        <Label htmlFor="legalName" className="mt-2 text-slate-500 w-36">Legal name</Label>
-                        <Input id="legalName" value={session.data?.user?.name} readOnly />
+                    <div className="flex space-x-11">
+                        <Label htmlFor="legalName" className="mt-2 text-slate-500 w-36">{t("legal_name")}</Label>
+                        <div>
+                            <p className="font-base">{userDetails.name}</p>
+                        </div>
                     </div>
-                    <Button variant="link" className="text-purple-600">Edit</Button>
+                    <Button variant="link" className="text-purple-600">{t("edit")}</Button>
                 </div>
 
                 {/* Email */}
                 <div className="flex justify-between items-center">
-                    <div className="flex space-x-28">
-                        <Label htmlFor="email" className="mt-2 text-slate-500 w-36">Email</Label>
-                        <Input id="email" value={session.data?.user?.email} readOnly />
+                    <div className="flex space-x-11">
+                        <Label htmlFor="email" className="mt-2 text-slate-500 w-36">{t("email")}</Label>
+                        <div>
+                            <p className="font-base">{userDetails.email}</p>
+                        </div>
                     </div>
-                    <Button variant="link" className="text-purple-600">Edit</Button>
+                    <Button variant="link" className="text-purple-600">{t("edit")}</Button>
                 </div>
 
                 {/* Country */}
                 <div className="flex justify-between items-center">
-                    <div className="flex space-x-28">
-                        <Label htmlFor="country" className="mt-2 text-slate-500 w-36">Country</Label>
-                        <Input id="country" value={session.data?.user.country || "Bangladesh"} readOnly />
+                    <div className="flex space-x-11">
+                        <Label htmlFor="country" className="mt-2 text-slate-500 w-36">{t("country")}</Label>
+                        <div>
+                            <p className="font-base">{userDetails.country}</p>
+                        </div>
                     </div>
-                    <Button variant="link" className="text-purple-600">Edit</Button>
                 </div>
             </div>
         </div>
