@@ -4,6 +4,8 @@ import { sendMoneyPayload, SendMoneySchema } from "@repo/forms/sendMoneySchema"
 import { authOptions } from "@repo/network"
 import { getServerSession } from "next-auth"
 import { prisma } from "@repo/db/client"
+import { p2ptransfer } from "@repo/db/type"
+import { generateTransactionId } from "./utils"
 
 export const sendMoneyAction = async (payload: sendMoneyPayload) => {
     try {
@@ -30,13 +32,12 @@ export const sendMoneyAction = async (payload: sendMoneyPayload) => {
         if (!isRecipientExist) {
             return { message: "Recipient not found", status: 404 }
         }
-
         if (isUserExist.number === isRecipientExist.number) {
             return { message: "Cannot send money to yourself. Invalid recipient number", status: 401 }
         }
 
         await prisma.$transaction(async (tx) => {
-            await tx.$queryRaw`SELECT * FROM "Balance" WHERE "userId" = ${isUserExist.id} FOR UPDATE`;
+            await tx.$queryRaw`SELECT * FROM Balance WHERE userId=${isUserExist.id} FOR UPDATE`;
 
             const senderBalance = await prisma.balance.findFirst({ where: { userId: isUserExist.id } })
             if (!senderBalance) {
@@ -70,12 +71,16 @@ export const sendMoneyAction = async (payload: sendMoneyPayload) => {
                     }
                 }
             })
+            const { currency } = (await prisma.preference.findFirst({ where: { userId: isUserExist.id } }))!
             await prisma.p2ptransfer.create({
                 data: {
                     amount: parseInt(payload.amount),
                     timestamp: new Date(),
+                    transactionType: "Send",
+                    transactionID: generateTransactionId(),
                     fromUserId: isUserExist.id,
-                    toUserId: isRecipientExist.id
+                    toUserId: isRecipientExist.id,
+                    currency
                 }
             })
         })
@@ -83,5 +88,41 @@ export const sendMoneyAction = async (payload: sendMoneyPayload) => {
     } catch (error: any) {
         console.log(error);
         return { message: error.message || "Sending money failed. Something went wrong", status: 500 }
+    }
+}
+
+export const getAllP2PTransactionHistories = async (): Promise<p2ptransfer[] | []> => {
+    try {
+        const session = await getServerSession(authOptions)
+        if (!session?.user?.uid) {
+            return []
+        }
+        const isUserExist = await prisma.user.findFirst({ where: { id: session.user.uid } })
+        if (!isUserExist) {
+            return []
+        }
+        const p2pTransactionHistories = await prisma.p2ptransfer.findMany({
+            where: {
+                OR: [{ fromUserId: isUserExist.id }, { toUserId: isUserExist.id }],
+            },
+            include: {
+                user_p2ptransfer_fromUserIdTouser: {
+                    select: {
+                        name: true
+                    }
+                },
+                user_p2ptransfer_toUserIdTouser: {
+                    select: {
+                        name: true
+                    }
+                }
+            },
+            orderBy: { timestamp: "desc" }
+        })
+        console.log(p2pTransactionHistories);
+        return p2pTransactionHistories
+    } catch (error) {
+        console.log("getAllP2PTransactions =========>", error);
+        return []
     }
 }
