@@ -8,11 +8,12 @@ datasource db {
 }
 
 model balance {
-  id     Int  @id @default(autoincrement())
-  userId Int  @unique(map: "Balance_userId_key")
-  amount Int
-  locked Int
-  user   user @relation(fields: [userId], references: [id], map: "Balance_userId_fkey")
+  id       Int    @id @default(autoincrement())
+  userId   Int    @unique(map: "Balance_userId_key")
+  amount   Int
+  locked   Int
+  currency String
+  user     user   @relation(fields: [userId], references: [id], map: "Balance_userId_fkey")
 }
 
 model merchant {
@@ -36,13 +37,16 @@ model onramptransaction {
 }
 
 model p2ptransfer {
-  id                                Int      @id @default(autoincrement())
+  id                                Int              @id @default(autoincrement())
+  transactionID                     String
+  currency                          String
   amount                            Int
   timestamp                         DateTime
   fromUserId                        Int
   toUserId                          Int
-  user_p2ptransfer_fromUserIdTouser user     @relation("p2ptransfer_fromUserIdTouser", fields: [fromUserId], references: [id], map: "P2pTransfer_fromUserId_fkey")
-  user_p2ptransfer_toUserIdTouser   user     @relation("p2ptransfer_toUserIdTouser", fields: [toUserId], references: [id], map: "P2pTransfer_toUserId_fkey")
+  transactionType                   transaction_type
+  user_p2ptransfer_fromUserIdTouser user             @relation("p2ptransfer_fromUserIdTouser", fields: [fromUserId], references: [id], map: "P2pTransfer_fromUserId_fkey")
+  user_p2ptransfer_toUserIdTouser   user             @relation("p2ptransfer_toUserIdTouser", fields: [toUserId], references: [id], map: "P2pTransfer_toUserId_fkey")
 
   @@index([fromUserId], map: "P2pTransfer_fromUserId_fkey")
   @@index([toUserId], map: "P2pTransfer_toUserId_fkey")
@@ -96,4 +100,9 @@ enum onramptransaction_status {
 enum merchant_auth_type {
   Google
   Github
+}
+
+enum transaction_type {
+  Send
+  Recieve
 }

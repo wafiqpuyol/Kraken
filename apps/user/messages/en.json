@@ -248,8 +248,14 @@
     "EUR": {
       "name": "EUR"
     },
-    "AUD": {
-      "name": "AUD"
+    "BDT": {
+      "name": "BDT"
+    },
+    "JPY": {
+      "name": "JPY"
+    },
+    "INR": {
+      "name": "INR"
     },
     "US English": {
       "name": "U.S. English"
@@ -297,6 +303,7 @@
   "SupportedLangDialog": {
     "title": "Languages",
     "save": "Save",
+    "saving": "Saving",
     "US English": {
       "name": "U.S. English"
     },
@@ -328,12 +335,20 @@
       "name": "USD"
     },
     "Euro": {
-      "title": "Euro",
+      "title": "EURO",
       "name": "EUR"
     },
-    "Australian Dollar": {
-      "title": "Australian Dollar",
-      "name": "AUD"
+    "Rupee": {
+      "title": "Rupee",
+      "name": "INR"
+    },
+    "Taka": {
+      "title": "Taka",
+      "name": "BDT"
+    },
+    "YEN": {
+      "title": "YEN",
+      "name": "JPY"
     }
   },
   "Transfer": {
@@ -368,8 +383,14 @@
     "EUR": {
       "name": "EUR"
     },
-    "AUD": {
-      "name": "AUD"
+    "BDT": {
+      "name": "BDT"
+    },
+    "YEN": {
+      "name": "YEN"
+    },
+    "INR": {
+      "name": "INR"
     }
   },
   "OnRampTransaction": {
@@ -388,5 +409,49 @@
     "amount": "Amount",
     "sending": "Sending....",
     "send_money": "Send Money"
+  },
+  "ChangePasswordDialog": {
+    "title": "Change Password"
+  },
+  "ChangePasswordForm": {
+    "current_password": "Current Password",
+    "new_password": "New Password",
+    "confirm_new_password": "Confirm New Password",
+    "cancel_button": "Cancel",
+    "save_button": "Save",
+    "password_placeholder_text": "e.g: ******"
+  },
+  "ResetPasswordForm": {
+    "title": "Create new password",
+    "desc": "Enter your new password.",
+    "new_password": "New Password",
+    "confirm_new_password": "Confirm Password",
+    "password_placeholder_text": "e.g: ******",
+    "save_button": "Save"
+  },
+  "ForgotPasswordForm": {
+    "title": "Forgot password",
+    "desc": "Enter your email address. If it’s correct, we’ll send you an email with password reset instructions.",
+    "email": "Email",
+    "send_button": "Send Email"
+  },
+  "TransactionHistory": {
+    "title": "Transaction History",
+    "no_transaction_history": "No Transaction History",
+    "sent_money": "Sent Money",
+    "received_money": "Received Money",
+    "transID_label": "Trans ID:",
+    "to": "TO:",
+    "from": "FROM:"
+  },
+  "TransactionModal": {
+    "Send": "Send Money",
+    "Received": "Received Money",
+    "sender_name": "Sender Name",
+    "transaction_ID": "Transaction ID",
+    "receiver_name": "Receiver Name",
+    "amount": "Amount",
+    "time": "Time",
+    "download_button": "Download"
   }
 }

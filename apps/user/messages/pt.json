@@ -248,8 +248,14 @@
     "EUR": {
       "name": "EUR"
     },
-    "AUD": {
-      "name": "AUD"
+    "BDT": {
+      "name": "BDT"
+    },
+    "JPY": {
+      "name": "JPY"
+    },
+    "INR": {
+      "name": "INR"
     },
     "US English": {
       "name": "Inglês americano"
@@ -297,6 +303,7 @@
   "SupportedLangDialog": {
     "title": "Idiomas",
     "save": "Salvar",
+    "saving": "Salvando",
     "US English": {
       "name": "Inglês americano"
     },
@@ -331,9 +338,17 @@
       "title": "Euro",
       "name": "EUR"
     },
-    "Australian Dollar": {
-      "title": "Dólar australiano",
-      "name": "AUD"
+    "Rupee": {
+      "title": "Rupia",
+      "name": "INR"
+    },
+    "Taka": {
+      "title": "Taka",
+      "name": "BDT"
+    },
+    "YEN": {
+      "title": "Iene",
+      "name": "JPY"
     }
   },
   "Transfer": {
@@ -388,5 +403,49 @@
     "amount": "Montante",
     "sending": "Enviando...",
     "send_money": "Enviar dinheiro"
+  },
+  "ChangePasswordDialog": {
+    "title": "Alterar senha"
+  },
+  "ChangePasswordForm": {
+    "current_password": "Senha atual",
+    "new_password": "Nova senha",
+    "confirm_new_password": "Confirmar nova senha",
+    "cancel_button": "Cancelar",
+    "save_button": "Salvar",
+    "password_placeholder_text": "e.g: ******"
+  },
+  "ResetPasswordForm": {
+    "title": "Criar nova senha",
+    "desc": "Digite sua nova senha.",
+    "new_password": "Nova senha",
+    "confirm_new_password": "Confirmar senha",
+    "password_placeholder_text": "e.g: ******",
+    "save_button": "Salvar"
+  },
+  "ForgotPasswordForm": {
+    "title": "Esqueceu a senha",
+    "desc": "Digite seu endereço de e-mail. Se estiver correto, enviaremos um e-mail com instruções para redefinir a senha.",
+    "email": "E-mail",
+    "send_button": "Enviar e-mail"
+  },
+  "TransactionHistory": {
+    "title": "Histórico de transações",
+    "no_transaction_history": "Nenhum histórico de transações",
+    "sent_money": "Dinheiro enviado",
+    "received_money": "Dinheiro recebido",
+    "transID_label": "ID da transação:",
+    "to": "PARA:",
+    "from": "DE:"
+  },
+  "TransactionModal": {
+    "Send": "Enviar dinheiro",
+    "Received": "Dinheiro recebido",
+    "sender_name": "Nome do remetente",
+    "transaction_ID": "ID da transação",
+    "receiver_name": "Nome do destinatário",
+    "amount": "Montante",
+    "time": "Tempo",
+    "download_button": "Baixar"
   }
 }

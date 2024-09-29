@@ -248,8 +248,14 @@
     "EUR": {
       "name": "EUR"
     },
-    "AUD": {
-      "name": "AUD"
+    "BDT": {
+      "name": "BDT"
+    },
+    "JPY": {
+      "name": "JPY"
+    },
+    "INR": {
+      "name": "INR"
     },
     "US English": {
       "name": "アメリカ英語"
@@ -297,6 +303,7 @@
   "SupportedLangDialog": {
     "title": "言語",
     "save": "保存",
+    "saving": "保存中",
     "US English": {
       "name": "アメリカ英語"
     },
@@ -331,9 +338,17 @@
       "title": "ユーロ",
       "name": "EUR"
     },
-    "Australian Dollar": {
-      "title": "オーストラリアドル",
-      "name": "AUD"
+    "Rupee": {
+      "title": "ルピー",
+      "name": "INR"
+    },
+    "Taka": {
+      "title": "タカ",
+      "name": "BDT"
+    },
+    "YEN": {
+      "title": "円",
+      "name": "JPY"
     }
   },
   "Transfer": {
@@ -388,5 +403,49 @@
     "amount": "金額",
     "sending": "送信中...",
     "send_money": "送金"
+  },
+  "ChangePasswordDialog": {
+    "title": "パスワードを変更"
+  },
+  "ChangePasswordForm": {
+    "current_password": "現在のパスワード",
+    "new_password": "新しいパスワード",
+    "confirm_new_password": "新しいパスワードの確認",
+    "cancel_button": "キャンセル",
+    "save_button": "保存",
+    "password_placeholder_text": "例： ******"
+  },
+  "ResetPasswordForm": {
+    "title": "新しいパスワードを作成",
+    "desc": "新しいパスワードを入力してください。",
+    "new_password": "新しいパスワード",
+    "confirm_new_password": "パスワードの確認",
+    "password_placeholder_text": "例: ******",
+    "save_button": "保存"
+  },
+  "ForgotPasswordForm": {
+    "title": "パスワードを忘れた",
+    "desc": "メールアドレスを入力してください。正しい場合は、パスワードのリセット手順が記載されたメールを送信します。",
+    "email": "メール",
+    "send_button": "メールを送信"
+  },
+  "TransactionHistory": {
+    "title": "トランザクション履歴",
+    "no_transaction_history": "トランザクション履歴がありません",
+    "sent_money": "送金",
+    "received_money": "受け取ったお金",
+    "transID_label": "Trans ID:",
+    "to": "宛先:",
+    "from": "差出人:"
+  },
+  "TransactionModal": {
+    "Send": "送金",
+    "Received": "受け取ったお金",
+    "sender_name": "送信者名",
+    "transaction_ID": "トランザクション ID",
+    "receiver_name": "受信者名",
+    "amount": "金額",
+    "time": "時間",
+    "download_button": "ダウンロード"
   }
 }

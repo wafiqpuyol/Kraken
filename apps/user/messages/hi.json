@@ -248,8 +248,14 @@
     "EUR": {
       "name": "EUR"
     },
-    "AUD": {
-      "name": "AUD"
+    "BDT": {
+      "name": "BDT"
+    },
+    "JPY": {
+      "name": "JPY"
+    },
+    "INR": {
+      "name": "INR"
     },
     "US English": {
       "name": "U.S. अंग्रेज़ी"
@@ -297,6 +303,7 @@
   "SupportedLangDialog": {
     "title": "भाषाएँ",
     "save": "सहेजें",
+    "saving": "सहेज रहा है",
     "US English": {
       "name": "U.S. अंग्रेज़ी"
     },
@@ -331,9 +338,17 @@
       "title": "यूरो",
       "name": "EUR"
     },
-    "Australian Dollar": {
-      "title": "ऑस्ट्रेलियन डॉलर",
-      "name": "AUD"
+    "Rupee": {
+      "title": "रुपया",
+      "name": "INR"
+    },
+    "Taka": {
+      "title": "टका",
+      "name": "BDT"
+    },
+    "YEN": {
+      "title": "येन",
+      "name": "JPY"
     }
   },
   "Transfer": {
@@ -388,5 +403,49 @@
     "amount": "मात्रा",
     "sending": "भेजना",
     "send_money": "पैसा भेजें"
+  },
+  "ChangePasswordDialog": {
+    "title": "पासवर्ड बदलें"
+  },
+  "ChangePasswordForm": {
+    "current_password": "वर्तमान पासवर्ड",
+    "new_password": "नया पासवर्ड",
+    "confirm_new_password": "नया पासवर्ड पुष्टि करें",
+    "cancel_button": "रद्द करें",
+    "save_button": "सहेजें",
+    "password_placeholder_text": "उदाहरण: ******"
+  },
+  "ResetPasswordForm": {
+    "title": "नया पासवर्ड बनाएं",
+    "desc": "अपना नया पासवर्ड दर्ज करें।",
+    "new_password": "नया पासवर्ड",
+    "confirm_new_password": "पासवर्ड की पुष्टि करें",
+    "password_placeholder_text": "उदाहरण: ******",
+    "save_button": "सहेजें"
+  },
+  "ForgotPasswordForm": {
+    "title": "पासवर्ड भूल गए",
+    "desc": "अपना ईमेल पता दर्ज करें। यदि यह सही है, तो हम आपको पासवर्ड रीसेट निर्देश के साथ एक ईमेल भेजेंगे।",
+    "email": "ईमेल",
+    "send_button": "ईमेल भेजें"
+  },
+  "TransactionHistory": {
+    "title": "लेनदेन इतिहास",
+    "no_transaction_history": "कोई लेनदेन इतिहास नहीं",
+    "sent_money": "पैसा भेजा",
+    "received_money": "पैसा प्राप्त हुआ",
+    "transID_label": "ट्रांस आईडी:",
+    "to": "से:",
+    "from": "से:"
+  },
+  "TransactionModal": {
+    "Send": "पैसा भेजें",
+    "Received": "पैसा प्राप्त हुआ",
+    "sender_name": "प्रेषक का नाम",
+    "transaction_ID": "ट्रांजेक्शन आईडी",
+    "receiver_name": "प्राप्तकर्ता का नाम",
+    "amount": "राशि",
+    "time": "समय",
+    "download_button": "डाउनलोड"
   }
 }

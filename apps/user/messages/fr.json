@@ -248,8 +248,14 @@
     "EUR": {
       "name": "EUR"
     },
-    "AUD": {
-      "name": "AUD"
+    "BDT": {
+      "name": "BDT"
+    },
+    "JPY": {
+      "name": "JPY"
+    },
+    "INR": {
+      "name": "INR"
     },
     "US English": {
       "name": "Anglais américain"
@@ -297,6 +303,7 @@
   "SupportedLangDialog": {
     "title": "Langues",
     "save": "Enregistrer",
+    "saving": "Enregistrement",
     "US English": {
       "name": "Anglais américain"
     },
@@ -331,9 +338,17 @@
       "title": "Euro",
       "name": "EUR"
     },
-    "Australian Dollar": {
-      "title": "Dollar australien",
-      "name": "AUD"
+    "Rupee": {
+      "title": "Roupies",
+      "name": "INR"
+    },
+    "Taka": {
+      "title": "Taka",
+      "name": "BDT"
+    },
+    "YEN": {
+      "title": "YEN",
+      "name": "JPY"
     }
   },
   "Transfer": {
@@ -388,5 +403,49 @@
     "amount": "Montant",
     "sending": "Envoi en cours...",
     "send_money": "Envoyer de l'argent"
+  },
+  "ChangePasswordDialog": {
+    "title": "Changer de mot de passe"
+  },
+  "ChangePasswordForm": {
+    "current_password": "Mot de passe actuel",
+    "new_password": "Nouveau mot de passe",
+    "confirm_new_password": "Confirmer le nouveau mot de passe",
+    "cancel_button": "Annuler",
+    "save_button": "Enregistrer",
+    "password_placeholder_text": "exemple: ******"
+  },
+  "ResetPasswordForm": {
+    "title": "Créer un nouveau mot de passe",
+    "desc": "Saisissez votre nouveau mot de passe.",
+    "new_password": "Nouveau mot de passe",
+    "confirm_new_password": "Confirmer le mot de passe",
+    "password_placeholder_text": "par exemple: ******",
+    "save_button": "Enregistrer"
+  },
+  "ForgotPasswordForm": {
+    "title": "Mot de passe oublié",
+    "desc": "Saisissez votre adresse e-mail. Si elle est correcte, nous vous enverrons un e-mail avec les instructions de réinitialisation du mot de passe.",
+    "email": "Email",
+    "send_button": "Envoyer l'e-mail"
+  },
+  "TransactionHistory": {
+    "title": "Historique des transactions",
+    "no_transaction_history": "Aucun historique de transaction",
+    "sent_money": "Argent envoyé",
+    "received_money": "Argent reçu",
+    "transID_label": "ID de la transaction :",
+    "to": "À :",
+    "from": "De :"
+  },
+  "TransactionModal": {
+    "Send": "Envoyer de l'argent",
+    "Received": "Argent reçu",
+    "sender_name": "Nom de l'expéditeur",
+    "transaction_ID": "ID de la transaction",
+    "receiver_name": "Nom du destinataire",
+    "amount": "Montant",
+    "time": "Heure",
+    "download_button": "Télécharger"
   }
 }

@@ -239,13 +239,19 @@
     "auto_log_out": "অটো লগ-আউট",
     "edit": "পরিবর্তন করুন",
     "USD": {
-      "name": "ইউসি"
+      "name": "ইউসডি"
     },
     "EUR": {
       "name": "ইউরো"
     },
-    "AUD": {
-      "name": "এইউডি"
+    "BDT": {
+      "name": "BDT"
+    },
+    "JPY": {
+      "name": "JPY"
+    },
+    "INR": {
+      "name": "INR"
     },
     "U.S. English": {
       "name": "মার্কিন ইংরেজি"
@@ -328,9 +334,17 @@
       "title": "ইউরো",
       "name": "ইউরো"
     },
-    "Australian Dollar": {
-      "title": "অস্ট্রেলিয়ান ডলার",
-      "name": "এইউডি"
+    "Rupee": {
+      "title": "রুপি",
+      "name": "INR"
+    },
+    "Taka": {
+      "title": "টাকা",
+      "name": "BDT"
+    },
+    "YEN": {
+      "title": "ইয়েন",
+      "name": "JPY"
     }
   },
   "Transfer": {
@@ -358,7 +372,7 @@
     "total_locked_balance": "মোট লকড ব্যালেন্স",
     "total_balance": "মোট ব্যালেন্স",
     "USD": {
-      "name": "ইউসি"
+      "name": "ইউসডি"
     },
     "EUR": {
       "name": "ইউরো"
@@ -383,5 +397,49 @@
     "amount": "পরিমাণ",
     "sending": "পাঠানো হচ্ছে....",
     "send_money": "টাকা পাঠান"
+  },
+  "ChangePasswordDialog": {
+    "title": "পাসওয়ার্ড পরিবর্তন করুন"
+  },
+  "ChangePasswordForm": {
+    "current_password": "বর্তমান পাসওয়ার্ড",
+    "new_password": "নতুন পাসওয়ার্ড",
+    "confirm_new_password": "নতুন পাসওয়ার্ড নিশ্চিত করুন",
+    "cancel_button": "বাতিল করুন",
+    "save_button": "সংরক্ষণ করুন",
+    "password_placeholder_text": "উদাহরণ: ******"
+  },
+  "ResetPasswordForm": {
+    "title": "নতুন পাসওয়ার্ড তৈরি করুন",
+    "desc": "আপনার নতুন পাসওয়ার্ড লিখুন।",
+    "new_password": "নতুন পাসওয়ার্ড",
+    "confirm_new_password": "পাসওয়ার্ড নিশ্চিত করুন",
+    "password_placeholder_text": "উদাহরণ: ******",
+    "save_button": "সংরক্ষণ করুন"
+  },
+  "ForgotPasswordForm": {
+    "title": "পাসওয়ার্ড ভুলে গেছেন?",
+    "desc": "আপনার ইমেল ঠিকানা লিখুন। যদি এটি সঠিক হয়, আমরা আপনাকে পাসওয়ার্ড পুনরুদ্ধার নির্দেশাবলী সহ একটি ইমেল পাঠাব।",
+    "email": "ইমেল",
+    "send_button": "ইমেল পাঠান"
+  },
+  "TransactionHistory": {
+    "title": "লেনদেনের ইতিহাস",
+    "no_transaction_history": "কোনো লেনদেনের ইতিহাস নেই",
+    "sent_money": "প্রেরিত টাকা",
+    "received_money": "প্রাপ্ত টাকা",
+    "transID_label": "ট্রান্স আইডি:",
+    "to": "কাছে:",
+    "from": "থেকে:"
+  },
+  "TransactionModal": {
+    "Send": "প্রেরিত টাকা",
+    "Received": "প্রাপ্ত টাকা",
+    "sender_name": "প্রেরকের নাম",
+    "receiver_name": "প্রাপকের নাম",
+    "transaction_ID": "ট্রান্সেকশন ID",
+    "amount": "মোট",
+    "time": "সময়",
+    "download_button": "ডাউনলোড"
   }
 }

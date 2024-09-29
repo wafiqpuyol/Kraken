@@ -248,8 +248,14 @@
     "EUR": {
       "name": "EUR"
     },
-    "AUD": {
-      "name": "AUD"
+    "BDT": {
+      "name": "BDT"
+    },
+    "JPY": {
+      "name": "JPY"
+    },
+    "INR": {
+      "name": "INR"
     },
     "US English": {
       "name": "Inglês americano"
@@ -280,7 +286,7 @@
     "password": "Senha",
     "password_text": "Proteja sua conta com uma senha única e forte não usada em outro lugar.",
     "change": "Mudar",
-    "auto_sign-out": "Sair automaticamente",
+    "auto_sign_out": "Sair automaticamente",
     "auto_sign-out_title": "480 minutos (padrão)",
     "auto_sign-out_text": "Tempo de inatividade da conta antes do logout automático.",
     "twoFA_title": "Autenticação de dois fatores (2FA) de login",
@@ -297,6 +303,7 @@
   "SupportedLangDialog": {
     "title": "Idiomas",
     "save": "Salvar",
+    "saving": "Salvando",
     "US English": {
       "name": "Inglês americano"
     },
@@ -331,9 +338,17 @@
       "title": "Euro",
       "name": "EUR"
     },
-    "Australian Dollar": {
-      "title": "Dólar australiano",
-      "name": "AUD"
+    "Rupee": {
+      "title": "Rupia",
+      "name": "INR"
+    },
+    "Taka": {
+      "title": "Taka",
+      "name": "BDT"
+    },
+    "YEN": {
+      "title": "YEN",
+      "name": "JPY"
     }
   },
   "Transfer": {
@@ -388,5 +403,49 @@
     "amount": "Montante",
     "sending": "Enviando...",
     "send_money": "Enviar dinheiro"
+  },
+  "ChangePasswordDialog": {
+    "title": "Cambiar contraseña"
+  },
+  "ChangePasswordForm": {
+    "current_password": "Contraseña actual",
+    "new_password": "Nueva contraseña",
+    "confirm_new_password": "Confirmar nueva contraseña",
+    "cancel_button": "Cancelar",
+    "save_button": "Guardar",
+    "password_placeholder_text": "ejemplo: ******"
+  },
+  "ResetPasswordForm": {
+    "title": "Crear nueva contraseña",
+    "desc": "Ingrese su nueva contraseña.",
+    "new_password": "Nueva contraseña",
+    "confirm_new_password": "Confirmar contraseña",
+    "password_placeholder_text": "e.g: ******",
+    "save_button": "Guardar"
+  },
+  "ForgotPasswordForm": {
+    "title": "¿Olvidó la contraseña?",
+    "desc": "Ingrese su dirección de correo electrónico. Si es correcta, le enviaremos un correo electrónico con las instrucciones para restablecer la contraseña.",
+    "email": "Correo electrónico",
+    "send_button": "Enviar correo electrónico"
+  },
+  "TransactionHistory": {
+    "title": "Historial de transacciones",
+    "no_transaction_history": "No hay historial de transacciones",
+    "sent_money": "Dinero enviado",
+    "received_money": "Dinero recibido",
+    "transID_label": "ID de trans.:",
+    "to": "A:",
+    "from": "DE:"
+  },
+  "TransactionModal": {
+    "Send": "Enviar dinero",
+    "Received": "Dinero recibido",
+    "sender_name": "Nombre del remitente",
+    "transaction_ID": "ID de transacción",
+    "receiver_name": "Nombre del receptor",
+    "amount": "Monto",
+    "time": "Hora",
+    "download_button": "Descargar"
   }
 }
