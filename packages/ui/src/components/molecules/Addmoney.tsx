@@ -14,6 +14,7 @@ import { balance as UserBalance } from "@repo/db/type"
 import { useToast } from "@repo/ui/useToast"
 import axios from 'axios';
 import { useLocale, useTranslations } from 'next-intl';
+import { IoInformationCircleOutline } from "react-icons/io5";
 
 
 interface AddMoneyProps {
@@ -134,7 +135,10 @@ export const AddMoney: React.FC<AddMoneyProps> = ({ addMoneyAction, userBalance 
                         </Button>
                     </form>
                 </ Form>
-
+                <small className="flex text-xs text-slate-500 gap-1 items-center mt-3">
+                    <IoInformationCircleOutline />
+                    Make sure to copy the public ID from account settings.
+                </small>
             </div>
         </div>
     )

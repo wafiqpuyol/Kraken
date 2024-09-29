@@ -4,12 +4,13 @@ import { Button } from "../../atoms/Button"
 import { Card, CardContent } from "../../atoms/Card"
 import { Badge } from "../../atoms/Badge"
 import { useSession } from "next-auth/react"
-import { useRouter } from "next/navigation"
 import { TwoFAEnableDialog } from "../../molecules/TwoFAEnableModal"
 import { TwoFADisableDialog } from "../../molecules/TwoFADisableDialog"
 import { useToast } from "../../molecules/Toaster/use-toast"
 import { useState } from "react"
-
+import { useTranslations } from "next-intl"
+import { ChangePasswordDialog } from "../../molecules/ChangePasswordDialog"
+import { changePasswordPayload } from "@repo/forms/changePasswordSchema"
 
 interface SecurityTabProps {
     isTwoFaEnabled: boolean
@@ -21,19 +22,21 @@ interface SecurityTabProps {
     activate2fa: (otp: string) => Promise<{
         message: string;
         status: number;
+    }>,
+    changePasswordAction: (payload: changePasswordPayload) => Promise<{
+        message: string | undefined;
+        status: number;
     }>
 
 }
-export const SecurityTab: React.FC<SecurityTabProps> = ({ getTwoFASecret, isTwoFaEnabled, activate2fa }) => {
+export const SecurityTab: React.FC<SecurityTabProps> = ({ getTwoFASecret, isTwoFaEnabled, activate2fa, changePasswordAction }) => {
     const session = useSession()
-    const router = useRouter()
     const { toast } = useToast()
     const [code, setCode] = useState("");
-    console.log(session.data);
+    const t = useTranslations("SecurityTab")
 
     const handleClick = async () => {
         const res = await getTwoFASecret()
-        console.log(res);
         switch (res.status) {
             case 200:
                 setCode(res.twoFactorSecret as string)
@@ -57,42 +60,40 @@ export const SecurityTab: React.FC<SecurityTabProps> = ({ getTwoFASecret, isTwoF
         <div className="space-y-6 bg-white">
             <Card>
                 <CardContent className="pt-6">
-                    <h2 className="text-2xl font-semibold mb-4">Sign-in</h2>
+                    <h2 className="text-2xl font-semibold mb-4">{t("signIn_title")}</h2>
                     <div className="space-y-4">
                         <div className="flex justify-between items-start">
                             {/* gap-x-40 */}
                             <div className="flex items-center justify-between space-x-40">
-                                <h3 className="text-sm font-medium  text-gray-500 self-start">Sign-in with</h3>
+                                <h3 className="text-sm font-medium  text-gray-500 self-start">{t("signIn_with")}</h3>
                                 <div>
                                     <p className="mt-1 font-medium">
-                                        email
+                                        {t("email")}
                                         <span className="text-slate-500 ml-2">({session.data?.user?.email})</span>
-                                    </p>
-                                    <p className="text-sm text-gray-500 mt-1">
-                                        We recommend setting this to "username only" if you access Kraken on a shared device.
                                     </p>
                                 </div>
                             </div>
-                            <Button variant="outline" className="text-purple-600 bg-purple-200">Edit</Button>
                         </div>
                         <div className="flex justify-between items-start">
                             <div className="flex items-center justify-between text-gray-500 space-x-44">
-                                <h3 className="text-sm font-medium ">Password</h3>
-                                <p className="mt-1 text-sm">Protect your account with a unique, strong password not used elsewhere.</p>
+                                <h3 className="text-sm font-medium ">{t("password")}</h3>
+                                <p className="mt-1 text-sm">{t("password_text")}</p>
                             </div>
-                            <Button variant="outline" className="text-purple-600 bg-purple-200" onClick={() => router.push("/change-password")}>Change</Button>
+                            <ChangePasswordDialog changePasswordAction={changePasswordAction}>
+                                <Button variant="outline" className="text-purple-600 bg-purple-200">{t("change")}</Button>
+                            </ChangePasswordDialog>
                         </div>
                         <div className="flex justify-between items-start">
                             <div className="flex items-center justify-between space-x-36">
-                                <h3 className="text-sm font-medium text-gray-500">Auto sign-out</h3>
+                                <h3 className="text-sm font-medium text-gray-500">{t("auto_sign_out")}</h3>
                                 <div className="">
-                                    <p className="mt-1 font-medium">480 minutes (default)</p>
+                                    <p className="mt-1 font-medium">{t("auto_sign_out_title")}</p>
                                     <p className="text-sm text-gray-500 mt-1">
-                                        Time of account inactivity before automatic sign-out.
+                                        {t("auto_sign_out_text")}
                                     </p>
                                 </div>
                             </div>
-                            <Button variant="outline" className="text-purple-600 bg-purple-200">Edit</Button>
+                            <Button variant="outline" className="text-purple-600 bg-purple-200">{t("edit")}</Button>
                         </div>
                     </div>
                 </CardContent>
@@ -100,32 +101,32 @@ export const SecurityTab: React.FC<SecurityTabProps> = ({ getTwoFASecret, isTwoF
 
             <Card>
                 <CardContent className="pt-6">
-                    <h2 className="text-2xl font-semibold mb-4">Sign-in Two-Factor Authentication (2FA)</h2>
+                    <h2 className="text-2xl font-semibold mb-4">{t("twoFA_title")}(2FA)</h2>
                     <div className="space-y-4">
                         <div className="flex justify-between items-start">
                             <div className="flex items-center justify-between space-x-32">
                                 <div className="flex flex-col items-start">
-                                    <h3 className="text-sm font-medium text-gray-500 mb-1">Passkeys</h3>
-                                    <Badge variant="outline" className="bg-green-50 text-green-700 border-green-200 rounded-md">Recommended</Badge>
+                                    <h3 className="text-sm font-medium text-gray-500 mb-1">{t("passkeys")}</h3>
+                                    <Badge variant="outline" className="bg-green-50 text-green-700 border-green-200 rounded-md">{t("recommended")}</Badge>
                                 </div>
                                 <p className="mt-1 text-sm text-slate-500">
-                                    Uses FIDO2 compliant device biometrics or a hardware security key. Add up to 5 passkeys that protect you from phishing attacks.{' '}
-                                    <a href="#" className="text-purple-600 hover:underline font-medium">Learn more</a>
+                                    {t("passkeys_text")}
+                                    <a href="#" className="text-purple-600 hover:underline font-medium"> {t("learn_more")}</a>
                                 </p>
                             </div>
-                            <Button variant="outline" className="text-purple-600 bg-purple-200">Add passkey</Button>
+                            <Button variant="outline" className="text-purple-600 bg-purple-200">{t("add_passkey")}</Button>
                         </div>
                         <div className="flex justify-between items-start">
                             <div className="flex items-center justify-between space-x-28">
-                                <h3 className="text-sm font-medium text-gray-500">Authenticator app</h3>
+                                <h3 className="text-sm font-medium text-gray-500">{t("authenticator_app")}</h3>
                                 <p className="mt-1 text-sm text-slate-500">
-                                    Uses a one-time code from an app like Google Authenticator or Authy.{' '}
-                                    <a href="#" className="text-purple-600 hover:underline font-medium">Learn more</a>
+                                    {t("authenticator_app_text")}
+                                    <a href="#" className="text-purple-600 hover:underline font-medium"> {t("learn_more")}</a>
                                 </p>
                             </div>
                             {
                                 isTwoFaEnabled ?
-                                    <TwoFADisableDialog ><Button variant="outline" className="text-purple-600 bg-purple-200" onClick={handleClick}>Remove</Button></TwoFADisableDialog>
+                                    <TwoFADisableDialog ><Button variant="outline" className="text-purple-600 bg-purple-200">{t("remove")}</Button></TwoFADisableDialog>
                                     :
                                     <TwoFAEnableDialog code={code} activate2fa={activate2fa}><Button variant="outline" className="text-purple-600 bg-purple-200" onClick={handleClick}>Enable</Button></TwoFAEnableDialog>
                             }
