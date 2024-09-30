@@ -7,7 +7,7 @@ import { prisma } from "@repo/db/client"
 import { p2ptransfer } from "@repo/db/type"
 import { generateTransactionId } from "./utils"
 
-export const sendMoneyAction = async (payload: sendMoneyPayload) => {
+export const sendMoneyAction = async (payload: sendMoneyPayload): Promise<{ message: string | undefined, status: number, transaction?: p2ptransfer | undefined }> => {
     try {
         const session = await getServerSession(authOptions)
         if (!session?.user?.uid) {
@@ -35,7 +35,7 @@ export const sendMoneyAction = async (payload: sendMoneyPayload) => {
         if (isUserExist.number === isRecipientExist.number) {
             return { message: "Cannot send money to yourself. Invalid recipient number", status: 401 }
         }
-
+        let transaction: p2ptransfer | undefined = undefined;
         await prisma.$transaction(async (tx) => {
             await tx.$queryRaw`SELECT * FROM Balance WHERE userId=${isUserExist.id} FOR UPDATE`;
 
@@ -72,7 +72,7 @@ export const sendMoneyAction = async (payload: sendMoneyPayload) => {
                 }
             })
             const { currency } = (await prisma.preference.findFirst({ where: { userId: isUserExist.id } }))!
-            await prisma.p2ptransfer.create({
+            transaction = await prisma.p2ptransfer.create({
                 data: {
                     amount: parseInt(payload.amount),
                     timestamp: new Date(),
@@ -81,10 +81,22 @@ export const sendMoneyAction = async (payload: sendMoneyPayload) => {
                     fromUserId: isUserExist.id,
                     toUserId: isRecipientExist.id,
                     currency
-                }
+                },
+                include: {
+                    user_p2ptransfer_fromUserIdTouser: {
+                        select: {
+                            name: true
+                        }
+                    },
+                    user_p2ptransfer_toUserIdTouser: {
+                        select: {
+                            name: true
+                        }
+                    }
+                },
             })
         })
-        return { message: "Sending money successful", status: 200 }
+        return { message: "Sending money successful", status: 200, transaction }
     } catch (error: any) {
         console.log(error);
         return { message: error.message || "Sending money failed. Something went wrong", status: 500 }

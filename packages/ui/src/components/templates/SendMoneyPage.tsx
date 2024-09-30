@@ -11,28 +11,27 @@ import { useSession } from "next-auth/react"
 import { useRouter } from "next/navigation"
 import { useToast } from "../molecules/Toaster/use-toast"
 import { useLocale, useTranslations } from 'next-intl';
-
+import { TransactionHistory } from "../organisms/TransactionHistory"
+import { p2ptransfer } from "@repo/db/type"
+import { useState } from "react"
 
 interface SendMoneyProps {
     sendMoneyAction: (arg: sendMoneyPayload) => Promise<{
-        message: string;
-        status: number;
-        field?: undefined;
-    } | {
         message: string | undefined;
         status: number;
-        field: string;
+        transaction?: p2ptransfer | undefined;
     }>
+    p2pTransactionHistories: p2ptransfer[] | []
 }
 
-export const SendMoneyPage: React.FC<SendMoneyProps> = ({ sendMoneyAction }) => {
+export const SendMoneyPage: React.FC<SendMoneyProps> = ({ sendMoneyAction, p2pTransactionHistories }) => {
     const t = useTranslations("SendMoneyPage")
     const locale = useLocale()
     const { handleSubmit, control, formState, ...form } = userFormSendMoney()
     const router = useRouter()
     const session = useSession()
     const { toast } = useToast()
-    console.log(session);
+    const [allTransactionHistory, setAllTransactionHistory] = useState<p2ptransfer[] | []>(p2pTransactionHistories)
     const submit = async (payload: sendMoneyPayload) => {
         try {
             if (!session.data?.user) {
@@ -45,6 +44,11 @@ export const SendMoneyPage: React.FC<SendMoneyProps> = ({ sendMoneyAction }) => 
                     toast({
                         title: res.message,
                         variant: "default"
+                    })
+                    setAllTransactionHistory((prev) => {
+                        const updatedArr = [...prev]
+                        updatedArr.unshift(res.transaction!)
+                        return updatedArr
                     })
                     form.reset({ amount: "", phone_number: "" })
                     break;
@@ -91,7 +95,7 @@ export const SendMoneyPage: React.FC<SendMoneyProps> = ({ sendMoneyAction }) => 
     }
 
     return (
-        <div className="min-h-screen flex items-start justify-center p-4 w-full mt-20">
+        <div className="min-h-screen flex items-start justify-center px-4 w-screen mt-20 gap-x-10">
             <Card className="w-full max-w-md bg-white">
                 <CardHeader>
                     <CardTitle>{t("title")}</CardTitle>
@@ -130,7 +134,7 @@ export const SendMoneyPage: React.FC<SendMoneyProps> = ({ sendMoneyAction }) => 
                                 )}
                             />
 
-                            <Button type="submit" className="w-full mt-6 bg-black text-white" disabled={formState.isSubmitting}>
+                            <Button type="submit" className="w-full mt-6 bg-purple-600 text-white" disabled={formState.isSubmitting}>
                                 {formState.isSubmitting ? t("sending") : t('send_money')}
                                 <ArrowRight className="ml-2 h-4 w-4" />
                             </Button>
@@ -140,6 +144,8 @@ export const SendMoneyPage: React.FC<SendMoneyProps> = ({ sendMoneyAction }) => 
                 <CardFooter className="flex flex-col items-start">
                 </CardFooter>
             </Card>
+
+            <TransactionHistory p2pTransactionHistories={allTransactionHistory} />
         </div>
     )
 }
