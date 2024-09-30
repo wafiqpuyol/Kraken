@@ -39,3 +39,14 @@ export const SUPPORTED_CURRENCY = [
         name: "EUR"
     },
 ]
+
+export const LINK = [
+    {
+        title: "Privacy Policy",
+        href: "https://www.kraken.com/legal/privacy"
+    },
+    {
+        title: "Terms of Services",
+        href: "https://www.kraken.com/legal"
+    }
+]

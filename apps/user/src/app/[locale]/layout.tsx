@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import localFont from "next/font/local";
 import "./globals.css";
 import { Toaster } from "@repo/ui/Toaster"
-import { Navbar } from "@repo/ui/Navbar"
+import { Navbar } from "../../components/Navbar"
 import { SessionProvider } from "@repo/ui/SessionProvider"
 import { disable2fa } from "../../lib/twoFA"
 import { NextIntlClientProvider } from 'next-intl';
