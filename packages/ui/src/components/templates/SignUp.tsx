@@ -12,6 +12,7 @@ import { usePhoneInput } from 'react-international-phone';
 import 'react-international-phone/style.css';
 import { useTranslations } from 'next-intl';
 import { useLocale } from 'next-intl';
+import { Eye, ClosedEye } from "../../icons"
 
 interface SignUpFormProps {
     signUpAction: (arg: signUpPayload, countryName: string) => Promise<{
@@ -24,6 +25,7 @@ export const SignUpForm: React.FC<SignUpFormProps> = ({ signUpAction }) => {
     const { toast } = useToast()
     const router = useRouter()
     const { handleSubmit, control, ...form } = userFormSignup()
+    const [toggleEye, setToggleEye] = useState(false)
     const locale = useLocale();
     const { country, setCountry } = usePhoneInput({
         defaultCountry: 'us',
@@ -31,7 +33,7 @@ export const SignUpForm: React.FC<SignUpFormProps> = ({ signUpAction }) => {
     })
     const [countryCode, setCountryCode] = useState(`+${country.dialCode}`)
     const t = useTranslations("SignUpForm")
-
+    console.log(form.formState.errors);
     const submit = async (payload: signUpPayload) => {
         try {
             const res = await signUpAction(payload, country.name)
@@ -101,7 +103,7 @@ export const SignUpForm: React.FC<SignUpFormProps> = ({ signUpAction }) => {
                                                     field.onChange(() => `+${e.dialCode}`)
                                                     setCountryCode(e.dialCode || "")
                                                 }} />
-                                                <Input type="text" {...field} defaultValue={countryCode} value={field.value} onChange={(e) => {
+                                                <Input placeholder={t("phone_number")} {...field} defaultValue={countryCode} value={field.value} onChange={(e) => {
                                                     setCountryCode(field.value)
                                                     field.onChange(e.target.value)
                                                 }} />
@@ -150,14 +152,24 @@ export const SignUpForm: React.FC<SignUpFormProps> = ({ signUpAction }) => {
                                 <FormItem>
                                     <FormLabel className='text-gray-600'>{t("password")}</FormLabel>
                                     <FormControl>
-                                        <Input type="password" placeholder="e.g. ********" {...field} />
+                                        <div className='flex items-center border rounded-lg pr-1 focus-visible:ring-1 focus-visible:ring-ring focus-visible:ring-offset-2'>
+                                            <Input
+                                                className='border-none focus-visible:ring-offset-0 focus-visible:ring-0'
+                                                type={toggleEye ? "text" : "password"} placeholder="e.g. ********" {...field} />
+                                            {
+                                                toggleEye
+                                                    ? <div className='cursor-pointer' onClick={() => setToggleEye(!toggleEye)}><Eye /></div>
+                                                    :
+                                                    <div className='cursor-pointer' onClick={() => setToggleEye(!toggleEye)}><ClosedEye /></div>
+                                            }
+                                        </div>
                                     </FormControl>
                                     <FormMessage className='text-red-500' />
                                 </FormItem>
                             )}
                         />
 
-                        <Button type="submit" className="bg-[#7132F5] w-full text-white text-lg">{t("create_button")}</Button>
+                        <Button type="submit" className="bg-purple-600 w-full text-white text-lg hover:bg-purple-700">{t("create_button")}</Button>
                     </form>
                 </ Form>
 

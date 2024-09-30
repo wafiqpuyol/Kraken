@@ -2,7 +2,7 @@
 
 import { generateHash, generateRandomNumber, comparePassword } from "@repo/network"
 import { prisma } from "@repo/db/client"
-import { signUpPayload } from "@repo/forms/signupSchema"
+import { signUpPayload, SignUpSchema } from "@repo/forms/signupSchema"
 import { ChangePasswordSchema, changePasswordPayload } from "@repo/forms/changePasswordSchema"
 import { ForgotPasswordSchema, forgotPasswordPayload } from "@repo/forms/forgotPasswordSchema"
 import { authOptions } from "@repo/network"
@@ -11,9 +11,24 @@ import { randomBytes } from "crypto";
 import { sendVerificationEmail } from "./mail"
 import { resetPasswordPayload } from "@repo/forms/resetPasswordSchema"
 import { PasswordMatchSchema } from "@repo/forms/changePasswordSchema"
+import { SUPPORTED_CURRENCY } from "./constants"
 
 export const signUpAction = async (payload: signUpPayload, countryName: string): Promise<{ message: string, status: number }> => {
     try {
+        const validatedPayload = SignUpSchema.safeParse(payload)
+        if (!validatedPayload.success) {
+            return {
+                message: (validatedPayload.error.format().email?._errors[0]
+                    ||
+                    validatedPayload.error.format().name?._errors[0] as string
+                    ||
+                    validatedPayload.error.format().phone_number?._errors[0]
+                    ||
+                    validatedPayload.error.format().password?._errors[0]) as string,
+                status: 400,
+            }
+        }
+
         const isUser = await prisma.user.findUnique({ where: { email: payload.email } })
         if (isUser) {
             return { message: "User already exist", status: 409 }
@@ -31,17 +46,20 @@ export const signUpAction = async (payload: signUpPayload, countryName: string):
                     country: countryName
                 }
             });
-            console.log("Signup ------->", user);
+
+            const currency = SUPPORTED_CURRENCY.find((c) => (c.country === countryName) || "USD")?.name!
             await prisma.balance.create({
                 data: {
                     amount: 0,
                     locked: 0,
                     userId: user.id,
+                    currency: currency
                 }
             })
             await prisma.preference.create({
                 data: {
-                    userId: user.id
+                    userId: user.id,
+                    currency
                 }
             })
         })

@@ -12,43 +12,58 @@ import { TwoFAForm } from '../molecules/TwoFAForm'
 import { useState } from 'react'
 import { usePhoneInput, CountrySelector } from 'react-international-phone';
 import 'react-international-phone/style.css';
+import { useTranslations } from 'next-intl';
+import { useLocale } from 'next-intl';
+import { Eye, ClosedEye } from "../../icons"
 
 interface LoginProps {
-    isTwoFAEnabled: boolean
+    isTwoFAEnabledFunc: () => Promise<{
+        message: string;
+        status: number;
+        isTwoFAEnabled?: boolean;
+        isOTPVerified?: boolean
+    }>
     activate2fa: (otp: string) => Promise<{
         message: string;
         status: number;
     }>
 }
 
-export const SignInForm: React.FC<LoginProps> = ({ isTwoFAEnabled, activate2fa }) => {
+export const SignInForm: React.FC<LoginProps> = ({ isTwoFAEnabledFunc, activate2fa }) => {
     const [isTwoFAFormShow, setIsTwoFAFormShow] = useState(false)
+    const [isOTPVerified, setIsOTPVerified] = useState(false)
+    const locale = useLocale();
     const router = useRouter()
     const { toast } = useToast()
+    const [toggleEye, setToggleEye] = useState(false)
     const { handleSubmit, control, ...form } = userFormSignIn()
     const { country, setCountry } = usePhoneInput({
         defaultCountry: 'us',
         value: '+1 (234)',
     })
     const [countryCode, setCountryCode] = useState(`+${country.dialCode}`)
+    const t = useTranslations("SignInForm")
 
     const submit = async (payload: loginPayload) => {
         try {
-            signIn("credentials", { ...payload, redirect: false }).then((response) => {
+            signIn("credentials", { ...payload, redirect: false }).then(async (response) => {
                 if (!response?.ok || response.error) {
                     return toast({
-                        title: response.error || "Email or Password is incorrect",
+                        title: response?.error || "Email or Password is incorrect",
                         variant: "destructive"
                     })
                 }
-                setIsTwoFAFormShow(true)
+                const twoFA = await isTwoFAEnabledFunc()
+                console.log("client ____________________>", twoFA);
                 toast({
                     title: `Login Successful`,
                     variant: "default"
                 })
-                if (!isTwoFAEnabled) {
-                    router.push("/dashboard/home");
+                if (!twoFA.isTwoFAEnabled) {
+                    router.push(`/${locale}/dashboard/home`);
                 }
+                setIsTwoFAFormShow(twoFA.isTwoFAEnabled!)
+                setIsOTPVerified(twoFA.isOTPVerified!)
             })
         } catch (err: any) {
             toast({
@@ -62,11 +77,11 @@ export const SignInForm: React.FC<LoginProps> = ({ isTwoFAEnabled, activate2fa }
         <div className="flex flex-col items-center justify-center h-screen p-4 ">
             <div className="flex flex-col bg-white rounded-lg shadow-lg p-6 max-w-md w-full">
                 <div className='self-start mb-7'>
-                    <h1 className='font-medium text-3xl text-gray-800'>Sign in to Kraken</h1>
+                    <h1 className='font-medium text-3xl text-gray-800'>{t("title")}</h1>
                 </div>
-                {/* @ts-ignore */}
                 {!isTwoFAFormShow &&
                     <>
+                        {/* @ts-ignore */}
                         < Form {...form}>
                             <form
                                 onSubmit={handleSubmit(submit)}
@@ -79,7 +94,7 @@ export const SignInForm: React.FC<LoginProps> = ({ isTwoFAEnabled, activate2fa }
                                     render={({ field }) => {
                                         return (
                                             <FormItem>
-                                                <FormLabel className='text-gray-600'>Phone Number</FormLabel>
+                                                <FormLabel className='text-gray-600'>{t("phone_number")}</FormLabel>
                                                 <FormControl>
                                                     <div className='flex gap-1 items-center'>
                                                         <CountrySelector selectedCountry={country.iso2} onSelect={(e) => {
@@ -104,30 +119,40 @@ export const SignInForm: React.FC<LoginProps> = ({ isTwoFAEnabled, activate2fa }
                                     name="password"
                                     render={({ field }) => (
                                         <FormItem>
-                                            <FormLabel>* Password (required)</FormLabel>
+                                            <FormLabel className='text-gray-600'>{t("password")}</FormLabel>
                                             <FormControl>
-                                                <Input type="password" placeholder="e.g. ********" {...field} />
+                                                <div className='flex items-center border rounded-lg pr-1 focus-visible:ring-1 focus-visible:ring-ring focus-visible:ring-offset-2'>
+                                                    <Input
+                                                        className='border-none focus-visible:ring-offset-0 focus-visible:ring-0'
+                                                        type={toggleEye ? "text" : "password"} placeholder="e.g. ********" {...field} />
+                                                    {
+                                                        toggleEye
+                                                            ? <div className='cursor-pointer' onClick={() => setToggleEye(!toggleEye)}><Eye /></div>
+                                                            :
+                                                            <div className='cursor-pointer' onClick={() => setToggleEye(!toggleEye)}><ClosedEye /></div>
+                                                    }
+                                                </div>
                                             </FormControl>
                                             <FormMessage className='text-red-500' />
                                         </FormItem>
                                     )}
                                 />
 
-                                <Button type="submit" className="bg-[#7132F5] w-full text-white text-lg">Continue</Button>
+                                <Button type="submit" className="bg-purple-600 w-full text-white text-lg hover:bg-purple-700">{t("continue_button")}</Button>
                             </form>
                         </ Form>
 
                         <div className='ml-1 flex gap-1 mt-2 justify-center'>
-                            <span className='text-sm font-medium text-slate-500'>Forgot</span>
-                            <Link href="/forgot-password" className='text-sm text-purple-400 font-medium'>password?</Link>
+                            <span className='text-sm font-medium text-slate-500'>{t("forgot")}</span>
+                            <Link href={`/${locale}/forgot-password`} className='text-sm text-purple-400 font-medium'>{t("password")}?</Link>
                         </div>
                     </>
                 }
                 {
-                    !isTwoFAEnabled && isTwoFAFormShow && <TwoFAForm activate2fa={activate2fa} />
+                    isTwoFAFormShow && !isOTPVerified && <TwoFAForm activate2fa={activate2fa} />
                 }
             </div>
 
-        </div>
+        </div >
     )
 }
