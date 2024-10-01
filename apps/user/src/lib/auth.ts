@@ -8,7 +8,7 @@ import { ForgotPasswordSchema, forgotPasswordPayload } from "@repo/forms/forgotP
 import { authOptions } from "@repo/network"
 import { getServerSession } from "next-auth"
 import { randomBytes } from "crypto";
-import { sendVerificationEmail } from "./mail"
+import { sendPasswordResetEmail, sendVerificationEmail } from "./mail"
 import { resetPasswordPayload } from "@repo/forms/resetPasswordSchema"
 import { PasswordMatchSchema } from "@repo/forms/changePasswordSchema"
 import { SUPPORTED_CURRENCY } from "./constants"
@@ -109,7 +109,7 @@ export const changePasswordAction = async (payload: changePasswordPayload): Prom
     }
 }
 
-export const forgotPasswordAction = async (payload: forgotPasswordPayload): Promise<{ message: string, status: number }> => {
+export const forgotPasswordAction = async (payload: forgotPasswordPayload, locale: string): Promise<{ message: string, status: number }> => {
     try {
         const session = await getServerSession(authOptions)
         if (session?.user?.uid) {
@@ -138,8 +138,7 @@ export const forgotPasswordAction = async (payload: forgotPasswordPayload): Prom
                 tokenExpiry
             }
         })
-
-        return await sendVerificationEmail(payload.email, passwordResetToken)
+        return await sendPasswordResetEmail(payload.email, passwordResetToken, locale)
     } catch (error: any) {
         console.log("forgotPasswordAction ---->", error.message);
         return { message: "Something went wrong while resetting password", status: 500 }
@@ -165,12 +164,7 @@ export const resetPasswordAction = async (payload: resetPasswordPayload, token: 
         }
 
         const resetPasswordTableData = await prisma.resetpassword.findFirst({
-            where: {
-                AND: [
-                    { userId: session?.user?.uid },
-                    { token }
-                ]
-            }
+            where: { token }
         })
 
         const now = new Date();
@@ -191,7 +185,7 @@ export const resetPasswordAction = async (payload: resetPasswordPayload, token: 
                 password: await generateHash(payload.newPassword)
             }
         })
-        return { message: "Password reset successfully", status: 201 }
+        return { message: "Password reset successful", status: 201 }
 
     } catch (error) {
         console.log("reset password error ----->", error);
