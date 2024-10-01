@@ -14,6 +14,8 @@ import { useLocale, useTranslations } from 'next-intl';
 import { TransactionHistory } from "../organisms/TransactionHistory"
 import { p2ptransfer } from "@repo/db/type"
 import { useState } from "react"
+import { Loader } from "../atoms/Loader"
+import { GetVerified } from "../molecules/GetVerified"
 
 interface SendMoneyProps {
     sendMoneyAction: (arg: sendMoneyPayload) => Promise<{
@@ -22,9 +24,13 @@ interface SendMoneyProps {
         transaction?: p2ptransfer | undefined;
     }>
     p2pTransactionHistories: p2ptransfer[] | []
+    sendVerificationEmailAction: (locale: string) => Promise<{
+        message: string;
+        status: number;
+    }>
 }
 
-export const SendMoneyPage: React.FC<SendMoneyProps> = ({ sendMoneyAction, p2pTransactionHistories }) => {
+export const SendMoneyPage: React.FC<SendMoneyProps> = ({ sendMoneyAction, p2pTransactionHistories, sendVerificationEmailAction }) => {
     const t = useTranslations("SendMoneyPage")
     const locale = useLocale()
     const { handleSubmit, control, formState, ...form } = userFormSendMoney()
@@ -95,57 +101,69 @@ export const SendMoneyPage: React.FC<SendMoneyProps> = ({ sendMoneyAction, p2pTr
     }
 
     return (
-        <div className="min-h-screen flex items-start justify-center px-4 w-screen mt-20 gap-x-10">
+
+        <div className="min-h-screen flex items-start justify-center px-4 w-screen mt-20 gap-x-28">
             <Card className="w-full max-w-md bg-white">
                 <CardHeader>
                     <CardTitle>{t("title")}</CardTitle>
                     <CardDescription className='text-slate-500'>{t("desc")}</CardDescription>
                 </CardHeader>
                 <CardContent>
-                    {/* @ts-ignore */}
-                    <Form {...form}>
-                        <form onSubmit={handleSubmit(submit)}>
+                    {
+                        session.status === "loading" || !session.data
+                            ?
+                            <Loader />
+                            :
+                            session.data?.user?.isVerified
+                                ?
+                                // @ts-ignore
+                                <Form {...form}>
+                                    <form onSubmit={handleSubmit(submit)}>
 
-                            <FormField
-                                control={control}
-                                name="phone_number"
-                                render={({ field }) => (
-                                    <FormItem>
-                                        <FormLabel>{t("recipient_number")}</FormLabel>
-                                        <FormControl>
-                                            <Input type="tel" {...field} />
-                                        </FormControl>
-                                        <FormMessage className="text-red-600" />
-                                    </FormItem>
-                                )}
-                            />
+                                        <FormField
+                                            control={control}
+                                            name="phone_number"
+                                            render={({ field }) => (
+                                                <FormItem>
+                                                    <FormLabel>{t("recipient_number")}</FormLabel>
+                                                    <FormControl>
+                                                        <Input type="tel" {...field} />
+                                                    </FormControl>
+                                                    <FormMessage className="text-red-600" />
+                                                </FormItem>
+                                            )}
+                                        />
 
-                            <FormField
-                                control={control}
-                                name="amount"
-                                render={({ field }) => (
-                                    <FormItem>
-                                        <FormLabel>{t("amount")}</FormLabel>
-                                        <FormControl>
-                                            <Input type="number" {...field} />
-                                        </FormControl>
-                                        <FormMessage className="text-red-600" />
-                                    </FormItem>
-                                )}
-                            />
+                                        <FormField
+                                            control={control}
+                                            name="amount"
+                                            render={({ field }) => (
+                                                <FormItem>
+                                                    <FormLabel>{t("amount")}</FormLabel>
+                                                    <FormControl>
+                                                        <Input type="number" {...field} />
+                                                    </FormControl>
+                                                    <FormMessage className="text-red-600" />
+                                                </FormItem>
+                                            )}
+                                        />
 
-                            <Button type="submit" className="w-full mt-6 bg-purple-600 text-white" disabled={formState.isSubmitting}>
-                                {formState.isSubmitting ? t("sending") : t('send_money')}
-                                <ArrowRight className="ml-2 h-4 w-4" />
-                            </Button>
-                        </form>
-                    </Form>
+                                        <Button type="submit" className="w-full mt-6 bg-purple-600 text-white" disabled={formState.isSubmitting}>
+                                            {formState.isSubmitting ? t("sending") : t('send_money')}
+                                            <ArrowRight className="ml-2 h-4 w-4" />
+                                        </Button>
+                                    </form>
+                                </Form>
+                                :
+                                <GetVerified sendVerificationEmailAction={sendVerificationEmailAction} title="Complete verification to enable p2p money transfer" />
+                        /* @ts-ignore */
+                    }
                 </CardContent>
                 <CardFooter className="flex flex-col items-start">
                 </CardFooter>
             </Card>
 
             <TransactionHistory p2pTransactionHistories={allTransactionHistory} />
-        </div>
+        </div >
     )
 }

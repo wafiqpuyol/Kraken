@@ -1,6 +1,7 @@
 import React from 'react'
 import { Deposit } from "@repo/ui/Deposit"
 import { addMoneyAction } from '../../../../../lib/deposit'
+import { sendVerificationEmailAction } from "../../../../../lib/auth"
 import { getServerSession } from "next-auth"
 import { prisma } from '@repo/db/client'
 import { balance, preference } from '@repo/db/type'
@@ -20,10 +21,11 @@ async function page({ params: { locale } }: { params: { locale: string } }) {
     const userBalance: Omit<balance, "id"> = {
         amount: getBalance?.amount || 0,
         locked: getBalance?.locked || 0,
-        userId: getBalance?.userId || 0
+        userId: getBalance?.userId || 0,
+        currency: getBalance?.currency!
     }
     return (
-        <Deposit userBalance={userBalance} addMoneyAction={addMoneyAction} userPreference={userPreference} />
+        <Deposit userBalance={userBalance} addMoneyAction={addMoneyAction} userPreference={userPreference} sendVerificationEmailAction={sendVerificationEmailAction} />
     )
 }
 
