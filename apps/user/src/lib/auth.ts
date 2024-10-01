@@ -192,3 +192,56 @@ export const resetPasswordAction = async (payload: resetPasswordPayload, token: 
         return { message: "Something went wrong while resetting password", status: 500 }
     }
 }
+
+export const sendVerificationEmailAction = async (locale: string): Promise<{ message: string, status: number }> => {
+    try {
+        const session = await getServerSession(authOptions)
+        if (!session?.user?.uid) {
+            return { message: "Unauthorized. Please login first", status: 401 }
+        }
+
+        const isUserExist = await prisma.user.findUnique({ where: { id: session.user.uid } })
+
+        if (!isUserExist) {
+            return { message: "User with this email does not exist", status: 404 }
+        }
+
+        const payload = {
+            verificationToken: randomBytes(32).toString("hex"),
+            verificationTokenExpiresAt: (new Date(Date.now() + 24 * 60 * 60 * 1000)),
+        }
+        await prisma.user.update({ where: { id: isUserExist.id }, data: payload })
+        console.log(payload.verificationToken);
+        return await sendVerificationEmail(isUserExist.email!, payload.verificationToken, locale)
+    } catch (error) {
+        console.log("sendVerificationEmailAction", error);
+        return { message: "Something went wrong while sending email verification", status: 500 }
+    }
+}
+
+export const verifyEmail = async (token: string) => {
+    console.log(token);
+    try {
+        if (!token) {
+            return { message: "Token is missing", status: 401 }
+        }
+
+        const isUserExist = await prisma.user.findFirst({ where: { verificationToken: token } })
+
+        if (!isUserExist) {
+            return { message: "User with this email does not exist", status: 404 }
+        }
+        if (isUserExist.verificationToken !== token) {
+            return { message: "Invalid token. Please try again", status: 401 }
+        }
+        const payload = {
+            isVerified: true,
+            verificationToken: ""
+        }
+        await prisma.user.update({ where: { id: isUserExist.id }, data: payload })
+        return { message: "Email verification successful", status: 200 }
+    } catch (error: any) {
+        console.log("------> verifyEmail", error);
+        return { message: error.message || "Something went wrong while verifying email", status: 500 }
+    }
+}
