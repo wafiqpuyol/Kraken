@@ -1,0 +1,3 @@
+-- AlterTable
+ALTER TABLE `user` ADD COLUMN `verificationToken` VARCHAR(191) NOT NULL DEFAULT '',
+    ADD COLUMN `verificationTokenExpiresAt` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3);

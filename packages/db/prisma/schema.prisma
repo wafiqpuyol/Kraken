@@ -62,6 +62,9 @@ model user {
   twoFactorSecret                          String?
   country                                  String?
   otpVerified                              Boolean             @default(false)
+  isVerified                               Boolean             @default(false)
+  verificationToken                        String              @default("")
+  verificationTokenExpiresAt               DateTime            @default(now())
   balance                                  balance?
   onramptransaction                        onramptransaction[]
   p2ptransfer_p2ptransfer_fromUserIdTouser p2ptransfer[]       @relation("p2ptransfer_fromUserIdTouser")
