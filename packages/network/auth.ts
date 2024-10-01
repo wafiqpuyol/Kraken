@@ -6,13 +6,17 @@ export const MAX_AGE = 1 * 24 * 60 * 60
 import { sign } from 'jsonwebtoken'
 import { loginPayload, LoginSchema } from "@repo/forms/loginSchema"
 import { prisma } from "@repo/db/client"
-import { User } from "@repo/db/type"
+import { user } from "@repo/db/type"
 import bcrypt from "bcryptjs";
 
 
 declare module 'next-auth' {
     interface Session {
-        user?: DefaultSession['user'] & { number: string }
+        user?: DefaultSession['user'] & {
+            number: string, uid: number, isTwoFAActive: boolean,
+            isOtpVerified: boolean,
+            isVerified: boolean
+        }
     }
 }
 
@@ -37,7 +41,7 @@ export const authOptions: NextAuthOptions = {
                 const { phone_number, password } = validatedFields.data
                 const isUserExist = await prisma.user.findUnique({ where: { number: phone_number } })
                 if (!isUserExist) {
-                    throw new Error('User not found. Please signup first')
+                    throw new Error('user not found. Please signup first')
                 }
                 const isPasswordMatch = await bcrypt.compare(password, isUserExist.password);
                 if (!isPasswordMatch) {
@@ -60,9 +64,6 @@ export const authOptions: NextAuthOptions = {
         strategy: 'jwt',
         maxAge: MAX_AGE,
     },
-    pages: {
-        signIn: '/login',
-    },
     callbacks: {
         // async signIn({ user, account, }) {
         //     console.log("ggggggggggggggggggg", user);
@@ -83,8 +84,8 @@ export const authOptions: NextAuthOptions = {
         //     }
         //     return true
         // },
-        async session({ token, session, newSession, user }) {
-            let existUser: User | undefined | null = undefined;
+        async session({ token, session }) {
+            let existUser: user | undefined | null = undefined;
             if (token.email) {
                 existUser = await prisma.user.findUnique({
                     where: {
@@ -92,12 +93,16 @@ export const authOptions: NextAuthOptions = {
                     }
                 })
             }
-            console.log("Session ---->", token, session, newSession, user);
+            if (!existUser) return session;
             session.user = {
                 name: token.name,
                 email: token.email,
                 image: token.picture,
-                number: existUser?.number || ""
+                number: existUser?.number || "",
+                uid: existUser.id,
+                isTwoFAActive: existUser.twoFactorActivated,
+                isOtpVerified: existUser.otpVerified,
+                isVerified: existUser.isVerified
             }
             return session
         }
