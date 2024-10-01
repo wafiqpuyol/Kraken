@@ -1,5 +1,5 @@
 "use client"
-import { ReactNode, useState } from "react"
+import { Dispatch, ReactNode, SetStateAction, useState } from "react"
 import { Button } from "../atoms/Button"
 import {
     Dialog,
@@ -19,8 +19,9 @@ interface TwoFADialogProps {
         message: string;
         status: number;
     }>
+    setTwoFA: Dispatch<SetStateAction<boolean>>
 }
-export const TwoFAEnableDialog: React.FC<TwoFADialogProps> = ({ children, code, activate2fa }) => {
+export const TwoFAEnableDialog: React.FC<TwoFADialogProps> = ({ children, code, activate2fa, setTwoFA }) => {
     const [otp, setOtp] = useState("");
     const { toast } = useToast()
     console.log(code);
@@ -36,6 +37,7 @@ export const TwoFAEnableDialog: React.FC<TwoFADialogProps> = ({ children, code, 
                         title: `${res.message}`,
                         variant: "default"
                     })
+                    setTwoFA(true)
                     break;
                 case 400:
                     toast({

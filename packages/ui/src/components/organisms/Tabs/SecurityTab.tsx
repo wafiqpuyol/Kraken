@@ -33,6 +33,7 @@ export const SecurityTab: React.FC<SecurityTabProps> = ({ getTwoFASecret, isTwoF
     const session = useSession()
     const { toast } = useToast()
     const [code, setCode] = useState("");
+    const [twoFA, setTwoFA] = useState(isTwoFaEnabled);
     const t = useTranslations("SecurityTab")
 
     const handleClick = async () => {
@@ -125,10 +126,10 @@ export const SecurityTab: React.FC<SecurityTabProps> = ({ getTwoFASecret, isTwoF
                                 </p>
                             </div>
                             {
-                                isTwoFaEnabled ?
+                                twoFA ?
                                     <TwoFADisableDialog ><Button variant="outline" className="text-purple-600 bg-purple-200">{t("remove")}</Button></TwoFADisableDialog>
                                     :
-                                    <TwoFAEnableDialog code={code} activate2fa={activate2fa}><Button variant="outline" className="text-purple-600 bg-purple-200" onClick={handleClick}>Enable</Button></TwoFAEnableDialog>
+                                    <TwoFAEnableDialog setTwoFA={setTwoFA} code={code} activate2fa={activate2fa}><Button variant="outline" className="text-purple-600 bg-purple-200" onClick={handleClick}>Enable</Button></TwoFAEnableDialog>
                             }
                         </div>
                     </div>
