@@ -1,7 +1,7 @@
 "use server"
 
 const nodemailer = require("nodemailer");
-import { PASSWORD_RESET_REQUEST_TEMPLATE } from "../templates/mailTemplates"
+import { PASSWORD_RESET_REQUEST_TEMPLATE, VERIFICATION_EMAIL_TEMPLATE } from "../templates/mailTemplates"
 
 
 const nodeMailerClient = nodemailer.createTransport({
@@ -18,19 +18,36 @@ const sender = process.env.NEXT_PUBLIC_MAIL_SENDER!;
 
 
 
-export const sendVerificationEmail = async (email: string, passwordResetToken: string) => {
-    console.log(sender, passwordResetToken);
+export const sendPasswordResetEmail = async (email: string, passwordResetToken: string, locale: string) => {
+    console.log(sender, passwordResetToken, email);
+    try {
+        await nodeMailerClient.sendMail({
+            from: sender,
+            to: email,
+            subject: "Reset your password",
+            html: PASSWORD_RESET_REQUEST_TEMPLATE.replace("{resetToken}", passwordResetToken).replace("{locale}", locale),
+            category: "Password Reset",
+        });
+        return { message: "Password reset link has been sent to your email", status: 200 };
+    } catch (error: any) {
+        console.log(error);
+        return { message: "Something went wrong while sending password reset link to your email", status: 500 };
+    }
+};
+
+
+export const sendVerificationEmail = async (email: string, emailVerificationToken: string, locale: string) => {
     try {
         await nodeMailerClient.sendMail({
             from: sender,
             to: email,
             subject: "Verify your email",
-            html: PASSWORD_RESET_REQUEST_TEMPLATE.replace("{resetToken}", passwordResetToken),
+            html: VERIFICATION_EMAIL_TEMPLATE.replace("{locale}", locale).replace("{verificationCode}", emailVerificationToken),
             category: "Email Verification",
         });
-        return { message: "Password reset link has been sent to your email`", status: 200 };
+        return { message: "Email verification link has been sent to your email", status: 200 };
     } catch (error: any) {
         console.log(error);
-        return { message: "Something went wrong while sending password reset link to your email", status: 500 };
+        return { message: "Something went wrong while sending email verification link to your email", status: 500 };
     }
 };
