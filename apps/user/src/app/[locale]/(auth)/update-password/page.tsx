@@ -12,4 +12,4 @@ const page = async ({ searchParams, params }: { searchParams: { token?: string }
     )
 }
 
-export default page
+export default page 
