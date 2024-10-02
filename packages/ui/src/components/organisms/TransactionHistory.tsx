@@ -1,6 +1,6 @@
 "use client"
 
-import { p2ptransfer } from "@repo/db/type"
+import { p2ptransfer, preference } from "@repo/db/type"
 import { useSession } from "next-auth/react"
 import { cn } from "../../lib/utils"
 import { TransactionModal } from "../molecules/TransactionModal"
@@ -15,10 +15,9 @@ export const TransactionHistory: React.FC<TransactionHistoryProps> = ({ p2pTrans
     const [isSekelton, setIsSekelton] = useState(true)
     const currentUserID = useSession().data?.user?.uid;
     const t = useTranslations("TransactionHistory")
-    console.log(p2pTransactionHistories[0]);
 
     useEffect(() => {
-        const timerId = setTimeout(() => setIsSekelton(false), 3000)
+        const timerId = setTimeout(() => setIsSekelton(false), 2500)
         return () => clearTimeout(timerId)
     }, [])
 
@@ -53,9 +52,15 @@ export const TransactionHistory: React.FC<TransactionHistoryProps> = ({ p2pTrans
                                                         <div className="text-gray-800 text-lg">
                                                             {(transactionType === "Send" && obj.fromUserId === currentUserID)
                                                                 ?
-                                                                <span><small className="text-gray-500 text-[1rem] mr-1">{t("to")}</small> {obj.user_p2ptransfer_toUserIdTouser.name}</span>
+                                                                <span>
+                                                                    <small className="text-gray-500 text-[1rem] mr-1">{t("to")}</small>
+                                                                    {obj.user_p2ptransfer_toUserIdTouser?.name}
+                                                                </span>
                                                                 :
-                                                                <span><small className="text-gray-500 text-[1rem] mr-1">{t("from")}</small> {obj.user_p2ptransfer_fromUserIdTouser.name}</span>
+                                                                <span>
+                                                                    <small className="text-gray-500 text-[1rem] mr-1">{t("from")}</small>
+                                                                    {obj.user_p2ptransfer_fromUserIdTouser?.name}
+                                                                </span>
                                                             }
                                                         </div>
                                                         <small className="text-gray-500">{t("transID_label")} {obj.transactionID}</small>

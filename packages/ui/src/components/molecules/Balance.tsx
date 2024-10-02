@@ -6,7 +6,7 @@ interface BalanceProps {
     userPreference: preference
 }
 
-export const Balance: React.FC<BalanceProps> = ({ userBalance, userPreference }) => {
+export const Balance: React.FC<BalanceProps> = ({ userBalance }) => {
     const t = useTranslations("Balance")
 
     return (
@@ -16,15 +16,15 @@ export const Balance: React.FC<BalanceProps> = ({ userBalance, userPreference })
                 <div className="mt-4">
                     <div className="flex justify-between py-2 border-b border-border font-medium text-gray-500">
                         <span>{t("unlocked_balance")}</span>
-                        <span className="text-black/85">{userBalance.amount / 100} {t(`${userPreference.currency}.name`)}</span>
+                        <span className="text-black/85">{userBalance.amount / 100} {t(`${userBalance.currency}.name`)}</span>
                     </div>
                     <div className="flex justify-between py-2 border-b border-border font-medium text-gray-500">
                         <span>{t("total_locked_balance")}</span>
-                        <span className="text-black/85">{userBalance.locked / 100}  {t(`${userPreference.currency}.name`)}</span>
+                        <span className="text-black/85">{userBalance.locked / 100}  {t(`${userBalance.currency}.name`)}</span>
                     </div>
                     <div className="flex justify-between py-2 font-medium text-gray-500">
                         <span >{t("total_balance")}</span>
-                        <span className="text-black/85">{(userBalance.amount + userBalance.locked) / 100}  {t(`${userPreference.currency}.name`)}</span>
+                        <span className="text-black/85">{(userBalance.amount + userBalance.locked) / 100}  {t(`${userBalance.currency}.name`)}</span>
                     </div>
                 </div>
             </div>

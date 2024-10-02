@@ -5,22 +5,23 @@ import { Form, FormField, FormItem, FormLabel, FormControl, FormMessage } from '
 import { forgotPasswordPayload } from '@repo/forms/forgotPasswordSchema'
 import { useFormForgotPassword } from "@repo/forms/forgotPassword"
 import { useToast } from "../molecules/Toaster/use-toast"
-import { useTranslations } from "next-intl"
+import { useTranslations, useLocale } from "next-intl"
 
 
 interface forgotPasswordProps {
-    forgotPasswordAction: (payload: forgotPasswordPayload) => Promise<{
+    forgotPasswordAction: (payload: forgotPasswordPayload, locale: string) => Promise<{
         message: string;
         status: number;
     }>
 }
 export const ForgotPasswordForm: React.FC<forgotPasswordProps> = ({ forgotPasswordAction }) => {
+    const locale = useLocale()
     const { toast } = useToast()
     const { handleSubmit, control, ...form } = useFormForgotPassword()
     const t = useTranslations("ForgotPasswordForm");
     const submit = async (payload: forgotPasswordPayload) => {
         try {
-            const res = await forgotPasswordAction(payload)
+            const res = await forgotPasswordAction(payload, locale)
             switch (res.status) {
                 case 200:
                     toast({

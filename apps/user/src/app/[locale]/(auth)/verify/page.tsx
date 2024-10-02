@@ -54,18 +54,30 @@ const page: React.FC<IProps> = async ({ params: { locale }, searchParams: { toke
                     }
                     return <EmailVerification content={content} sendVerificationEmailAction={sendVerificationEmailAction} />
                 case 401:
+                    let description = "";
+                    if (res.message.includes("Token is missing")) {
+                        description = `
+                            <div className='bg-red-200/50 py-4 rounded-xl px-3'>
+                        <p className='text-slate-600 text-[0.95rem] font-medium'>Email verification failed due to missing token.</p>
+                    </div>
+                        `
+                    }
+                    console.log(res.message.includes("Token has expired"));
+                    if (res.message.includes("Token has expired")) {
+                        description = `
+                        <div className='bg-red-200/50 py-4 rounded-xl px-3'>
+                    <p className='text-slate-600 text-[0.95rem] font-medium'>Email verification failed due to token expiration.</p>
+                </div>
+                    `
+                    }
                     content = {
                         locale,
+                        description,
                         status: res.status,
                         title: res.message,
-                        description: `
-                            <div className='bg-red-200/50 py-4 rounded-xl px-3'>
-                        <p className='text-slate-600 text-[0.95rem] font-medium'>Seems we couldn't find your email verification token.</p>
-                    </div>
-    
-                        `,
                         btnText: "Resend Verification Email"
                     }
+
                     return <EmailVerification content={content} sendVerificationEmailAction={sendVerificationEmailAction} />
                 case 404:
                     content = {

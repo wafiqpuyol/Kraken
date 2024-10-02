@@ -32,7 +32,7 @@ export const ResetPasswordForm: React.FC<resetPasswordProps> = ({ resetPasswordA
                         title: `${res.message}`,
                         variant: "default"
                     })
-                    router.push(`${locale}/dashboard/home`);
+                    router.push(`/${locale}/dashboard/home`);
                     break;
                 case 400:
                     toast({
