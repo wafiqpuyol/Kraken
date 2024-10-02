@@ -5,18 +5,37 @@ import { Button } from "../atoms/Button"
 import { Label } from "../atoms/Label"
 import { useState } from "react"
 import { useToast } from "../molecules/Toaster/use-toast"
-import { user } from "@repo/db/type"
+import { user, account as AccountType } from "@repo/db/type"
 import { useTranslations } from 'next-intl';
+import { ChangeEmailDialog } from "./ChangeEmailDialog"
+import { forgotPasswordPayload } from "@repo/forms/forgotPasswordSchema"
+import { confirmMailPayload } from "@repo/forms/confirmMailSchema"
+
 
 interface PersonalInfoProps {
     userDetails: user
+    account: AccountType
+    changeEmailAction: (payload: forgotPasswordPayload) => Promise<{
+        message: string;
+        status: number;
+    }>
+    updateEmail: (payload: confirmMailPayload) => Promise<{
+        message: string;
+        status: number;
+    }>
+    cancelConfirmMail: () => Promise<{
+        message: string;
+        status: number;
+    }>
 }
 
-export const PersonalInfo: React.FC<PersonalInfoProps> = ({ userDetails }) => {
+export const PersonalInfo: React.FC<PersonalInfoProps> = ({ userDetails, account, changeEmailAction, updateEmail, cancelConfirmMail }) => {
     const [isCopied, setIsCopied] = useState<boolean>(false)
     const { toast } = useToast()
     const t = useTranslations("PersonalInfo")
     const publicId = userDetails.id
+
+
     const handleClick = async () => {
         try {
             await navigator.clipboard.writeText(publicId.toString())
@@ -89,7 +108,9 @@ export const PersonalInfo: React.FC<PersonalInfoProps> = ({ userDetails }) => {
                             <p className="font-base">{userDetails.email}</p>
                         </div>
                     </div>
-                    <Button variant="link" className="text-purple-600">{t("edit")}</Button>
+                    <ChangeEmailDialog account={account} changeEmailAction={changeEmailAction} updateEmail={updateEmail} cancelConfirmMail={cancelConfirmMail}>
+                        <Button variant="link" className="text-purple-600">{t("edit")}</Button>
+                    </ChangeEmailDialog>
                 </div>
 
                 {/* Country */}
