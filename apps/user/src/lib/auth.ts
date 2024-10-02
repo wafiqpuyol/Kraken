@@ -2,13 +2,15 @@
 
 import { generateHash, generateRandomNumber, comparePassword } from "@repo/network"
 import { prisma } from "@repo/db/client"
+import { user } from "@repo/db/type"
 import { signUpPayload, SignUpSchema } from "@repo/forms/signupSchema"
 import { ChangePasswordSchema, changePasswordPayload } from "@repo/forms/changePasswordSchema"
 import { ForgotPasswordSchema, forgotPasswordPayload } from "@repo/forms/forgotPasswordSchema"
+import { ConfirmMailSchema, confirmMailPayload } from "@repo/forms/confirmMailSchema"
 import { authOptions } from "@repo/network"
 import { getServerSession } from "next-auth"
 import { randomBytes } from "crypto";
-import { sendPasswordResetEmail, sendVerificationEmail } from "./mail"
+import { sendPasswordResetEmail, sendVerificationEmail, sendChangeEmailVerification } from "./mail"
 import { resetPasswordPayload } from "@repo/forms/resetPasswordSchema"
 import { PasswordMatchSchema } from "@repo/forms/changePasswordSchema"
 import { SUPPORTED_CURRENCY } from "./constants"
@@ -31,7 +33,7 @@ export const signUpAction = async (payload: signUpPayload, countryName: string):
 
         const isUser = await prisma.user.findUnique({ where: { email: payload.email } })
         if (isUser) {
-            return { message: "User already exist", status: 409 }
+            return { message: "User already exist with this email", status: 409 }
         }
 
         payload.password = await generateHash(payload.password);
@@ -60,6 +62,13 @@ export const signUpAction = async (payload: signUpPayload, countryName: string):
                 data: {
                     userId: user.id,
                     currency
+                }
+            })
+            await prisma.account.create({
+                data: {
+                    current_email: user.email!,
+                    userId: user.id,
+                    email_update: JSON.stringify({}),
                 }
             })
         })
@@ -208,7 +217,7 @@ export const sendVerificationEmailAction = async (locale: string): Promise<{ mes
 
         const payload = {
             verificationToken: randomBytes(32).toString("hex"),
-            verificationTokenExpiresAt: new Date(Date.now() + 10 * 60 * 1000),
+            verificationTokenExpiresAt: new Date(Date.now() + 1000 * 60 * 60 * 24 * 1),
         }
         await prisma.user.update({ where: { id: isUserExist.id }, data: payload })
         console.log(payload.verificationToken);
@@ -252,3 +261,128 @@ export const verifyEmail = async (token: string): Promise<{
         return { message: error.message || "Something went wrong while verifying your email", status: 500 }
     }
 }
+
+export const changeEmailAction = async (payload: forgotPasswordPayload): Promise<{ message: string, status: number }> => {
+    try {
+        const session = await getServerSession(authOptions)
+        if (!session?.user?.uid) {
+            return { message: "Unauthorized. Please login first to change your email.", status: 401 }
+        }
+        const validatedPayload = ForgotPasswordSchema.safeParse(payload)
+        if (!validatedPayload.success) {
+            return {
+                message: validatedPayload.error.format().email?._errors[0] as string,
+                status: 400,
+            }
+        }
+
+        const isUserExist = await prisma.user.findFirst({ where: { id: session.user.uid } })
+        if (!isUserExist) {
+            return { message: "Unauthorized. Please login first", status: 401 }
+        }
+
+        const isEmailExist = await prisma.user.findUnique({ where: { email: payload.email } })
+        if (isEmailExist) {
+            return { message: "Email already exists. Try to choose different email", status: 409 }
+        }
+
+        const updated = {
+            email_update_pending: true,
+            userId: session.user.uid,
+            email_update: JSON.stringify({
+                email_address: payload.email,
+                expiration: new Date(Date.now() + 1000 * 60 * 60 * 24 * 1),
+            }),
+            authorization_code: randomBytes(16).toString("hex"),
+            confirmation_code: randomBytes(16).toString("hex")
+        }
+
+        await prisma.account.update({ where: { userId: session.user.uid }, data: updated })
+        await sendChangeEmailVerification(isUserExist.email!, payload.email, updated.authorization_code, updated.confirmation_code)
+        return { message: "Email change request sent successfully", status: 200 }
+    } catch (error: any) {
+        console.log("changeEmailAction", error);
+        return { message: error.message || "Something went wrong while sending email change request", status: 500 }
+    }
+}
+
+export const updateEmail = async (payload: confirmMailPayload): Promise<{ message: string, status: number }> => {
+    try {
+        const session = await getServerSession(authOptions)
+        if (!session?.user?.uid) {
+            return { message: "Unauthorized. Please login first to change your email.", status: 401 }
+        }
+        const validatedPayload = ConfirmMailSchema.safeParse(payload)
+        if (!validatedPayload.success) {
+            return {
+                message: validatedPayload.error.format().authorization_code?._errors[0] as string || validatedPayload.error.format().confirmation_code?._errors[0] as string,
+                status: 400,
+            }
+        }
+
+        const isUserExist = await prisma.user.findFirst({ where: { id: session.user.uid } })
+        if (!isUserExist) {
+            return { message: "Unauthorized. Please login first", status: 401 }
+        }
+
+        const isAccountExist = await prisma.account.findFirst({
+            where: {
+                AND: [
+                    { userId: isUserExist.id },
+                    { authorization_code: payload.authorization_code },
+                    { confirmation_code: payload.confirmation_code }
+                ]
+            }
+        })
+
+        if (!isAccountExist) {
+            return { message: "Invalid confirmation or authorization code", status: 400 }
+        }
+
+        const newEmail = JSON.parse(isAccountExist.email_update.toLocaleString());
+
+        await prisma.user.update({ where: { id: session.user.uid }, data: { email: newEmail.email_address } })
+        await prisma.account.update({
+            where: { userId: isUserExist.id }, data: {
+                authorization_code: null,
+                confirmation_code: null,
+                current_email: newEmail.email_address,
+                email_update_pending: false,
+                email_update: JSON.stringify({})
+            }
+        })
+
+        return { message: "Email changed successfully", status: 200 }
+    } catch (error: any) {
+        console.log("updateEmail", error);
+        return { message: error.message || "Something went wrong while updating your email", status: 500 }
+    }
+}
+
+export const cancelConfirmMail = async (): Promise<{
+    message: string;
+    status: number;
+}> => {
+    try {
+        const session = await getServerSession(authOptions)
+        if (!session?.user?.uid) {
+            return { message: "Unauthorized. Please login first to change your email.", status: 401 }
+        }
+        const isUserExist = await prisma.user.findFirst({ where: { id: session?.user.uid } }) as user
+        await prisma.account.update({
+            where: {
+                userId: isUserExist.id,
+            },
+            data: {
+                authorization_code: null,
+                confirmation_code: null,
+                email_update_pending: false,
+                email_update: JSON.stringify({}),
+            }
+        })
+        return { message: "Email change request canceled successfully", status: 200 }
+    } catch (error) {
+        console.log("cancelConfirmMail -->", error);
+        return { message: "Something went wrong while canceling email change request", status: 500 }
+    }
+} 
