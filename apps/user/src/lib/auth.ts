@@ -208,7 +208,7 @@ export const sendVerificationEmailAction = async (locale: string): Promise<{ mes
 
         const payload = {
             verificationToken: randomBytes(32).toString("hex"),
-            verificationTokenExpiresAt: (new Date(Date.now() + 24 * 60 * 60 * 1000)),
+            verificationTokenExpiresAt: new Date(Date.now() + 10 * 60 * 1000),
         }
         await prisma.user.update({ where: { id: isUserExist.id }, data: payload })
         console.log(payload.verificationToken);
@@ -219,29 +219,36 @@ export const sendVerificationEmailAction = async (locale: string): Promise<{ mes
     }
 }
 
-export const verifyEmail = async (token: string) => {
+export const verifyEmail = async (token: string): Promise<{
+    message: string;
+    status: number;
+}> => {
     console.log(token);
     try {
         if (!token) {
             return { message: "Token is missing", status: 401 }
         }
-
+        const now = new Date();
         const isUserExist = await prisma.user.findFirst({ where: { verificationToken: token } })
 
         if (!isUserExist) {
             return { message: "User with this email does not exist", status: 404 }
         }
         if (isUserExist.verificationToken !== token) {
-            return { message: "Invalid token. Please try again", status: 401 }
+            return { message: "Invalid token", status: 400 }
+        }
+        if (now > isUserExist.verificationTokenExpiresAt!) {
+            return { message: "Token has expired", status: 401 }
         }
         const payload = {
             isVerified: true,
-            verificationToken: ""
+            verificationToken: "",
+            verificationTokenExpiresAt: null
         }
         await prisma.user.update({ where: { id: isUserExist.id }, data: payload })
         return { message: "Email verification successful", status: 200 }
     } catch (error: any) {
         console.log("------> verifyEmail", error);
-        return { message: error.message || "Something went wrong while verifying email", status: 500 }
+        return { message: error.message || "Something went wrong while verifying your email", status: 500 }
     }
 }
