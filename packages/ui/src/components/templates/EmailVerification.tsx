@@ -3,6 +3,7 @@
 import React, { useEffect } from 'react'
 import { useRouter } from "next/navigation"
 import parse from 'html-react-parser';
+import { useToast } from "../molecules/Toaster/use-toast"
 
 interface EmailVerificationProps {
 
@@ -21,12 +22,59 @@ interface EmailVerificationProps {
 }
 export const EmailVerification: React.FC<EmailVerificationProps> = ({ sendVerificationEmailAction, content }) => {
     const router = useRouter();
-    console.log("LOcale ---->", content.locale);
+    const { toast } = useToast()
+
+
     const handleClick = async () => {
         if (content.status === 200) {
-            router.push(`/${content.locale}/dashboard/home`)
+            return router.push(`/${content.locale}/dashboard/home`)
         }
-        await sendVerificationEmailAction(content.locale)
+        try {
+            const res = await sendVerificationEmailAction(content.locale);
+            switch (res.status) {
+                case 200:
+                    toast({
+                        title: res.message,
+                        variant: "default"
+                    })
+                    break;
+
+                case 401:
+                    toast({
+                        title: res.message,
+                        variant: "default"
+                    })
+                    router.push(`/${content.locale}/login`);
+                    break;
+
+                case 404:
+                    toast({
+                        title: res.message,
+                        variant: "default"
+                    })
+                    router.push(`/${content.locale}/login`);
+                    break;
+
+                case 500:
+                    toast({
+                        title: res.message,
+                        variant: "destructive"
+                    })
+                    break;
+
+                default:
+                    toast({
+                        title: res.message,
+                        variant: "destructive"
+                    })
+                    break;
+            }
+        } catch (error) {
+            toast({
+                title: error.message || "Something went wrong",
+                variant: "destructive"
+            })
+        }
     }
 
     useEffect(() => {
