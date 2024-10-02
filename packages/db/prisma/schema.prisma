@@ -64,12 +64,13 @@ model user {
   otpVerified                              Boolean             @default(false)
   isVerified                               Boolean             @default(false)
   verificationToken                        String              @default("")
-  verificationTokenExpiresAt               DateTime?           
+  verificationTokenExpiresAt               DateTime?
   balance                                  balance?
   onramptransaction                        onramptransaction[]
   p2ptransfer_p2ptransfer_fromUserIdTouser p2ptransfer[]       @relation("p2ptransfer_fromUserIdTouser")
   p2ptransfer_p2ptransfer_toUserIdTouser   p2ptransfer[]       @relation("p2ptransfer_toUserIdTouser")
   preference                               preference?
+  account                                  account?
   resetpassword                            resetpassword[]
 }
 
@@ -92,6 +93,19 @@ model preference {
   user     user   @relation(fields: [userId], references: [id], map: "Preference_userId_fkey")
 
   @@index([userId], map: "Preference_userId_fkey")
+}
+
+model account {
+  id                   Int     @id @default(autoincrement())
+  userId               Int     @unique(map: "Account_userId_key")
+  current_email        String
+  email_update_pending Boolean @default(false)
+  email_update         Json
+  authorization_code   String?
+  confirmation_code    String?
+  user                 user    @relation(fields: [userId], references: [id], map: "Account_userId_fkey")
+
+  @@index([userId], map: "Account_userId_fkey")
 }
 
 enum onramptransaction_status {
