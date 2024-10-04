@@ -6,8 +6,11 @@ import { getServerSession } from "next-auth"
 import { prisma } from "@repo/db/client"
 import { p2ptransfer } from "@repo/db/type"
 import { generateTransactionId } from "./utils"
+import { verify } from "jsonwebtoken"
+import { MINIMUM_AMOUNT } from "@repo/ui/constants"
+import { } from "@repo/ui/constants"
 
-export const sendMoneyAction = async (payload: sendMoneyPayload): Promise<{ message: string | undefined, status: number, transaction?: p2ptransfer | undefined }> => {
+export const sendMoneyAction = async (payload: sendMoneyPayload): Promise<{ message: string | undefined, status: number, transaction?: p2ptransfer | {} }> => {
     try {
         const session = await getServerSession(authOptions)
         if (!session?.user?.uid) {
@@ -18,7 +21,7 @@ export const sendMoneyAction = async (payload: sendMoneyPayload): Promise<{ mess
         if (!validatedPayload.success) {
             console.log(validatedPayload.error.format().phone_number?._errors);
             return {
-                message: validatedPayload.error.format().phone_number?._errors[0] || validatedPayload.error.format().amount?._errors[0],
+                message: validatedPayload.error.format().phone_number?._errors[0] || validatedPayload.error.format().amount?._errors[0] || validatedPayload.error.format().pincode?._errors[0],
                 status: 400, field: validatedPayload.error.name || validatedPayload.error.name
             }
         }
@@ -27,29 +30,47 @@ export const sendMoneyAction = async (payload: sendMoneyPayload): Promise<{ mess
         if (!isUserExist) {
             return { message: "User not found", status: 401 }
         }
+        if (!isUserExist.isVerified) {
+            return { message: "Please verify your account first to send money", status: 401 }
+        }
+
+        const wallet = await prisma.wallet.findFirst({ where: { userId: isUserExist.id } })
+        if (!wallet || !wallet.pincode) {
+            return { message: "Pincode not found. Pincode is required to send money", status: 401 }
+        }
+
+        const decodedPincode = verify(wallet.pincode!, isUserExist.password)
+        const isPincodeValid = decodedPincode === payload.pincode
+        if (!isPincodeValid) {
+            return { message: "Wrong pincode. Please enter the correct pincode", status: 401 }
+        }
 
         const isRecipientExist = await prisma.user.findUnique({ where: { number: payload.phone_number } })
         if (!isRecipientExist) {
-            return { message: "Recipient not found", status: 404 }
+            return { message: "Recipient number not found. Please enter a valid recipient number", status: 404 }
         }
+
         if (isUserExist.number === isRecipientExist.number) {
             return { message: "Cannot send money to yourself. Invalid recipient number", status: 401 }
         }
-        let transaction: p2ptransfer | undefined = undefined;
+
+        const senderBalance = await prisma.balance.findFirst({ where: { userId: isUserExist.id } })
+        if (!senderBalance) {
+            return { message: "Balance not found", status: 404 }
+        }
+
+        if (senderBalance?.amount < parseInt(payload.amount)) {
+            return { message: "You're wallet does not have sufficient balance to make this transfer.", status: 401 }
+        }
+        const deductedAmount = (senderBalance?.amount - (parseInt(payload.amount) * 100)) / 100
+        if (deductedAmount <= MINIMUM_AMOUNT) {
+            return { message: `Insufficient funds; you must have at least ${MINIMUM_AMOUNT}${senderBalance.currency} remain after the transfer`, status: 403 }
+        }
+
+
+        let transaction: p2ptransfer | [] = [];
         await prisma.$transaction(async (tx) => {
             await tx.$queryRaw`SELECT * FROM Balance WHERE userId=${isUserExist.id} FOR UPDATE`;
-
-            const senderBalance = await prisma.balance.findFirst({ where: { userId: isUserExist.id } })
-            if (!senderBalance) {
-                return { message: "Please deposit atleast $10", status: 404 }
-            }
-            if (senderBalance?.amount < parseInt(payload.amount)) {
-                return { message: "Insufficient balance", status: 401 }
-            }
-            const deductedAmount = (senderBalance?.amount - (parseInt(payload.amount) * 100)) / 100
-            if (deductedAmount <= 10) {
-                return { message: "Insufficient funds; you must have at least $10 remaining after the transfer.”", status: 403 }
-            }
 
             await tx.balance.update({
                 where: {
@@ -96,6 +117,7 @@ export const sendMoneyAction = async (payload: sendMoneyPayload): Promise<{ mess
                 },
             })
         })
+        console.log("---------------ENTER 4 ---------------");
         return { message: "Sending money successful", status: 200, transaction }
     } catch (error: any) {
         console.log(error);
