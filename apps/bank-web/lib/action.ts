@@ -14,7 +14,7 @@ const webHookCall = async (payload: IWebhookPayload) => {
     await axios.post(`${process.env.NEXT_PUBLIC_WEEBHOOK_API_URL}/webhook`, payload)
 }
 
-export const transactionAction = async (userId: number, token: string): Promise<{ message: string, statusCode: number }> => {
+export const transactionAction = async (userId: number, token: string): Promise<{ message: string, statusCode: number, country?: string }> => {
 
     try {
         const isUserExist = await prisma.user.findFirst({
@@ -46,8 +46,8 @@ export const transactionAction = async (userId: number, token: string): Promise<
         if (!isOnRampExist) {
             throw new Error("Onramp doesn't exist")
         }
-        await webHookCall({ amount: isOnRampExist.amount, userId, token, tokenValidation: "Success" })
-        return { message: "ok", statusCode: 200 }
+        await webHookCall({ amount: isOnRampExist.amount, userId, token, tokenValidation: "Success", })
+        return { message: "ok", statusCode: 200, country: isUserExist.country! }
     } catch (error: any) {
         console.log("--------------->", error.message);
         webHookCall({ amount: 0, userId, token, tokenValidation: "Failure" })

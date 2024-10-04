@@ -7,6 +7,7 @@ import Link from "next/link"
 import { transactionAction } from "../lib/action"
 import { useEffect, useState } from "react"
 import { useSearchParams, useRouter } from 'next/navigation'
+import { SUPPORTED_LOCALES } from "../lib/constants"
 
 export default function Component() {
   const [userId, setUserId] = useState<string | null>(null)
@@ -19,18 +20,23 @@ export default function Component() {
     setInputError(false)
   }, [userId])
   const handleClick = async () => {
-    let res;
+    let res: {
+      message: string;
+      statusCode: number;
+      country?: string;
+    };
     if (userId != null) {
       if (parseInt(userId)) {
         res = await transactionAction(parseInt(userId), params.get("token"))
+        const locale = SUPPORTED_LOCALES.find((l) => l.title === res.country)?.code || "/en"
         if (res.statusCode === 400) {
           return setInputError("Invalid User Id")
         }
         if (res.statusCode === 403) {
-          return router.push(`${process.env.NEXT_PUBLIC_FRONTEND_URL}/dashboard/transfer/deposit`)
+          return router.push(`${process.env.NEXT_PUBLIC_FRONTEND_URL}${locale}/dashboard/transfer/deposit`)
         }
         if (res.statusCode === 200) {
-          return router.push(`${process.env.NEXT_PUBLIC_FRONTEND_URL}/dashboard/transactions/history`)
+          return router.push(`${process.env.NEXT_PUBLIC_FRONTEND_URL}${locale}/dashboard/transactions/history`)
         }
       }
       setInputError("Invalid User Id")
