@@ -9,6 +9,7 @@ import { useRouter } from "next/navigation"
 import { CountrySelector } from 'react-international-phone';
 import { useState } from 'react'
 import { usePhoneInput } from 'react-international-phone';
+import { SELECTED_COUNTRY } from "../../lib/constant"
 import 'react-international-phone/style.css';
 import { useTranslations } from 'next-intl';
 import { useLocale } from 'next-intl';
@@ -31,6 +32,7 @@ export const SignUpForm: React.FC<SignUpFormProps> = ({ signUpAction }) => {
         defaultCountry: 'us',
         value: '+1 (234)',
     })
+
     const [countryCode, setCountryCode] = useState(`+${country.dialCode}`)
     const t = useTranslations("SignUpForm")
     console.log(form.formState.errors);
@@ -98,7 +100,7 @@ export const SignUpForm: React.FC<SignUpFormProps> = ({ signUpAction }) => {
                                         <FormLabel className='text-gray-600'>{t("phone_number")}</FormLabel>
                                         <FormControl>
                                             <div className='flex gap-1 items-center'>
-                                                <CountrySelector flagStyle={{ width: "35px", height: "35px" }} selectedCountry={country.iso2} onSelect={(e) => {
+                                                <CountrySelector flagStyle={{ width: "35px", height: "35px" }} countries={[...SELECTED_COUNTRY]} selectedCountry={country.iso2} onSelect={(e) => {
                                                     setCountry(e.iso2);
                                                     field.onChange(() => `+${e.dialCode}`)
                                                     setCountryCode(e.dialCode || "")

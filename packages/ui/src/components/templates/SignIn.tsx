@@ -10,11 +10,12 @@ import { useRouter } from "next/navigation"
 import Link from "next/link"
 import { TwoFAForm } from '../molecules/TwoFAForm'
 import { useState } from 'react'
-import { usePhoneInput, CountrySelector } from 'react-international-phone';
+import { usePhoneInput, CountrySelector, } from 'react-international-phone';
 import 'react-international-phone/style.css';
 import { useTranslations } from 'next-intl';
 import { useLocale } from 'next-intl';
 import { Eye, ClosedEye } from "../../icons"
+import { SELECTED_COUNTRY } from "@repo/ui/constants"
 
 interface LoginProps {
     isTwoFAEnabledFunc: () => Promise<{
@@ -97,7 +98,7 @@ export const SignInForm: React.FC<LoginProps> = ({ isTwoFAEnabledFunc, activate2
                                                 <FormLabel className='text-gray-600'>{t("phone_number")}</FormLabel>
                                                 <FormControl>
                                                     <div className='flex gap-1 items-center'>
-                                                        <CountrySelector selectedCountry={country.iso2} onSelect={(e) => {
+                                                        <CountrySelector countries={[...SELECTED_COUNTRY]} selectedCountry={country.iso2} onSelect={(e) => {
                                                             setCountry(e.iso2);
                                                             field.onChange(() => `+${e.dialCode}`)
                                                             setCountryCode(e.dialCode || "")
