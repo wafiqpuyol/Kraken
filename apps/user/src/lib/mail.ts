@@ -1,7 +1,7 @@
 "use server"
 
 const nodemailer = require("nodemailer");
-import { PASSWORD_RESET_REQUEST_TEMPLATE, VERIFICATION_EMAIL_TEMPLATE, AUTHORIZATION_CODE_TEMPLATE, CONFIRMATION_CODE_TEMPLATE } from "../templates/mailTemplates"
+import { PASSWORD_RESET_REQUEST_TEMPLATE, VERIFICATION_EMAIL_TEMPLATE, AUTHORIZATION_CODE_TEMPLATE, CONFIRMATION_CODE_TEMPLATE, EMERGENCY_CODE_TEMPLATE } from "../templates/mailTemplates"
 
 
 const nodeMailerClient = nodemailer.createTransport({
@@ -74,5 +74,22 @@ export const sendChangeEmailVerification = async (current_email: string, new_ema
     } catch (error: any) {
         console.log("sendChangeEmailVerification -->", error);
         return { message: "Something went wrong while sending email to your email", status: 500 };
+    }
+};
+
+export const sendEmergencyCodeMail = async (email: string, emergency_code: string) => {
+    console.log(email, emergency_code)
+    try {
+        await nodeMailerClient.sendMail({
+            from: sender,
+            to: email,
+            subject: "Reset your pincode",
+            html: EMERGENCY_CODE_TEMPLATE.replace("{emergency_code}", emergency_code),
+            category: "Emergency Code",
+        });
+        return { message: "Emergency code has been sent to your email", status: 200 };
+    } catch (error: any) {
+        console.log("sendEmergencyCodeMail -->", error);
+        return { message: "Something went wrong while sending emergency code to your email", status: 500 };
     }
 };

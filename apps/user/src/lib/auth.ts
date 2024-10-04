@@ -13,7 +13,7 @@ import { randomBytes } from "crypto";
 import { sendPasswordResetEmail, sendVerificationEmail, sendChangeEmailVerification } from "./mail"
 import { resetPasswordPayload } from "@repo/forms/resetPasswordSchema"
 import { PasswordMatchSchema } from "@repo/forms/changePasswordSchema"
-import { SUPPORTED_CURRENCY } from "./constants"
+import { SUPPORTED_CURRENCY } from "@repo/ui/constants"
 
 export const signUpAction = async (payload: signUpPayload, countryName: string): Promise<{ message: string, status: number }> => {
     try {
@@ -49,7 +49,7 @@ export const signUpAction = async (payload: signUpPayload, countryName: string):
                 }
             });
 
-            const currency = SUPPORTED_CURRENCY.find((c) => (c.country === countryName) || "USD")?.name!
+            const currency = SUPPORTED_CURRENCY.find((c) => (c.country === countryName))?.name || "USD"
             await prisma.balance.create({
                 data: {
                     amount: 0,

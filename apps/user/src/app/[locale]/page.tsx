@@ -1,4 +1,4 @@
-import { assets } from "../../lib/constants"
+import { ASSETS } from "@repo/ui/constants"
 import { useTranslations } from 'next-intl';
 
 export default function Home() {
@@ -14,7 +14,7 @@ export default function Home() {
           </p>
           <div className="flex items-center space-x-4">
             <div className="flex items-center space-x-2">
-              <img src={assets.QR} alt="QR Code" className="w-12 h-12" />
+              <img src={ASSETS.QR} alt="QR Code" className="w-12 h-12" />
               <span className="text-gray-600">{t("qr_text")}</span>
             </div>
           </div>
