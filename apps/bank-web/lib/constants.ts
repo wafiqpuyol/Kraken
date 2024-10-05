@@ -1,30 +1,30 @@
 export const SUPPORTED_LOCALES = [
     {
-        title: "United States",
+        language: "U.S. English",
         code: "/en",
     },
     {
-        title: "India",
+        language: "Hindi",
         code: "/hi",
     },
     {
-        title: "Bangladesh",
+        language: "Bengali",
         code: "/bn",
     },
     {
-        title: "Japan",
+        language: "Japanese",
         code: "/ja",
     },
     {
-        title: "Spain",
+        language: "Espanol",
         code: "/es",
     },
     {
-        title: "France",
+        language: "French",
         code: "/fr",
     },
     {
-        title: "Portugal",
+        language: "Portuguese",
         code: "/pt",
     },
 ]

@@ -23,12 +23,12 @@ export default function Component() {
     let res: {
       message: string;
       statusCode: number;
-      country?: string;
+      language?: string;
     };
     if (userId != null) {
       if (parseInt(userId)) {
         res = await transactionAction(parseInt(userId), params.get("token"))
-        const locale = SUPPORTED_LOCALES.find((l) => l.title === res.country)?.code || "/en"
+        const locale = SUPPORTED_LOCALES.find((l) => l.language === res.language)?.code || "/en"
         if (res.statusCode === 400) {
           return setInputError("Invalid User Id")
         }

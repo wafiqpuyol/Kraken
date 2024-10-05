@@ -14,15 +14,24 @@ const webHookCall = async (payload: IWebhookPayload) => {
     await axios.post(`${process.env.NEXT_PUBLIC_WEEBHOOK_API_URL}/webhook`, payload)
 }
 
-export const transactionAction = async (userId: number, token: string): Promise<{ message: string, statusCode: number, country?: string }> => {
+export const transactionAction = async (userId: number, token: string): Promise<{ message: string, statusCode: number, language?: string }> => {
 
     try {
         const isUserExist = await prisma.user.findFirst({
             where: {
                 id: userId
+            },
+            include: {
+                preference: {
+                    select: {
+                        language: true
+                    }
+                }
             }
         })
+        console.log(isUserExist);
         if (!isUserExist) {
+            console.log("indie --->", isUserExist);
             return { message: "Invalid User Id", statusCode: 400 }
         }
 
@@ -31,6 +40,7 @@ export const transactionAction = async (userId: number, token: string): Promise<
         if (!tokenDecodedData || tokenDecodedData !== isUserExist.id) {
             return { message: "Invalid Token", statusCode: 400 }
         }
+
         const isOnRampExist = await prisma.onramptransaction.findFirst({
             where: {
                 AND: [
@@ -47,7 +57,7 @@ export const transactionAction = async (userId: number, token: string): Promise<
             throw new Error("Onramp doesn't exist")
         }
         await webHookCall({ amount: isOnRampExist.amount, userId, token, tokenValidation: "Success", })
-        return { message: "ok", statusCode: 200, country: isUserExist.country! }
+        return { message: "ok", statusCode: 200, language: isUserExist.preference?.language! }
     } catch (error: any) {
         console.log("--------------->", error.message);
         webHookCall({ amount: 0, userId, token, tokenValidation: "Failure" })
