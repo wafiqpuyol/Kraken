@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import localFont from "next/font/local";
+import { Toaster } from "@repo/ui/Toaster"
 import "./globals.css";
 
 const geistSans = localFont({
@@ -25,6 +26,7 @@ export default function RootLayout({
     <html lang="en">
       <body className={`bg-dark ${geistSans.variable} ${geistMono.variable}`}>
         {children}
+        <Toaster />
       </body>
     </html>
   );

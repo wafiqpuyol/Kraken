@@ -8,13 +8,14 @@ import { transactionAction } from "../lib/action"
 import { useEffect, useState } from "react"
 import { useSearchParams, useRouter } from 'next/navigation'
 import { SUPPORTED_LOCALES } from "../lib/constants"
+import { useToast } from "@repo/ui/useToast"
 
 export default function Component() {
   const [userId, setUserId] = useState<string | null>(null)
   const [inputError, setInputError] = useState<boolean | string>(false)
   const params = useSearchParams()
   const router = useRouter()
-  console.log("Client token --->", params.get("token"));
+  const { toast } = useToast()
 
   useEffect(() => {
     setInputError(false)
@@ -30,18 +31,27 @@ export default function Component() {
         res = await transactionAction(parseInt(userId), params.get("token"))
         const locale = SUPPORTED_LOCALES.find((l) => l.language === res.language)?.code || "/en"
         if (res.statusCode === 400) {
+          toast({ title: res.message, variant: "destructive" })
           return setInputError("Invalid User Id")
         }
         if (res.statusCode === 403) {
-          return router.push(`${process.env.NEXT_PUBLIC_FRONTEND_URL}${locale}/dashboard/transfer/deposit`)
+          toast({ title: res.message, variant: "destructive" })
+          setTimeout(() => router.push(`${process.env.NEXT_PUBLIC_FRONTEND_URL}${locale}/login`), 5500)
+        }
+        if (res.statusCode === 498) {
+          toast({ title: res.message, variant: "destructive" })
+          setTimeout(() => router.push(`${process.env.NEXT_PUBLIC_FRONTEND_URL}${locale}/dashboard/transfer/deposit`), 5500)
         }
         if (res.statusCode === 200) {
-          return router.push(`${process.env.NEXT_PUBLIC_FRONTEND_URL}${locale}/dashboard/transactions/history`)
+          toast({ title: res.message, variant: "destructive" })
+          setTimeout(() => router.push(`${process.env.NEXT_PUBLIC_FRONTEND_URL}${locale}/dashboard/transactions/withdraw-history`), 5500)
+        }
+        if (res.statusCode === 500) {
+          toast({ title: res.message, variant: "destructive" })
         }
       }
-      setInputError("Invalid User Id")
     } else {
-      setInputError("Please Enter User Id")
+      setInputError("Please Enter your User Id")
       return;
     }
   }
