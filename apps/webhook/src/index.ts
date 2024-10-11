@@ -8,10 +8,6 @@ const app = express()
 
 app.use(express.json())
 app.use(cors({ origin: ["http://localhost:3001"] }))
-app.use(cors({
-    origin: ["http://localhost:3001"],
-}))
-
 
 
 app.post("/api/v1/webhook", async (req, res) => {
@@ -24,7 +20,10 @@ app.post("/api/v1/webhook", async (req, res) => {
                 },
                 data: {
                     amount: {
-                        increment: Number(payload.amount)
+                        increment: (payload.amount - payload.lockedAmount)
+                    },
+                    locked: {
+                        increment: payload.lockedAmount
                     }
                 }
             }),
@@ -42,7 +41,8 @@ app.post("/api/v1/webhook", async (req, res) => {
             message: "Successful"
         })
     } catch (error) {
-        console.log(error);
+        console.log("----------------->", error);
+        return res.json({ message: "Payment failed" })
     }
 })
 
