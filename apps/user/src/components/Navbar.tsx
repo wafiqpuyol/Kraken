@@ -1,5 +1,6 @@
 "use client"
 
+import Image from "next/image"
 import { usePathname } from 'next/navigation'
 import Link from "next/link"
 import { useSession } from "next-auth/react"
@@ -32,9 +33,9 @@ export const Navbar: React.FC<NavbarProps> = ({ disable2fa }) => {
     }, [])
 
     return (
-        <nav className="bg-purple-600 px-8 py-6 flex justify-between items-center relative">
+        <nav className="bg-purple-600 px-8 h-96 flex justify-between items-center fixed w-full z-10">
             <Link href={`/${locale}`}>
-                <img width={140} height={140} src='http://localhost:3000/kraken.webp' alt="Kraken Logo" />
+                <Image width={140} height={140} src='/kraken.webp' alt="Kraken Logo" />
             </Link>
             {
                 showSkeleton
@@ -58,7 +59,7 @@ export const Navbar: React.FC<NavbarProps> = ({ disable2fa }) => {
                                             </Button>
                                             :
                                             <Profile>
-                                                <Button className='bg-white font-medium text-slate-500 px-2 hover:bg-slate-100' onClick={handleClick}>{t("logout")}</Button>
+                                                <Button className='bg-white font-medium text-slate-500 px-1 hover:bg-slate-100' onClick={handleClick}>{t("logout")}</Button>
                                             </Profile>
                                     )
                                     :

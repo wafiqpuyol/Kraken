@@ -33,7 +33,7 @@ export default async function RootLayout({
 
   return (
     <html lang="en">
-      <body className={`${geistSans.variable} bg-[#f2f1f5] ${geistMono.variable}`}>
+      <body className={`${geistSans.variable} bg-[#F6F5F9] ${geistMono.variable} relative overflow-x-hidden`}>
         <SessionProvider>
           <NextIntlClientProvider messages={messages} locale={locale}>
             <Navbar disable2fa={disable2fa} />

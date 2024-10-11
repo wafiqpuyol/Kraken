@@ -8,14 +8,16 @@ export default function Layout({ children, params }: { children: React.ReactNode
     const session = useSession()
 
     return (
-        <div className="flex" >
+        <div >
             {
                 (session.status === "unauthenticated")
                     ?
                     redirect(`/${params.locale}/login`) :
                     <>
                         <SideBar />
-                        {children}
+                        <div className="pl-72 pt-10">
+                            {children}
+                        </div>
                     </>
             }
         </div >
