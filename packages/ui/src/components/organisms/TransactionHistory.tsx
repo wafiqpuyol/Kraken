@@ -45,7 +45,7 @@ export const TransactionHistory: React.FC<TransactionHistoryProps> = ({ p2pTrans
                                     const timestamp = new Date(obj.timestamp).toLocaleString().split(",").reverse().join().replace(",", "  ")
                                     return (
                                         <TransactionModal transactionDetail={obj}>
-                                            <div className="cursor-pointer mt-4 bg-slate-100/30 px-4 border-b border-border">
+                                            <div className="shadow-md cursor-pointer mt-4 bg-slate-100/30 px-4 py-5 border-b border-border rounded-2xl">
                                                 <div className="flex flex-row justify-between py-2 font-medium items-center ">
                                                     <div className="flex flex-col">
                                                         <span className="text-lg mb-2">{(transactionType === "Send" && obj.fromUserId === currentUserID) ? t("sent_money") : t("received_money")}</span>
@@ -54,12 +54,12 @@ export const TransactionHistory: React.FC<TransactionHistoryProps> = ({ p2pTrans
                                                                 ?
                                                                 <span>
                                                                     <small className="text-gray-500 text-[1rem] mr-1">{t("to")}</small>
-                                                                    {obj.user_p2ptransfer_toUserIdTouser?.name}
+                                                                    {obj.receiver_name}
                                                                 </span>
                                                                 :
                                                                 <span>
                                                                     <small className="text-gray-500 text-[1rem] mr-1">{t("from")}</small>
-                                                                    {obj.user_p2ptransfer_fromUserIdTouser?.name}
+                                                                    {obj.sender_name}
                                                                 </span>
                                                             }
                                                         </div>
@@ -69,7 +69,7 @@ export const TransactionHistory: React.FC<TransactionHistoryProps> = ({ p2pTrans
                                                         <div className={
                                                             cn("mb-1 text-[0.95rem]", (transactionType === "Send" && obj.fromUserId === currentUserID) ? "text-red-500" : "text-green-500")
                                                         }
-                                                        >{(transactionType === "Send" && obj.fromUserId === currentUserID) ? `-${amount}` : `+${amount}`} {obj.currency}</div>
+                                                        >{(transactionType === "Send" && obj.fromUserId === currentUserID) ? `-${amount / 100}` : `+${amount / 100}`} {obj.currency}</div>
                                                         <small className="w-40">{timestamp}</small>
                                                     </div>
                                                 </div>

@@ -30,7 +30,7 @@ const styles = StyleSheet.create({
         paddingTop: 20
     },
     midText: {
-        paddingVertical: 15
+        paddingVertical: 2
     },
     lastText: {
         paddingBottom: 20
@@ -102,15 +102,23 @@ export const Invoice = ({ invoice }: InvoiceProps) => {
                         <View>
                             <Text style={[styles.textSize, styles.firstText]}>Account Number</Text>
                             <Text style={[styles.textSize, styles.midText]}>Name</Text>
-                            <Text style={[styles.textSize, styles.lastText]}>Time</Text>
-                            <Text style={[styles.textSize, styles.lastText]}>Transaction ID</Text>
+                            <Text style={[styles.textSize, styles.midText]}>Number</Text>
+                            <Text style={[styles.textSize, styles.midText]}>Time</Text>
+                            <Text style={[styles.textSize, styles.midText]}>Transaction ID</Text>
+                            <Text style={[styles.textSize, styles.lastText]}>Trxn Fee:</Text>
                         </View>
                         <Text style={styles.middleBorder}></Text>
                         <View>
                             <Text style={[styles.RightTextColor, styles.textSize, styles.firstText]}>{invoice.fromUserId}</Text>
-                            <Text style={[styles.RightTextColor, styles.textSize, styles.midText]}>{invoice.user_p2ptransfer_fromUserIdTouser.name}</Text>
-                            <Text style={[styles.RightTextColor, styles.textSize, styles.lastText]}>{timeStamp}</Text>
-                            <Text style={[styles.RightTextColor, styles.textSize, styles.lastText]}>{invoice.transactionID}</Text>
+                            <Text style={[styles.RightTextColor, styles.textSize, styles.midText]}>{invoice.sender_name}</Text>
+                            <Text style={[styles.RightTextColor, styles.textSize, styles.midText]}>{invoice.sender_number}</Text>
+                            <Text style={[styles.RightTextColor, styles.textSize, styles.midText]}>{timeStamp}</Text>
+                            <Text style={[styles.RightTextColor, styles.textSize, styles.midText]}>{invoice.transactionID}</Text>
+                            <Text style={[styles.RightTextColor, styles.textSize, styles.lastText]}>
+                                {
+                                    invoice.transactionCategory === "International" ? invoice.international_trxn_fee : invoice.domestic_trxn_fee
+                                }
+                            </Text>
                         </View>
                     </View>
                 </View>
@@ -124,13 +132,15 @@ export const Invoice = ({ invoice }: InvoiceProps) => {
                         <View>
                             <Text style={[styles.textSize, styles.firstText]}>Account Number</Text>
                             <Text style={[styles.textSize, styles.midText]}>Name</Text>
+                            <Text style={[styles.textSize, styles.midText]}>Number</Text>
                             <Text style={[styles.textSize, styles.lastText]}>Time</Text>
 
                         </View>
                         <Text style={styles.middleBorder}></Text>
                         <View>
                             <Text style={[styles.RightTextColor, styles.textSize, styles.firstText]}>{invoice.toUserId}</Text>
-                            <Text style={[styles.RightTextColor, styles.textSize, styles.midText]}>{invoice.user_p2ptransfer_toUserIdTouser.name}</Text>
+                            <Text style={[styles.RightTextColor, styles.textSize, styles.midText]}>{invoice.receiver_name}</Text>
+                            <Text style={[styles.RightTextColor, styles.textSize, styles.midText]}>{invoice.receiver_number}</Text>
                             <Text style={[styles.RightTextColor, styles.textSize, styles.lastText]}>{timeStamp}</Text>
                         </View>
                     </View>
@@ -144,7 +154,7 @@ export const Invoice = ({ invoice }: InvoiceProps) => {
                     </View>
                     <Text style={{ "borderRight": "0.3px solid black" }}></Text>
                     <View style={{ "paddingVertical": 20, "marginLeft": 35 }}>
-                        <Text style={[{ "color": "green" }, styles.textSize, styles.lastText, styles.textWright]}>{invoice.amount} {invoice.currency}</Text>
+                        <Text style={[{ "color": "green" }, styles.textSize, styles.lastText, styles.textWright]}>{invoice.amount / 100} {invoice.currency}</Text>
                     </View>
                 </View>
                 <Text style={{ "borderBottom": "0.3px solid black" }}></Text>
@@ -152,20 +162,3 @@ export const Invoice = ({ invoice }: InvoiceProps) => {
         </Document>
     )
 }
-
-// export async function GET(request: Request, { params }: { params: { invoiceId: string; }}) {
-//   const invoice = {
-//     id: 1,
-//     name: 'Sample Invoice',
-//     dateCreated: Date.now(),
-//     value: 1234,
-//     description: 'This is a sample invoice.',
-//     status: 'open',
-//     customer: {
-//       name: 'John Smith',
-//       email: 'john@smith.com'
-//     }
-//   };
-//   const stream = await renderToStream(<Invoice invoice={invoice} />);
-//   return new NextResponse(stream as unknown as ReadableStream)
-// }
