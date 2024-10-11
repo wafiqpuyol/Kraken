@@ -12,6 +12,8 @@ import { useToast } from "@repo/ui/useToast"
 
 export default function Component() {
   const [userId, setUserId] = useState<string | null>(null)
+  const [isLoading, setIsLoading] = useState<boolean>(false)
+  const [isDisable, setIsDisable] = useState<boolean>(false)
   const [inputError, setInputError] = useState<boolean | string>(false)
   const params = useSearchParams()
   const router = useRouter()
@@ -20,33 +22,50 @@ export default function Component() {
   useEffect(() => {
     setInputError(false)
   }, [userId])
+
+
   const handleClick = async () => {
+    setIsLoading(true)
     let res: {
       message: string;
       statusCode: number;
       language?: string;
     };
+
     if (userId != null) {
       if (parseInt(userId)) {
         res = await transactionAction(parseInt(userId), params.get("token"))
         const locale = SUPPORTED_LOCALES.find((l) => l.language === res.language)?.code || "/en"
+
         if (res.statusCode === 400) {
+          setIsLoading(false)
           toast({ title: res.message, variant: "destructive" })
           return setInputError("Invalid User Id")
         }
+
         if (res.statusCode === 403) {
+          setIsLoading(false)
           toast({ title: res.message, variant: "destructive" })
-          setTimeout(() => router.push(`${process.env.NEXT_PUBLIC_FRONTEND_URL}${locale}/login`), 5500)
+          setTimeout(() => router.push(`${process.env.NEXT_PUBLIC_FRONTEND_URL}${locale}/login`), 3500)
         }
+
         if (res.statusCode === 498) {
           toast({ title: res.message, variant: "destructive" })
-          setTimeout(() => router.push(`${process.env.NEXT_PUBLIC_FRONTEND_URL}${locale}/dashboard/transfer/deposit`), 5500)
+          setTimeout(() => router.push(`${process.env.NEXT_PUBLIC_FRONTEND_URL}${locale}/dashboard/transfer/deposit`), 3500)
         }
+
         if (res.statusCode === 200) {
+          setInputError(false)
+          setUserId(null)
+          setIsLoading(false)
+          setIsDisable(true)
           toast({ title: res.message, variant: "destructive" })
-          setTimeout(() => router.push(`${process.env.NEXT_PUBLIC_FRONTEND_URL}${locale}/dashboard/transactions/withdraw-history`), 5500)
+          setIsDisable(true)
+          setTimeout(() => router.push(`${process.env.NEXT_PUBLIC_FRONTEND_URL}${locale}/dashboard/transactions/withdraw-history`), 3500)
         }
+
         if (res.statusCode === 500) {
+          setIsLoading(false)
           toast({ title: res.message, variant: "destructive" })
         }
       }
@@ -55,6 +74,8 @@ export default function Component() {
       return;
     }
   }
+
+
   return (
     <div className="container mx-auto p-4 max-w-4xl">
       <h1 className="text-2xl font-semibold text-blue-800 mb-4">Login to NetBanking</h1>
@@ -70,7 +91,11 @@ export default function Component() {
               Forgot Customer ID
             </Link>
           </div>
-          <Button className="w-full bg-blue-500 hover:bg-blue-600 text-white" onClick={() => handleClick()} disabled={!userId}>CONTINUE</Button>
+          <Button
+            disabled={!userId || isLoading || isDisable}
+            className="w-full bg-blue-500 hover:bg-blue-600 text-white" onClick={() => handleClick()} >
+            CONTINUE
+          </Button>
           <Card className="mt-4 bg-blue-50 p-4">
             <p className="text-sm text-gray-800">
               <strong>Dear Customer,</strong>
