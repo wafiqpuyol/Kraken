@@ -11,6 +11,8 @@ import {
 import { QRCodeSVG } from 'qrcode.react';
 import { InputOTP, InputOTPGroup, InputOTPSeparator, InputOTPSlot } from "../atoms/InputOTP"
 import { useToast } from "./Toaster/use-toast"
+import { useSession } from "next-auth/react"
+import { Session } from "next-auth"
 
 interface TwoFADialogProps {
     children: ReactNode
@@ -24,8 +26,7 @@ interface TwoFADialogProps {
 export const TwoFAEnableDialog: React.FC<TwoFADialogProps> = ({ children, code, activate2fa, setTwoFA }) => {
     const [otp, setOtp] = useState("");
     const { toast } = useToast()
-    console.log(code);
-
+    const session = useSession()
 
     const handleOTPSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
@@ -38,6 +39,16 @@ export const TwoFAEnableDialog: React.FC<TwoFADialogProps> = ({ children, code, 
                         variant: "default"
                     })
                     setTwoFA(true)
+                    session.update((data: Session) => {
+                        return {
+                            ...data,
+                            user: {
+                                ...data.user,
+                                isOtpVerified: true,
+                                isTwoFAActive: true
+                            }
+                        }
+                    })
                     break;
                 case 400:
                     toast({
