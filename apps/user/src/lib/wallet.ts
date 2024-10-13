@@ -28,13 +28,17 @@ export const generatePincode = async (pincode: string) => {
             return { message: "Please enter a valid pincode", status: 400 }
         }
 
+        const encryptedPin = sign(pincode, isUserExist.password)
         const wallet = await prisma.wallet.findFirst({ where: { userId: isUserExist.id } })
+        if (!wallet) {
+            await prisma.wallet.create({ data: { userId: isUserExist.id, pincode: encryptedPin } })
+        }
+        else if (!wallet.pincode) {
+            await prisma.wallet.update({ where: { userId: isUserExist.id }, data: { pincode: encryptedPin } })
+        }
         if (wallet && wallet.pincode) {
             return { message: "You already have a pincode, can't create another. If you forget your pincode, please click on forgot pincode.", status: 400 }
         }
-
-        const encryptedPin = sign(pincode, isUserExist.password)
-        await prisma.wallet.create({ data: { userId: isUserExist.id, pincode: encryptedPin } })
 
         return { message: "Pincode has created successfully", status: 201 }
     } catch (error) {

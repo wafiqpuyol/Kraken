@@ -9,13 +9,16 @@ import { prisma } from "@repo/db/client"
 import { user } from "@repo/db/type"
 import bcrypt from "bcryptjs";
 
-
 declare module 'next-auth' {
     interface Session {
         user?: DefaultSession['user'] & {
             number: string, uid: number, isTwoFAActive: boolean,
             isOtpVerified: boolean,
-            isVerified: boolean
+            isVerified: boolean,
+            wallet_currency: string
+            preference: any
+            country: string
+            total_balance: string
         }
     }
 }
@@ -49,7 +52,7 @@ export const authOptions: NextAuthOptions = {
                 }
                 const jwtToken = sign(
                     { uid: isUserExist.id, email: isUserExist.email, number: isUserExist.number },
-                    process.env.AUTH_SECRET || 'wafiqsuperSecret',
+                    process.env.NEXTAUTH_SECRET || 'wafiqsuperSecret',
                 )
                 return {
                     ...isUserExist,
@@ -90,19 +93,36 @@ export const authOptions: NextAuthOptions = {
                 existUser = await prisma.user.findUnique({
                     where: {
                         email: token.email
+                    },
+                    include: {
+                        preference: true,
+                        balance: {
+                            select: {
+                                currency: true,
+                                amount: true,
+                            }
+                        }
                     }
                 })
             }
             if (!existUser) return session;
             session.user = {
-                name: token.name,
-                email: token.email,
-                image: token.picture,
-                number: existUser?.number || "",
-                uid: existUser.id,
-                isTwoFAActive: existUser.twoFactorActivated,
-                isOtpVerified: existUser.otpVerified,
-                isVerified: existUser.isVerified
+                name: token?.name,
+                email: token?.email,
+                image: token?.picture,
+                number: existUser?.number,
+                uid: existUser?.id,
+                country: existUser?.country!,
+                isTwoFAActive: existUser?.twoFactorActivated,
+                isOtpVerified: existUser?.otpVerified,
+                isVerified: existUser?.isVerified,
+                wallet_currency: existUser?.balance?.currency,
+                total_balance: existUser?.balance.amount,
+                preference: {
+                    language: existUser?.preference?.language,
+                    timezone: existUser?.preference?.timezone,
+                    selected_currency: existUser?.preference?.currency
+                }
             }
             return session
         }
