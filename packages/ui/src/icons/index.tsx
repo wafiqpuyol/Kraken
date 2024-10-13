@@ -79,7 +79,6 @@ export const ClosedEye = () => (
 )
 
 export const USDLogo = ({ width, height }: { height?: string, width?: string }) => {
-    console.log(width, height);
     return (
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 1000" fill="#269B56" width={width || 30} height={height || 30}>
             <circle cx="50" cy="50" r="45" fill="#fff">
@@ -105,4 +104,13 @@ export const BDTLogo = ({ width, height }: { height?: string, width?: string }) 
         <path d="M0 0h24v24H0z" fill="none" stroke="none" />
         <circle cx="16.5" cy="15.5" r="1" /><path d="M7 7a2 2 0 1 1 4 0v9a3 3 0 0 0 6 0v-.5" /><path d="M8 11h6" />
     </svg>
+)
+
+export const Deposit = () => (
+    <div className="p-5 bg-purple-200 rounded-full hover:bg-purple-300 transform ease in-out duration-200">
+        <svg width="35" height="35" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" className="ms-ds-0 me-ds-0 mt-ds-0 mb-ds-0 stroke-ds-icon w-ds-icon-md h-ds-icon-md text-[#7F00FF]">
+            <path d="M5 20H19" stroke-linecap="round" stroke-linejoin="round" className="fill-transparent stroke-current"></path>
+            <path d="M16.2524 12.5846L13.0023 15.8348C12.4487 16.3884 11.5512 16.3884 10.9976 15.8348L7.74744 12.5846M11.9999 15.5968L11.9999 4.25" stroke-linecap="round" stroke-linejoin="round" className="fill-transparent stroke-current">
+            </path></svg>
+    </div>
 )
