@@ -16,6 +16,7 @@
     "zod": "^3.23.8"
   },
   "exports": {
+    "./types": "./src/types.ts",
     "./loginSchema": "./src/loginSchema.ts",
     "./signupSchema": "./src/signupSchema.ts",
     "./addMoneySchema": "./src/addMoneySchema.ts",
@@ -29,6 +30,8 @@
     "./forgotPassword": "./src/forgotPassword.tsx",
     "./forgotPasswordSchema": "./src/forgotPasswordSchema.ts",
     "./resetPassword": "./src/resetPassword.tsx",
-    "./resetPasswordSchema": "./src/resetPasswordSchema.ts"
+    "./resetPasswordSchema": "./src/resetPasswordSchema.ts",
+    "./confirmMail": "./src/confirmMail.tsx",
+    "./confirmMailSchema": "./src/confirmMailSchema.ts"
   }
 }
