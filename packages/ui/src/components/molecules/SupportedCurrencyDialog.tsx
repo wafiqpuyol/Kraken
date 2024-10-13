@@ -1,3 +1,5 @@
+"use client"
+
 import { Dialog, DialogTrigger, DialogContent, DialogTitle, DialogHeader } from "./Dialog"
 import { SUPPORTED_CURRENCY } from "../../lib/constant"
 import { cn } from "../../lib/utils"
@@ -5,6 +7,7 @@ import { Dispatch, SetStateAction, useState } from "react"
 import { Tick } from "../../icons/index"
 import { preference } from "@repo/db/type"
 import { useRouter } from "next/navigation";
+import { useSession } from "next-auth/react"
 import { useTranslations } from 'next-intl';
 
 
@@ -24,11 +27,24 @@ export const SupportedCurrencyDialog: React.FC<SupportedCurrencyDialogProps> = (
     const [save, setSave] = useState(false);
     const [supportedCurrency, setSupportedCurrency] = useState(currentCurrency);
     const router = useRouter();
+    const session = useSession()
 
     const handleClick = async () => {
         (() => setSave(true))()
         await updatePreference({ currency: supportedCurrency }).then((res) => {
             setPreference((prev: any) => ({ ...prev, currency: res.updatedPreference?.currency }))
+            session.update((data) => {
+                return {
+                    ...data,
+                    data: {
+                        ...data.data,
+                        preference: {
+                            ...data.data.preference,
+                            selected_currency: res.updatedPreference?.currency
+                        }
+                    }
+                }
+            })
             setSave(false)
         })
         router.refresh();
