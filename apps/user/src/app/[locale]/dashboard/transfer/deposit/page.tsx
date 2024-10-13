@@ -7,6 +7,7 @@ import { prisma } from '@repo/db/client'
 import { balance, preference } from '@repo/db/type'
 import { authOptions } from "@repo/network"
 import { useRedirectToLogin } from "../../../../../hooks/useRedirect"
+import { getAllOnRampTransactions } from "../../../../../lib/action"
 
 async function page({ params: { locale } }: { params: { locale: string } }) {
     await useRedirectToLogin(locale, "/login")
@@ -17,6 +18,7 @@ async function page({ params: { locale } }: { params: { locale: string } }) {
             userId: session?.user?.uid
         }
     });
+    const onRampTransactionLimitDetail = await getAllOnRampTransactions(session?.user?.uid!)
 
     const userBalance: Omit<balance, "id"> = {
         amount: getBalance?.amount || 0,
@@ -25,7 +27,7 @@ async function page({ params: { locale } }: { params: { locale: string } }) {
         currency: getBalance?.currency!
     }
     return (
-        <Deposit userBalance={userBalance} addMoneyAction={addMoneyAction} userPreference={userPreference} sendVerificationEmailAction={sendVerificationEmailAction} />
+        <Deposit onRampTransactionLimitDetail={onRampTransactionLimitDetail} userBalance={userBalance} addMoneyAction={addMoneyAction} userPreference={userPreference} sendVerificationEmailAction={sendVerificationEmailAction} />
     )
 }
 
