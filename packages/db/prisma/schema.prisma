@@ -126,6 +126,10 @@ model wallet {
   pincode                  String?
   emergency_code           String?
   emergency_code_expiresAt DateTime?
+  otp                      String?
+  otp_expiresAt            DateTime?
+  otpIssuer                String?
+  otpVerified              Boolean   @default(false)
   user                     user      @relation(fields: [userId], references: [id], map: "Wallet_userId_fkey")
 
   @@index([userId], map: "Wallet_userId_fkey")
