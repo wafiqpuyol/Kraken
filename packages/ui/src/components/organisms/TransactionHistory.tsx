@@ -40,6 +40,10 @@ export const TransactionHistory: React.FC<TransactionHistoryProps> = ({ p2pTrans
                             (p2pTransactionHistories.length > 0 && currentUserID)
                                 ?
                                 p2pTransactionHistories.map(obj => {
+                                    // console.log("ERROR =======>", obj);
+                                    if (Object.keys(obj).length === 0) {
+                                        return <></>;
+                                    }
                                     const transactionType = obj.transactionType;
                                     const amount = obj.amount
                                     const timestamp = new Date(obj.timestamp).toLocaleString().split(",").reverse().join().replace(",", "  ")
@@ -67,9 +71,15 @@ export const TransactionHistory: React.FC<TransactionHistoryProps> = ({ p2pTrans
                                                     </div>
                                                     <div className="flex flex-col self-end">
                                                         <div className={
-                                                            cn("mb-1 text-[0.95rem]", (transactionType === "Send" && obj.fromUserId === currentUserID) ? "text-red-500" : "text-green-500")
+                                                            cn("mb-1 text-[0.95rem]", (obj.status === "Failed" || (transactionType === "Send" && obj.fromUserId === currentUserID)) ? "text-red-500" : "text-green-500")
                                                         }
-                                                        >{(transactionType === "Send" && obj.fromUserId === currentUserID) ? `-${amount / 100}` : `+${amount / 100}`} {obj.currency}</div>
+                                                        >{
+                                                                obj.status === "Success"
+                                                                    ?
+                                                                    ((transactionType === "Send" && obj.fromUserId === currentUserID) ? `-${amount / 100}` : `+${amount / 100}`)
+                                                                    :
+                                                                    `${amount / 100}`}
+                                                            {' '} {obj.currency}</div>
                                                         <small className="w-40">{timestamp}</small>
                                                     </div>
                                                 </div>

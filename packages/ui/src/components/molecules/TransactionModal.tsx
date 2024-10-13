@@ -11,7 +11,6 @@ interface SupportedCurrencyDialogProps {
     transactionDetail: p2ptransfer
 }
 export const TransactionModal: React.FC<SupportedCurrencyDialogProps> = ({ children, transactionDetail }) => {
-    console.log(transactionDetail);
     const session = useSession()
     const t = useTranslations("TransactionModal")
     return (
@@ -69,7 +68,7 @@ export const TransactionModal: React.FC<SupportedCurrencyDialogProps> = ({ child
                     </div>
 
                 </div>
-                <PDFDownloadLink document={<Invoice invoice={transactionDetail} />}>
+                <PDFDownloadLink document={<Invoice invoice={transactionDetail} currentUserId={session.data?.user?.uid} />}>
                     <button type="button" className="bg-purple-600 hover:bg-purple-800 transition duration-300 text-white font-bold py-2 px-4 rounded">
                         {t("download_button")}
                     </button>
