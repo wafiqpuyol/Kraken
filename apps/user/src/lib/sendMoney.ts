@@ -1,129 +1,248 @@
 "use server"
 
-import { sendMoneyPayload, SendMoneySchema } from "@repo/forms/sendMoneySchema"
+import { SendMoneySchema } from "@repo/forms/sendMoneySchema"
 import { authOptions } from "@repo/network"
 import { getServerSession } from "next-auth"
 import { prisma } from "@repo/db/client"
-import { p2ptransfer } from "@repo/db/type"
+import { p2ptransfer, user, $Enums, preference, wallet } from "@repo/db/type"
 import { generateTransactionId } from "./utils"
 import { verify } from "jsonwebtoken"
-import { MINIMUM_AMOUNT } from "@repo/ui/constants"
-import { } from "@repo/ui/constants"
-
-export const sendMoneyAction = async (payload: sendMoneyPayload): Promise<{ message: string | undefined, status: number, transaction?: p2ptransfer | {} }> => {
-    try {
-        const session = await getServerSession(authOptions)
-        if (!session?.user?.uid) {
-            return { message: "Unauthorized. Please login first", status: 401 }
-        }
-
-        const validatedPayload = SendMoneySchema.safeParse(payload)
-        if (!validatedPayload.success) {
-            console.log(validatedPayload.error.format().phone_number?._errors);
-            return {
-                message: validatedPayload.error.format().phone_number?._errors[0] || validatedPayload.error.format().amount?._errors[0] || validatedPayload.error.format().pincode?._errors[0],
-                status: 400, field: validatedPayload.error.name || validatedPayload.error.name
-            }
-        }
-
-        const isUserExist = await prisma.user.findFirst({ where: { id: session.user.uid } })
-        if (!isUserExist) {
-            return { message: "User not found", status: 401 }
-        }
-        if (!isUserExist.isVerified) {
-            return { message: "Please verify your account first to send money", status: 401 }
-        }
-
-        const wallet = await prisma.wallet.findFirst({ where: { userId: isUserExist.id } })
-        if (!wallet || !wallet.pincode) {
-            return { message: "Pincode not found. Pincode is required to send money", status: 401 }
-        }
-
-        const decodedPincode = verify(wallet.pincode!, isUserExist.password)
-        const isPincodeValid = decodedPincode === payload.pincode
-        if (!isPincodeValid) {
-            return { message: "Wrong pincode. Please enter the correct pincode", status: 401 }
-        }
-
-        const isRecipientExist = await prisma.user.findUnique({ where: { number: payload.phone_number } })
-        if (!isRecipientExist) {
-            return { message: "Recipient number not found. Please enter a valid recipient number", status: 404 }
-        }
-
-        if (isUserExist.number === isRecipientExist.number) {
-            return { message: "Cannot send money to yourself. Invalid recipient number", status: 401 }
-        }
-
-        const senderBalance = await prisma.balance.findFirst({ where: { userId: isUserExist.id } })
-        if (!senderBalance) {
-            return { message: "Balance not found", status: 404 }
-        }
-
-        if (senderBalance?.amount < parseInt(payload.amount)) {
-            return { message: "You're wallet does not have sufficient balance to make this transfer.", status: 401 }
-        }
-        const deductedAmount = (senderBalance?.amount - (parseInt(payload.amount) * 100)) / 100
-        if (deductedAmount <= MINIMUM_AMOUNT) {
-            return { message: `Insufficient funds; you must have at least ${MINIMUM_AMOUNT}${senderBalance.currency} remain after the transfer`, status: 403 }
-        }
+import { ITransactionDetail } from "@repo/ui/types"
+import { senderAmountWithFee } from "@repo/ui/utils"
+import { ZodError } from "@repo/forms/types"
+import { guessCountryByPartialPhoneNumber } from 'react-international-phone';
+import { generateOTP } from "./utils"
+import { sendOTP } from "./mail"
 
 
-        let transaction: p2ptransfer | [] = [];
-        await prisma.$transaction(async (tx) => {
-            await tx.$queryRaw`SELECT * FROM Balance WHERE userId=${isUserExist.id} FOR UPDATE`;
+class SendMoney {
+    static instance: Promise<{
+        message: string;
+        status: number;
+        transaction?: p2ptransfer | {}
+    }>
 
-            await tx.balance.update({
-                where: {
-                    userId: isUserExist.id
+    private p2pTransfer: p2ptransfer | [] = []
+    private sender: user | null = null
+    private receiver: user | null = null
+    private currency: string | null = null
+    private fee_currency: string | null = null
+
+    private constructor(transactionDetail: ITransactionDetail) {
+
+        return this.start(transactionDetail)
+    }
+
+
+    private async createP2PTransfer(transactionDetail: ITransactionDetail, currency: string, status: $Enums.p2p_transaction_status) {
+        return prisma.p2ptransfer.create({
+            data: {
+                amount: parseFloat(transactionDetail.formData.amount) * 100,
+                timestamp: new Date(),
+                transactionType: "Send",
+                transactionID: generateTransactionId(),
+                fromUserId: this.sender?.id,
+                toUserId: this.receiver?.id,
+                currency,
+                status,
+                receiver_number: this.receiver?.number!,
+                sender_number: this.sender?.number!,
+                receiver_name: this.receiver?.name!,
+                sender_name: this.sender?.name!,
+                fee_currency: this?.fee_currency!,
+                transactionCategory: transactionDetail.additionalData.trxn_type,
+                domestic_trxn_fee: status === "Failed" ? "0" : transactionDetail.additionalData.domestic_trxn_fee,
+                international_trxn_fee: status === "Failed" ? "0" : transactionDetail.additionalData.international_trxn_fee
+            },
+            include: {
+                user_p2ptransfer_fromUserIdTouser: {
+                    select: {
+                        name: true
+                    }
                 },
-                data: {
-                    amount: {
-                        decrement: parseInt(payload.amount) * 100
+                user_p2ptransfer_toUserIdTouser: {
+                    select: {
+                        name: true
                     }
                 }
-            })
-            await tx.balance.update({
-                where: {
-                    userId: isRecipientExist.id
-                },
-                data: {
-                    amount: {
-                        increment: parseInt(payload.amount) * 100
-                    }
-                }
-            })
-            const { currency } = (await prisma.preference.findFirst({ where: { userId: isUserExist.id } }))!
-            transaction = await prisma.p2ptransfer.create({
-                data: {
-                    amount: parseInt(payload.amount),
-                    timestamp: new Date(),
-                    transactionType: "Send",
-                    transactionID: generateTransactionId(),
-                    fromUserId: isUserExist.id,
-                    toUserId: isRecipientExist.id,
-                    currency
-                },
-                include: {
-                    user_p2ptransfer_fromUserIdTouser: {
-                        select: {
-                            name: true
-                        }
-                    },
-                    user_p2ptransfer_toUserIdTouser: {
-                        select: {
-                            name: true
-                        }
-                    }
-                },
-            })
+            },
         })
-        console.log("---------------ENTER 4 ---------------");
-        return { message: "Sending money successful", status: 200, transaction }
-    } catch (error: any) {
-        console.log(error);
-        return { message: error.message || "Sending money failed. Something went wrong", status: 500 }
+    }
+    private async validateSender(userId: number, sender_number: string) {
+        return prisma.user.findFirst({ where: { AND: [{ id: userId }, { number: sender_number }] } })
+    }
+
+    private async validateReceiver(receiver_number: string) {
+        return prisma.user.findUnique({ where: { number: receiver_number } })
+    }
+
+    async start(transactionDetail: ITransactionDetail) {
+        try {
+            const session = await getServerSession(authOptions)
+            if (!session?.user?.uid) {
+                return { message: "Unauthorized. Please login first", status: 401 }
+            }
+
+            const validatedPayload = SendMoneySchema.safeParse(transactionDetail.formData)
+            if (!validatedPayload.success) {
+                console.log(validatedPayload.error.format().phone_number?._errors);
+                throw new Error(validatedPayload.error.format().phone_number?._errors[0] || validatedPayload.error.format().amount?._errors[0] || validatedPayload.error.format().pincode?._errors[0])
+            }
+
+            /* ------------------- Validate Sender -------------------*/
+            const isUserExist = await this.validateSender(session.user.uid, transactionDetail.additionalData.sender_number)
+            if (!isUserExist) {
+                throw new Error("User not found")
+            }
+            console.log("SEnder--------->", this.sender);
+            this.sender = isUserExist
+            if (!isUserExist.isVerified) {
+                throw new Error("Please verify your account first to send money")
+            }
+
+            const wallet = await prisma.wallet.findFirst({ where: { userId: isUserExist.id } })
+            if (!wallet) {
+                throw new Error("You're not verified to make a transaction.Please create a pincode or enter valid OTP sent to your mail")
+            }
+            if (!wallet.otpVerified) {
+                throw new Error("OTP verification falied. Enter valid OTP sent to your mail")
+            }
+            if (!wallet.pincode) {
+                throw new Error("Pincode not found. Pincode is required to send money")
+            }
+
+
+            const decodedPincode = verify(wallet.pincode, isUserExist.password)
+            const isPincodeValid = decodedPincode === transactionDetail.formData.pincode
+            if (!isPincodeValid) {
+                throw new Error("Wrong pincode. Please enter the correct pincode")
+            }
+
+            /* ------------------- Validate Receiver -------------------*/
+            const isRecipientExist = await this.validateReceiver(transactionDetail.additionalData.receiver_number)
+            if (!isRecipientExist) {
+                throw new Error("Recipient number not found. Please enter a valid recipient number")
+            }
+            this.receiver = isRecipientExist;
+            console.log("Receiver--------->", this.receiver);
+
+            /* ------------------- Check their number is not same -------------------*/
+            if (this.sender.number === this.receiver.number) {
+                throw new Error("Cannot send money to yourself. Invalid recipient number")
+            }
+
+            /* ------------------- Validate Numbers ------------------- */
+            console.log(transactionDetail.additionalData);
+            if (transactionDetail.additionalData.trxn_type === "Domestic") {
+                const recipientCountry = guessCountryByPartialPhoneNumber({ phone: transactionDetail.additionalData.receiver_number }).country?.name
+                if (isUserExist.country !== recipientCountry) {
+                    return { message: "Invalid recipient number", status: 400 }
+                }
+            }
+            if (transactionDetail.additionalData.trxn_type === "International") {
+                const recipientCountry = guessCountryByPartialPhoneNumber({ phone: transactionDetail.additionalData.receiver_number }).country?.name
+                console.log(isRecipientExist.country === recipientCountry);
+                if (isUserExist.country === recipientCountry) {
+                    return { message: "Invalid recipient number", status: 400 }
+                }
+            }
+
+            /* ------------------- Validate Sender Amount with his Balance -------------------*/
+            const senderBalance = await prisma.balance.findFirst({ where: { userId: this.sender.id } })
+            if (!senderBalance) {
+                throw new Error("Balance not found")
+            }
+
+            this.fee_currency = senderBalance.currency;
+            const senderAmountWithFeeArg = {
+                amount: transactionDetail.formData.amount,
+                transactionType: transactionDetail.additionalData.trxn_type,
+                walletCurrency: senderBalance.currency,
+                selectedCurrency: transactionDetail.additionalData?.international_trxn_currency
+            }
+            const senderTotalAmount = senderAmountWithFee(senderAmountWithFeeArg) as number
+            console.log("final ------>", senderTotalAmount);
+
+            if (senderBalance?.amount < senderTotalAmount) {
+                throw new Error("You're wallet does not have sufficient balance to make this transaction.")
+            }
+
+            const deductedAmount = (senderBalance?.amount - senderTotalAmount)
+            console.log(senderBalance?.amount + "----" + senderTotalAmount);
+            console.log("minus ---->", senderBalance?.amount - senderTotalAmount);
+
+            if (senderBalance.locked !== 0 && deductedAmount <= senderBalance.locked) {
+                throw new Error("The amount you're trying to send exceeds your locked amount. Please reduce the amount & try again")
+            }
+            if (deductedAmount < 0) {
+                throw new Error("You're wallet does not have sufficient balance to make this transfer.")
+            }
+
+            /* ------------------- Create P2P Transfer -------------------*/
+            await prisma.$transaction(async (tx) => {
+                await tx.$queryRaw`SELECT * FROM Balance WHERE userId=${isUserExist.id} FOR UPDATE`;
+                await tx.balance.update({
+                    where: {
+                        userId: this.sender?.id
+                    },
+                    data: {
+                        amount: deductedAmount
+                    }
+
+                })
+                await tx.balance.update({
+                    where: {
+                        userId: this.receiver?.id
+                    },
+                    data: {
+                        amount: parseFloat(transactionDetail.formData.amount) * 100
+                    }
+                })
+                if (transactionDetail.additionalData.trxn_type === "International") {
+                    await prisma.preference.update({ where: { userId: this.sender.id }, data: { currency: transactionDetail.additionalData.international_trxn_currency } })
+                }
+                this.currency = (await prisma.preference.findFirst({ where: { userId: this.sender.id } }) as preference)?.currency
+                this.p2pTransfer = await this.createP2PTransfer(transactionDetail, this.currency as string, "Success")
+            })
+            return { message: "Sending money successful", status: 200, transaction: this.p2pTransfer }
+
+        } catch (error: any) {
+            console.log("--------------->", error.message);
+            if (error.message === "Pincode not found. Pincode is required to send money" || error.message === "OTP verification failed. Enter valid OTP sent to your mail"
+                || error.message === "You're not verified to make a transaction.Please create a pincode or enter valid OTP sent to your mail" || false
+            ) {
+                return { message: error.message, status: 422 }
+            }
+            if (error.message === "Cannot send money to yourself. Invalid recipient number" ||
+                error.message === "You're wallet does not have sufficient balance to make this transfer." || false
+            ) {
+                return { message: error.message, status: 400 }
+            }
+            if (error instanceof ZodError) {
+                return { message: error.message, status: 400 }
+            }
+            if (error.message === "Unauthorized. Please login first" ||
+                error.message === "User not found" || error.message === "Please verify your account first to send money" ||
+                error.message === "Wrong pincode. Please enter the correct pincode" || error.message === "Recipient number not found. Please enter a valid recipient number" ||
+                error.message === "Balance not found"
+            ) {
+                return { message: error.message, status: 401 }
+            }
+            this.p2pTransfer = await this.createP2PTransfer(transactionDetail, this.currency as string, "Failed")
+            return { message: error.message || "Something went wrong on the bank server", status: 500 }
+
+        }
+    }
+
+    static getInstance(transactionDetail: ITransactionDetail) {
+
+        this.instance = new SendMoney(transactionDetail);
+
+        return this.instance;
     }
 }
+
+export const sendMoneyAction = async (transactionDetail: ITransactionDetail) => SendMoney.getInstance(transactionDetail)
 
 export const getAllP2PTransactionHistories = async (): Promise<p2ptransfer[] | []> => {
     try {
@@ -153,7 +272,7 @@ export const getAllP2PTransactionHistories = async (): Promise<p2ptransfer[] | [
             },
             orderBy: { timestamp: "desc" }
         })
-        console.log(p2pTransactionHistories);
+        // console.log(p2pTransactionHistories);
         return p2pTransactionHistories
     } catch (error) {
         console.log("getAllP2PTransactions =========>", error);
