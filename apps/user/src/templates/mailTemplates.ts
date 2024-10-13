@@ -161,3 +161,39 @@ export const EMERGENCY_CODE_TEMPLATE = `
 </body>
 </html>
 `
+
+
+export const OTP_CODE_TEMPLATE = `
+  <!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Emergency Code
+</title>
+</head>
+<body style="font-family: Arial, sans-serif; line-height: 1.6; color: #333; max-width: 600px; margin: 0 auto; padding: 20px;">
+  <div style="background: linear-gradient(to right, #4CAF50, #45a049); padding: 20px; text-align: center;">
+    <h1 style="color: white; margin: 0;">OTP Code
+</h1>
+  </div>
+  <div style="background-color: #f9f9f9; pahadding: 20px; border-radius: 0 0 5px 5px; box-shadow: 0 2px 5px rgba(0,0,0,0.1);">
+    <p>Hello,</p>
+    <p>We received your request to make a trasaction.</p>
+    <p>Your confirmation otp code is:</p>
+    <div style="text-align: center; margin: 30px 0;">
+<center style="box-sizing:border-box;min-width:500px;width:100%">  
+                  <div style="background:#f7f6fd;border-bottom:1px solid #d6d6d6;border-bottom-color:#242424;border-bottom-left-radius:0;border-bottom-right-radius:0;border-radius:8px 8px 0px 0px;border-top-left-radius:15px;border-top-right-radius:15px;box-sizing:border-box;padding-bottom:1rem;padding-left:1rem;padding-right:1rem;padding-top:1rem;width:75%" align="center">
+                    <strong style="box-sizing:border-box">{otp_code}</strong>
+                  </div>
+                </center>
+    </div>
+    <p>You'll also need to enter the otp code then only you can able move forward.Please enter this code within 1 minute to complete the process</p>
+    <p>Best regards,<br>Your App Team</p>
+  </div>
+  <div style="text-align: center; margin-top: 20px; color: #888; font-size: 0.8em;">
+    <p>This is an automated message, please do not reply to this email.</p>
+  </div>
+</body>
+</html>
+`

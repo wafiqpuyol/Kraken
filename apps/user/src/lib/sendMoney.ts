@@ -279,3 +279,99 @@ export const getAllP2PTransactionHistories = async (): Promise<p2ptransfer[] | [
         return []
     }
 }
+
+export const sendOTPAction = async (email: string): Promise<{
+    message: string;
+    status: number;
+}> => {
+    console.log(email);
+    try {
+        const session = await getServerSession(authOptions)
+        if (!session?.user?.uid) {
+            return { message: "Unauthorized. Please login first", status: 401 }
+        }
+
+        const isUserExist = await prisma.user.findFirst({
+            where:
+            {
+                AND: [
+                    { id: session?.user?.uid },
+                    { email }
+                ]
+            }
+        })
+
+        if (!isUserExist) return { message: "User doesn't exist. Please login first.", status: 401 }
+        if (!isUserExist.isVerified) return { message: "Please verify your account first to send money", status: 401 }
+        if (!isUserExist.twoFactorActivated) return { message: "Please enable your 2FA", status: 401 }
+        if (!isUserExist.otpVerified) return { message: "Please enable your 2FA", status: 401 }
+
+        const otp = generateOTP()
+        const updatedData = {
+            otp: otp,
+            otpIssuer: email,
+            otp_expiresAt: new Date(Date.now() + 1000 * 90),
+        }
+        const isWalletExist = await prisma.wallet.findFirst({ where: { userId: session.user.uid } })
+        if (!isWalletExist) {
+            await prisma.wallet.create({ data: { userId: session.user.uid, ...updatedData } })
+        } else {
+            await prisma.wallet.update({ where: { userId: session.user.uid }, data: updatedData })
+        }
+
+        return await sendOTP(email, otp)
+    } catch (error: any) {
+        console.log(error);
+        return { message: error.message || "Something went wrong while sending your otp", status: 500 }
+    }
+}
+
+export const verifyOTP = async (otp: string): Promise<{
+    message: string;
+    status: number;
+}> => {
+    console.log(otp);
+    try {
+        const session = await getServerSession(authOptions)
+        if (!session?.user?.uid) {
+            return { message: "Unauthorized. Please login first", status: 401 }
+        }
+
+        const isUserExist = await prisma.user.findFirst({
+            where:
+            {
+                AND: [
+                    { id: session?.user?.uid },
+                ]
+            }
+        })
+
+        if (!isUserExist) return { message: "User doesn't exist. Please login first.", status: 401 }
+        if (!isUserExist.isVerified) return { message: "Please verify your account first to send money", status: 401 }
+        if (!isUserExist.twoFactorActivated) return { message: "Please enable your 2FA", status: 401 }
+        if (!isUserExist.otpVerified) return { message: "Please enable your 2FA", status: 401 }
+
+
+        const isWalletExist = await prisma.wallet.findFirst({
+            where:
+                { AND: [{ userId: session.user.uid }, { otpIssuer: isUserExist.email }] }
+        })
+        if (!isWalletExist) {
+            return { message: "Invalid OTP. Please try again", status: 401 }
+        }
+        if (isWalletExist.otp !== otp) {
+            return { message: "Invalid OTP. Please try again", status: 401 }
+        }
+        if (isWalletExist.otp_expiresAt! < new Date()) {
+            prisma.wallet.update({ where: { userId: session.user.uid }, data: { otpVerified: false, otp: null, otp_expiresAt: null } })
+            return { message: "OTP has expired. Please try again", status: 400 }
+        }
+
+        console.log(isWalletExist);
+        await prisma.wallet.update({ where: { userId: session.user.uid }, data: { otpVerified: true, otp: null, otp_expiresAt: null } })
+        return { message: "OTP has verified", status: 200 }
+    } catch (error: any) {
+        console.log(error);
+        return { message: error.message || "Something went wrong while verifying your otp", status: 500 }
+    }
+}

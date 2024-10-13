@@ -1,7 +1,10 @@
 "use server"
 
 const nodemailer = require("nodemailer");
-import { PASSWORD_RESET_REQUEST_TEMPLATE, VERIFICATION_EMAIL_TEMPLATE, AUTHORIZATION_CODE_TEMPLATE, CONFIRMATION_CODE_TEMPLATE, EMERGENCY_CODE_TEMPLATE } from "../templates/mailTemplates"
+import {
+    PASSWORD_RESET_REQUEST_TEMPLATE, VERIFICATION_EMAIL_TEMPLATE,
+    AUTHORIZATION_CODE_TEMPLATE, CONFIRMATION_CODE_TEMPLATE, EMERGENCY_CODE_TEMPLATE, OTP_CODE_TEMPLATE
+} from "../templates/mailTemplates"
 
 
 const nodeMailerClient = nodemailer.createTransport({
@@ -91,5 +94,22 @@ export const sendEmergencyCodeMail = async (email: string, emergency_code: strin
     } catch (error: any) {
         console.log("sendEmergencyCodeMail -->", error);
         return { message: "Something went wrong while sending emergency code to your email", status: 500 };
+    }
+};
+
+export const sendOTP = async (email: string, otp: string) => {
+    console.log(email, otp)
+    try {
+        await nodeMailerClient.sendMail({
+            from: sender,
+            to: email,
+            subject: "verify transaction vai otp",
+            html: OTP_CODE_TEMPLATE.replace("{otp_code}", otp),
+            category: "OTP Code",
+        });
+        return { message: "otp code has been sent to your email", status: 200 };
+    } catch (error: any) {
+        console.log("sendOTP -->", error);
+        return { message: "Something went wrong while sending emergency otp code to your email", status: 500 };
     }
 };
