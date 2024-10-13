@@ -24,29 +24,39 @@ model merchant {
 }
 
 model onramptransaction {
-  id        Int                      @id @default(autoincrement())
-  status    onramptransaction_status
-  token     String                   @unique(map: "OnRampTransaction_token_key")
-  provider  String
-  amount    Int
-  startTime DateTime
-  userId    Int
-  user      user                     @relation(fields: [userId], references: [id], map: "OnRampTransaction_userId_fkey")
+  id           Int                      @id @default(autoincrement())
+  status       onramptransaction_status
+  token        String                   @unique(map: "OnRampTransaction_token_key")
+  provider     String
+  amount       Int
+  startTime    DateTime
+  lockedAmount Int
+  userId       Int
+  user         user                     @relation(fields: [userId], references: [id], map: "OnRampTransaction_userId_fkey")
 
   @@index([userId], map: "OnRampTransaction_userId_fkey")
 }
 
 model p2ptransfer {
-  id                                Int              @id @default(autoincrement())
+  id                                Int                    @id @default(autoincrement())
   transactionID                     String
   currency                          String
+  fee_currency                      String
   amount                            Int
   timestamp                         DateTime
   fromUserId                        Int
   toUserId                          Int
+  domestic_trxn_fee                 String?
+  international_trxn_fee            String?
+  sender_number                     String
+  receiver_number                   String
+  sender_name                       String
+  receiver_name                     String
   transactionType                   transaction_type
-  user_p2ptransfer_fromUserIdTouser user             @relation("p2ptransfer_fromUserIdTouser", fields: [fromUserId], references: [id], map: "P2pTransfer_fromUserId_fkey")
-  user_p2ptransfer_toUserIdTouser   user             @relation("p2ptransfer_toUserIdTouser", fields: [toUserId], references: [id], map: "P2pTransfer_toUserId_fkey")
+  transactionCategory               transaction_category
+  status                            p2p_transaction_status
+  user_p2ptransfer_fromUserIdTouser user                   @relation("p2ptransfer_fromUserIdTouser", fields: [fromUserId], references: [id], map: "P2pTransfer_fromUserId_fkey")
+  user_p2ptransfer_toUserIdTouser   user                   @relation("p2ptransfer_toUserIdTouser", fields: [toUserId], references: [id], map: "P2pTransfer_toUserId_fkey")
 
   @@index([fromUserId], map: "P2pTransfer_fromUserId_fkey")
   @@index([toUserId], map: "P2pTransfer_toUserId_fkey")
@@ -100,6 +110,7 @@ model account {
   id                   Int     @id @default(autoincrement())
   userId               Int     @unique(map: "Account_userId_key")
   current_email        String
+  isLock               Boolean @default(false)
   email_update_pending Boolean @default(false)
   email_update         Json
   authorization_code   String?
@@ -122,8 +133,13 @@ model wallet {
 
 enum onramptransaction_status {
   Success
-  Failure
+  Failed
   Processing
+}
+
+enum p2p_transaction_status {
+  Success
+  Failed
 }
 
 enum merchant_auth_type {
@@ -134,4 +150,9 @@ enum merchant_auth_type {
 enum transaction_type {
   Send
   Recieve
+}
+
+enum transaction_category {
+  Domestic
+  International
 }
