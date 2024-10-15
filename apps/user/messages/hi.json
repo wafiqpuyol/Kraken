@@ -472,5 +472,12 @@
     "Success": "सफल",
     "Failed": "विफल",
     "trxn_id": "Trxn ID"
+  },
+  "WithDrawLimits": {
+    "withdraw_limits": "निकासी सीमा",
+    "Daily": "दैनिक",
+    "Monthly": "मासिक",
+    "per_transaction_limit": "प्रति लेनदेन सीमा",
+    "withdraw_limit": "निकासी सीमा"
   }
 }

@@ -469,5 +469,12 @@
     "Success": "সফল",
     "Failed": "ব্যর্থ",
     "trxn_id": "ট্রান্সেকশন আইডি"
+  },
+  "WithDrawLimits": {
+    "withdraw_limits": "উত্তোলন সীমা",
+    "Daily": "দৈনিক",
+    "Monthly": "মাসিক",
+    "per_transaction_limit": "লেনদেন সীমা",
+    "withdraw_limit": "উত্তোলন সীমা"
   }
 }

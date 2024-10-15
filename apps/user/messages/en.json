@@ -472,5 +472,12 @@
     "Success": "Success",
     "Failed": "Failed",
     "trxn_id": "Trxn ID"
+  },
+  "WithDrawLimits": {
+    "withdraw_limits": "Withdraw Limits",
+    "Daily": "Daily",
+    "Monthly": "Monthly",
+    "per_transaction_limit": "Per transaction limit",
+    "withdraw_limit": "withdraw limit"
   }
 }

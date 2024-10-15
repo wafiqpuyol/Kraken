@@ -472,5 +472,12 @@
     "Success": "成功",
     "Failed": "失敗",
     "trxn_id": "Trxn ID"
+  },
+  "WithDrawLimits": {
+    "withdraw_limits": "出金制限",
+    "Daily": "日次",
+    "Monthly": "月次",
+    "per_transaction_limit": "1 回あたりの出金制限",
+    "withdraw_limit": "出金制限"
   }
 }

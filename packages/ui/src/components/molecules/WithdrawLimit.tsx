@@ -4,18 +4,22 @@ import { useState } from 'react'
 import { WITHDRAW_LIMIT } from "../../lib/constant"
 import { useSession } from "next-auth/react"
 import { Loader } from "../atoms/Loader"
-
+import { useTranslations } from "next-intl"
 
 interface WithdrawLimitsProps {
-    onRampTransactionLimitDetail: any
+    onRampTransactionLimitDetail: {
+        perDayTotal: number;
+        perMonthTotal: number;
+    } | undefined
 }
 
 export const WithDrawLimits: React.FC<WithdrawLimitsProps> = ({ onRampTransactionLimitDetail }) => {
+    const t = useTranslations("WithDrawLimits")
     const session = useSession({ required: true })
     const [view, setView] = useState<'daily' | 'monthly'>('daily')
     const [currentWithdrawal, setCurrentWithdrawal] = useState({
-        daily: onRampTransactionLimitDetail.perDayTotal / 100,
-        monthly: onRampTransactionLimitDetail.perMonthTotal / 100,
+        daily: onRampTransactionLimitDetail!.perDayTotal / 100,
+        monthly: onRampTransactionLimitDetail!.perMonthTotal / 100,
     })
     const currency = session.data?.user?.wallet_currency
 
@@ -33,21 +37,21 @@ export const WithDrawLimits: React.FC<WithdrawLimitsProps> = ({ onRampTransactio
     return (
         <div className="bg-white rounded-lg p-6 max-w-full shadow-md">
             <div className="flex justify-between items-center mb-6">
-                <h2 className="text-2xl font-semibold">Withdraw limits</h2>
+                <h2 className="text-2xl font-semibold">{t("withdraw_limits")}</h2>
                 <div className="flex bg-gray-100 rounded-full p-1">
                     <button
                         className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${view === 'daily' ? 'bg-white shadow-sm' : 'text-gray-500'
                             }`}
                         onClick={() => setView('daily')}
                     >
-                        Daily
+                        {t("Daily")}
                     </button>
                     <button
                         className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${view === 'monthly' ? 'bg-white shadow-sm' : 'text-gray-500'
                             }`}
                         onClick={() => setView('monthly')}
                     >
-                        Monthly
+                        {t("Monthly")}
                     </button>
                 </div>
             </div>
@@ -60,7 +64,7 @@ export const WithDrawLimits: React.FC<WithdrawLimitsProps> = ({ onRampTransactio
                         <>
                             <div className="mb-8">
                                 <div className="bg-gray-100 rounded-lg p-4">
-                                    <span className="text-sm text-gray-600">Per transaction limit:</span>
+                                    <span className="text-sm text-gray-600">{t("per_transaction_limit")}:</span>
                                     <span className="block text-lg font-medium mt-1">
                                         {formatCurrency(WITHDRAW_LIMIT[currency]?.perTransactionLimit.min)} - {formatCurrency(WITHDRAW_LIMIT[currency]?.perTransactionLimit.max)} {WITHDRAW_LIMIT[currency]?.name}
                                     </span>
@@ -68,7 +72,7 @@ export const WithDrawLimits: React.FC<WithdrawLimitsProps> = ({ onRampTransactio
                             </div>
                             <div className="py-2">
                                 <div className="flex justify-between items-center mb-2">
-                                    <span className="text-gray-600 font-medium">{view === 'daily' ? 'Daily' : 'Monthly'} withdraw limit</span>
+                                    <span className="text-gray-600 font-medium">{view === 'daily' ? t('Daily') : t('Monthly')} {t("withdraw_limit")}</span>
                                     <span className="font-medium">
                                         {formatCurrency(withdrawal)} of {formatCurrency(limit)} {WITHDRAW_LIMIT[currency]?.name}
                                     </span>
@@ -80,7 +84,7 @@ export const WithDrawLimits: React.FC<WithdrawLimitsProps> = ({ onRampTransactio
                                     ></div>
                                 </div>
                                 <div className="flex justify-between items-center py-2">
-                                    <span className="text-gray-600 font-medium">{view === 'daily' ? 'Daily' : 'Monthly'} withdrawal limit</span>
+                                    <span className="text-gray-600 font-medium">{view === 'daily' ? t('Daily') : t('Monthly')} {t("withdraw_limit")}</span>
                                     <span className="font-medium">{formatCurrency(limit)} {WITHDRAW_LIMIT[currency]?.name}</span>
                                 </div>
                             </div>

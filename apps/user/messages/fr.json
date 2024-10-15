@@ -472,5 +472,12 @@
     "Success": "Succès",
     "Failed": "Échoué",
     "trxn_id": "ID de la transaction"
+  },
+  "WithDrawLimits": {
+    "withdraw_limits": "Limites de retrait",
+    "Daily": "Quotidien",
+    "Monthly": "Mensuel",
+    "per_transaction_limit": "Limite par transaction",
+    "withdraw_limit": "limite de retrait"
   }
 }
