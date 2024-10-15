@@ -300,7 +300,14 @@
     "authenticator_app_text": "Utilise un code à usage unique d'une application comme Google Authenticator ou Authy.",
     "add_passkey": "Ajouter une clé de passage",
     "remove": "Retirer",
-    "edit": "Modifier"
+    "edit": "Modifier",
+    "enable": "Activer",
+    "advance_settings": "Paramètres avancés",
+    "master_key": "Clé principale",
+    "desc": "Pour renforcer encore plus la sécurité de vos comptes",
+    "master_key_desc": "La clé principale agit comme une clé de compte si vous perdez ou oubliez votre méthode de connexion 2FA. Il est également utilisé en conjonction avec d'autres fonctionnalités de sécurité avancées.",
+    "withdraw_2FA_desc": "WithDraw 2FA est crucial car il ajoute une couche de sécurité supplémentaire à vos dépôts de portefeuille électronique, réduisant considérablement le risque d'accès non autorisé et empêchant les transactions frauduleuses.",
+    "withdraw_2FA": "WithDraw 2FA"
   },
   "SupportedLangDialog": {
     "title": "Langues",
@@ -492,5 +499,14 @@
     "Monthly": "Mensuel",
     "per_transaction_limit": "Limite par transaction",
     "withdraw_limit": "limite de retrait"
+  },
+  "TwoFADisableDialog": {
+    "signIn2FA_title": "Impossible de supprimer l'application d'authentification",
+    "withdraw2FA_title": "Impossible de supprimer le retrait 2FA",
+    "signIn2FA_desc1": "Au moins une méthode de connexion 2FA multi-appareil est requise pour protéger votre compte.",
+    "withdraw2FA_desc1": "Le retrait 2FA est crucial car il ajoute une couche de sécurité supplémentaire à vos dépôts sur votre portefeuille électronique.",
+    "desc2": "Veuillez ajouter un",
+    "desc3": "avant de supprimer votre application d'authentification.",
+    "btn": "Compris"
   }
 }

@@ -300,7 +300,17 @@
     "authenticator_app_text": "Uses a one-time code from an app like Google Authenticator or Authy.",
     "add_passkey": "Add passkey",
     "remove": "Remove",
-    "edit": "Edit"
+    "edit": "Edit",
+    "enable": "Enable",
+    "advance_settings": "Advance Settings",
+    "master_key": "Master Key",
+    "desc": "For hardening your accounts security even further",
+    "master_key_desc": "The Master key acts as an account key if you lose or forget your sign-in 2FA method. It is also used in conjunction with other advance security features.",
+    "withdraw_2FA_desc": "WithDraw 2FA is crucial because it adds an extra layer of security to your e-wallet deposits, significantly reducing the risk of unauthorized access and preventing fraudulent transactions.",
+    "withdraw_2FA": "WithDraw 2FA"
+  },
+  "Enable2FADialog": {
+    "title": "Seems like you haven't enabled your 2FA. Please enable it to enable WithDraw 2FA."
   },
   "SupportedLangDialog": {
     "title": "Languages",
@@ -492,5 +502,14 @@
     "Monthly": "Monthly",
     "per_transaction_limit": "Per transaction limit",
     "withdraw_limit": "withdraw limit"
+  },
+  "TwoFADisableDialog": {
+    "signIn2FA_title": "Cannot remove Authenticator app",
+    "withdraw2FA_title": "Cannot remove Withdraw 2FA",
+    "signIn2FA_desc1": "At least one cross-device sign-in 2FA method is required to protect your account.",
+    "withdraw2FA_desc1": "WithDraw 2FA is crucial because it adds an extra layer of security to your e-wallet deposits.",
+    "desc2": "Please add a ",
+    "desc3": "before deleting your Authenticator app.",
+    "btn": "Got it"
   }
 }

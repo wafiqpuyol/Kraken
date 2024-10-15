@@ -300,7 +300,14 @@
     "authenticator_app_text": "Utiliza um código de uso único de um aplicativo como Google Authenticator ou Authy.",
     "add_passkey": "Adicionar chave de passagem",
     "remove": "Remover",
-    "edit": "Editar"
+    "edit": "Editar",
+    "enable": "Habilitar",
+    "advance_settings": "Configuración avanzada",
+    "master_key": "Clave maestra",
+    "desc": "Para reforzar aún más la seguridad de sus cuentas",
+    "master_key_desc": "La clave maestra actúa como una clave de cuenta si pierde u olvida su método de inicio de sesión 2FA. También se utiliza en conjunto con otras funciones de seguridad avanzadas.",
+    "withdraw_2FA_desc": "WithDraw 2FA es crucial porque agrega una capa adicional de seguridad a sus depósitos de billetera electrónica, reduciendo significativamente el riesgo de acceso no autorizado y evitando transacciones fraudulentas.",
+    "withdraw_2FA": "WithDraw 2FA"
   },
   "SupportedLangDialog": {
     "title": "Idiomas",
@@ -492,5 +499,14 @@
     "Monthly": "Mensual",
     "per_transaction_limit": "Límite por transacción",
     "withdraw_limit": "límite de retiro"
+  },
+  "TwoFADisableDialog": {
+    "signIn2FA_title": "No se puede eliminar la aplicación de autenticación",
+    "withdraw2FA_title": "No se puede eliminar 2FA de retiro",
+    "signIn2FA_desc1": "Se requiere al menos un método de inicio de sesión 2FA entre dispositivos para proteger su cuenta.",
+    "withdraw2FA_desc1": "2FA de retiro es crucial porque agrega una capa adicional de seguridad a sus depósitos de la billetera electrónica.",
+    "desc2": "Por favor, agregue un",
+    "desc3": "antes de eliminar su aplicación de autenticación.",
+    "btn": "Entendido"
   }
 }
