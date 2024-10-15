@@ -130,6 +130,9 @@ model wallet {
   otp_expiresAt            DateTime?
   otpIssuer                String?
   otpVerified              Boolean   @default(false)
+  withDrawTwoFASecret      String?
+  withDrawTwoFAActivated   Boolean   @default(false)
+  withDrawOTPVerified      Boolean   @default(false)
   user                     user      @relation(fields: [userId], references: [id], map: "Wallet_userId_fkey")
 
   @@index([userId], map: "Wallet_userId_fkey")
