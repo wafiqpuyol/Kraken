@@ -191,7 +191,9 @@
   },
   "Profile": {
     "my_account": "मेरा खाता",
-    "settings": "सेटिंग्स"
+    "settings": "सेटिंग्स",
+    "security": "सुरक्षा",
+    "help": "सहायता"
   },
   "SignUpForm": {
     "title": "व्यक्तिगत खाता बनाएं",

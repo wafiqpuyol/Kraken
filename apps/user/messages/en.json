@@ -191,7 +191,9 @@
   },
   "Profile": {
     "my_account": "My Account",
-    "settings": "Settings"
+    "settings": "Settings",
+    "security": "Security",
+    "help": "Help"
   },
   "SignUpForm": {
     "title": "Create a personal account",
