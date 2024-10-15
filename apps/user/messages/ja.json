@@ -383,8 +383,14 @@
     "EUR": {
       "name": "EUR"
     },
-    "AUD": {
-      "name": "AUD"
+    "BDT": {
+      "name": "BDT"
+    },
+    "JPY": {
+      "name": "YEN"
+    },
+    "INR": {
+      "name": "INR"
     }
   },
   "OnRampTransaction": {
@@ -401,6 +407,7 @@
     "desc": "別のユーザーに安全に資金を転送します。",
     "recipient_number": "受信者の番号",
     "amount": "金額",
+    "pincode": "ピンコード",
     "sending": "送信中...",
     "send_money": "送金"
   },
@@ -447,5 +454,23 @@
     "amount": "金額",
     "time": "時間",
     "download_button": "ダウンロード"
+  },
+  "Portfolio": {
+    "title": "ポートフォリオ",
+    "wallet_balance": "ウォレット残高",
+    "deposit": "入金",
+    "withdrawals": "引き出し",
+    "p2p_transfer": "P2P 転送",
+    "amount": "金額",
+    "locked": "ロック済み",
+    "status": "ステータス",
+    "category": "カテゴリ",
+    "receiver": "受信者",
+    "International": "国際",
+    "Domestic": "国内",
+    "date": "日付",
+    "Success": "成功",
+    "Failed": "失敗",
+    "trxn_id": "Trxn ID"
   }
 }

@@ -383,8 +383,14 @@
     "EUR": {
       "name": "EUR"
     },
-    "AUD": {
-      "name": "AUD"
+    "BDT": {
+      "name": "BDT"
+    },
+    "JPY": {
+      "name": "YEN"
+    },
+    "INR": {
+      "name": "INR"
     }
   },
   "OnRampTransaction": {
@@ -401,6 +407,7 @@
     "desc": "Transfira fundos para outro usuário com segurança.",
     "recipient_number": "Número do destinatário",
     "amount": "Montante",
+    "pincode": "código PIN",
     "sending": "Enviando...",
     "send_money": "Enviar dinheiro"
   },
@@ -447,5 +454,23 @@
     "amount": "Monto",
     "time": "Hora",
     "download_button": "Descargar"
+  },
+  "Portfolio": {
+    "title": "Portafolio",
+    "wallet_balance": "Saldo de la billetera",
+    "deposit": "Depósito",
+    "withdrawals": "Retiros",
+    "p2p_transfer": "Transferencia P2P",
+    "amount": "Monto",
+    "locked": "Bloqueado",
+    "status": "Estado",
+    "category": "Categoría",
+    "receiver": "Receptor",
+    "International": "Internacional",
+    "Domestic": "Nacional",
+    "date": "Fecha",
+    "Success": "Éxito",
+    "Failed": "Fallado",
+    "trxn_id": "ID de transacción"
   }
 }

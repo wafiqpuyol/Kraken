@@ -386,7 +386,7 @@
     "BDT": {
       "name": "BDT"
     },
-    "YEN": {
+    "JPY": {
       "name": "YEN"
     },
     "INR": {
@@ -407,6 +407,7 @@
     "desc": "Transfer funds to another user securely.",
     "recipient_number": "Recipient's Number",
     "amount": "Amount",
+    "pincode": "Pincode",
     "sending": "Sending....",
     "send_money": "Send Money"
   },
@@ -453,5 +454,23 @@
     "amount": "Amount",
     "time": "Time",
     "download_button": "Download"
+  },
+  "Portfolio": {
+    "title": "Portfolio",
+    "wallet_balance": "Wallet Balance",
+    "deposit": "Deposit",
+    "withdrawals": "WithDrawals",
+    "p2p_transfer": "P2P Transfer",
+    "amount": "Amount",
+    "locked": "Locked",
+    "status": "Status",
+    "category": "Category",
+    "receiver": "Receiver",
+    "International": "International",
+    "Domestic": "Domestic",
+    "date": "Date",
+    "Success": "Success",
+    "Failed": "Failed",
+    "trxn_id": "Trxn ID"
   }
 }

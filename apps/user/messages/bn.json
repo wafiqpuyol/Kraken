@@ -379,6 +379,15 @@
     },
     "AUD": {
       "name": "এইউডি"
+    },
+    "BDT": {
+      "name": "BDT"
+    },
+    "JPY": {
+      "name": "YEN"
+    },
+    "INR": {
+      "name": "INR"
     }
   },
   "OnRampTransaction": {
@@ -395,6 +404,7 @@
     "desc": "নিরাপদে অন্য ব্যবহারকারীর কাছে তহবিল স্থানান্তর করুন।",
     "recipient_number": "প্রাপকের নম্বর",
     "amount": "পরিমাণ",
+    "pincode": "পিনকোড",
     "sending": "পাঠানো হচ্ছে....",
     "send_money": "টাকা পাঠান"
   },
@@ -441,5 +451,23 @@
     "amount": "মোট",
     "time": "সময়",
     "download_button": "ডাউনলোড"
+  },
+  "Portfolio": {
+    "title": "পোর্টফোলিও",
+    "wallet_balance": "ওয়ালেট ব্যালেন্স",
+    "deposit": "জমা",
+    "withdrawals": "উত্তোলন",
+    "p2p_transfer": "পি২পি ট্রান্সফার",
+    "amount": "মোট ব্যালেন্স",
+    "locked": "লক ব্যালেন্স",
+    "status": "স্ট্যাটাস",
+    "category": "বিভাগ",
+    "receiver": "প্রাপক",
+    "International": "আন্তর্জাতিক",
+    "Domestic": "ঘরোয়া",
+    "date": "তারিখ",
+    "Success": "সফল",
+    "Failed": "ব্যর্থ",
+    "trxn_id": "ট্রান্সেকশন আইডি"
   }
 }
