@@ -406,10 +406,21 @@
     "title": "送金",
     "desc": "別のユーザーに安全に資金を転送します。",
     "recipient_number": "受信者の番号",
+    "phone_number": "電話番号を入力してください",
     "amount": "金額",
-    "pincode": "ピンコード",
+    "pincode": "PIN コード",
     "sending": "送信中...",
-    "send_money": "送金"
+    "send_money": "送金",
+    "transaction_type": "トランザクションタイプ",
+    "International": "国際",
+    "Domestic": "国内",
+    "currency": "通貨",
+    "current_balance": "現在の残高",
+    "create_pincode": "作成する",
+    "pincode_footer": "PIN コードがありません"
+  },
+  "TrxnToolTip": {
+    "tooltip_text": "設定に移動し、通貨を変更して 希望の取引タイプを取得します"
   },
   "ChangePasswordDialog": {
     "title": "パスワードを変更"

@@ -403,13 +403,24 @@
     "scheduled_tab": "Agendado"
   },
   "SendMoneyPage": {
-    "title": "Enviar dinheiro",
-    "desc": "Transfira fundos para outro usuário com segurança.",
-    "recipient_number": "Número do destinatário",
-    "amount": "Montante",
-    "pincode": "código PIN",
+    "title": "Enviar dinero",
+    "desc": "Transfiera fondos a otro usuario de forma segura.",
+    "recipient_number": "Número del destinatario",
+    "phone_number": "Introduce el número de teléfono",
+    "amount": "Monto",
+    "pincode": "Código PIN",
     "sending": "Enviando...",
-    "send_money": "Enviar dinheiro"
+    "send_money": "Enviar dinero",
+    "transaction_type": "Tipo de transacción",
+    "International": "Internacional",
+    "Domestic": "Nacional",
+    "currency": "Moneda",
+    "current_balance": "Saldo actual",
+    "create_pincode": "Crear uno",
+    "pincode_footer": "¿No tienes un código PIN?"
+  },
+  "TrxnToolTip": {
+    "tooltip_text": "Navegue a configuración y cambie la moneda para obtener el tipo de transacción que desee"
   },
   "ChangePasswordDialog": {
     "title": "Cambiar contraseña"

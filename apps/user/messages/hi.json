@@ -406,10 +406,21 @@
     "title": "पैसा भेजें",
     "desc": "किसी अन्य उपयोगकर्ता को सुरक्षित रूप से धन स्थानांतरित करें।",
     "recipient_number": "प्राप्तकर्ता का नंबर",
-    "amount": "मात्रा",
+    "phone_number": "फ़ोन नंबर दर्ज करें",
+    "amount": "राशि",
     "pincode": "पिनकोड",
-    "sending": "भेजना",
-    "send_money": "पैसा भेजें"
+    "sending": "प्रेषण...",
+    "send_money": "पैसा भेजें",
+    "transaction_type": "ट्रांजेक्शन प्रकार",
+    "International": "अंतर्राष्ट्रीय",
+    "Domestic": "घरेलू",
+    "currency": "मुद्रा",
+    "current_balance": "वर्तमान शेष",
+    "create_pincode": "एक बनाएँ",
+    "pincode_footer": "पिनकोड नहीं है"
+  },
+  "TrxnToolTip": {
+    "tooltip_text": "अपना वांछित लेनदेन प्रकार प्राप्त करने के लिए सेटिंग्स पर जाएं और मुद्रा बदलें"
   },
   "ChangePasswordDialog": {
     "title": "पासवर्ड बदलें"

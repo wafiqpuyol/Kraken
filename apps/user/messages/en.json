@@ -406,10 +406,21 @@
     "title": "Send Money",
     "desc": "Transfer funds to another user securely.",
     "recipient_number": "Recipient's Number",
+    "phone_number": "Enter phone number",
     "amount": "Amount",
     "pincode": "Pincode",
     "sending": "Sending....",
-    "send_money": "Send Money"
+    "send_money": "Send Money",
+    "transaction_type": "Transaction Type",
+    "International": "International",
+    "Domestic": "Domestic",
+    "currency": "Currency",
+    "current_balance": "Current Balance",
+    "create_pincode": "Create one",
+    "pincode_footer": "Don't have a pincode"
+  },
+  "TrxnToolTip": {
+    "tooltip_text": "Navigate to settings & change the currency to get your desired transaction type"
   },
   "ChangePasswordDialog": {
     "title": "Change Password"

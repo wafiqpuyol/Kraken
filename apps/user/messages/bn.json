@@ -403,10 +403,21 @@
     "title": "টাকা পাঠান",
     "desc": "নিরাপদে অন্য ব্যবহারকারীর কাছে তহবিল স্থানান্তর করুন।",
     "recipient_number": "প্রাপকের নম্বর",
+    "phone_number": "ফোন নম্বর লিখুন",
     "amount": "পরিমাণ",
     "pincode": "পিনকোড",
     "sending": "পাঠানো হচ্ছে....",
-    "send_money": "টাকা পাঠান"
+    "send_money": "টাকা পাঠান",
+    "International": "আন্তর্জাতিক",
+    "Domestic": "ঘরোয়া",
+    "transaction_type": "ট্রান্সঅ্যাকশন টাইপ",
+    "currency": "মুদ্রা",
+    "current_balance": "বর্তমান ব্যালেন্স",
+    "pincode_footer": "পিনকোড নেই",
+    "create_pincode": "তৈরি করুন"
+  },
+  "TrxnToolTip": {
+    "tooltip_text": "সেটিংসে নেভিগেট করুন এবং আপনার পছন্দসই লেনদেনের ধরন পেতে মুদ্রা পরিবর্তন করুন"
   },
   "ChangePasswordDialog": {
     "title": "পাসওয়ার্ড পরিবর্তন করুন"

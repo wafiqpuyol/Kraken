@@ -406,10 +406,21 @@
     "title": "Enviar dinheiro",
     "desc": "Transfira fundos para outro usuário com segurança.",
     "recipient_number": "Número do destinatário",
+    "phone_number": "Introduza o número de telefone",
     "amount": "Montante",
-    "pincode": "código PIN",
+    "pincode": "Código PIN",
     "sending": "Enviando...",
-    "send_money": "Enviar dinheiro"
+    "send_money": "Enviar dinheiro",
+    "transaction_type": "Tipo de transação",
+    "International": "Internacional",
+    "Domestic": "Doméstico",
+    "currency": "Moeda",
+    "current_balance": "Saldo atual",
+    "create_pincode": "Criar um",
+    "pincode_footer": "Não tem um código PIN"
+  },
+  "TrxnToolTip": {
+    "tooltip_text": "Navegue até as configurações e altere a moeda para obter o tipo de transação desejado"
   },
   "ChangePasswordDialog": {
     "title": "Alterar senha"
