@@ -508,5 +508,8 @@
     "desc2": "Por favor, adicione um",
     "desc3": "antes de excluir seu aplicativo de autenticação.",
     "btn": "Entendi"
+  },
+  "AccountLock": {
+    "title": "A sua conta foi bloqueada"
   }
 }

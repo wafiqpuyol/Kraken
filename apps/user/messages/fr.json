@@ -508,5 +508,8 @@
     "desc2": "Veuillez ajouter un",
     "desc3": "avant de supprimer votre application d'authentification.",
     "btn": "Compris"
+  },
+  "AccountLock": {
+    "title": "Votre compte a été verrouillé"
   }
 }

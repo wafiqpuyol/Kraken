@@ -476,7 +476,10 @@
     "receiver_name": "Receiver Name",
     "amount": "Amount",
     "time": "Time",
-    "download_button": "Download"
+    "download_button": "Download",
+    "status": "Status",
+    "category": "Category",
+    "fee": "Fee"
   },
   "Portfolio": {
     "title": "Portfolio",
@@ -511,5 +514,8 @@
     "desc2": "Please add a ",
     "desc3": "before deleting your Authenticator app.",
     "btn": "Got it"
+  },
+  "AccountLock": {
+    "title": "Your account has been locked"
   }
 }

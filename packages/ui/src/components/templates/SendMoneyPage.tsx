@@ -22,7 +22,7 @@ import { useToast } from "../molecules/Toaster/use-toast"
 import { useLocale, useTranslations } from 'next-intl';
 import { TransactionHistory } from "../organisms/TransactionHistory"
 import { p2ptransfer } from "@repo/db/type"
-import { Dispatch, SetStateAction, useState } from "react"
+import { Dispatch, SetStateAction, useEffect, useState } from "react"
 import { Loader } from "../atoms/Loader"
 import { GetVerified } from "../molecules/GetVerified"
 import { PincodeDialog } from "../molecules/PincodeDialog"
@@ -36,6 +36,7 @@ import { calculateAmountOnDemand } from "../../lib/utils"
 import { TrxnToolTip } from "../molecules/TrxnToolTip"
 import { Session } from "next-auth"
 import { InputOTP, InputOTPGroup, InputOTPSeparator, InputOTPSlot } from "../atoms/InputOTP"
+import { AccountLock } from "../molecules/Lock"
 
 export interface SendMoneyProps {
     sendMoneyAction: (arg: ITransactionDetail) => Promise<{
@@ -68,6 +69,14 @@ export interface SendMoneyProps {
         message: string;
         status: number;
     }>
+    isAccountLock: boolean
+    updateLockStatus: () => Promise<void>
+    checkAccountLockStatus(): Promise<{
+        message: string;
+        status: number;
+        isLock?: boolean;
+        lockExpiry?: Date | null;
+    }>
 }
 
 interface FinalProps {
@@ -89,6 +98,7 @@ interface FinalProps {
         message: string;
         status: number;
     }>
+    setAccountLock: Dispatch<SetStateAction<boolean>>
 }
 
 interface IOTPPrompt {
@@ -100,16 +110,24 @@ interface IOTPPrompt {
         message: string;
         status: number;
     }>
+    setAccountLock: Dispatch<SetStateAction<boolean>>
 }
 
-const SelectCurrency = ({ field, current_selected_currency, wallet_currency, form, setCurrency }: {
+interface SelectCurrencyProps {
     field: ControllerRenderProps<{
         amount: string;
         phone_number: string;
         pincode: string;
         currency?: string | undefined;
-    }, "currency">, current_selected_currency: string, wallet_currency: string | undefined, form: any, setCurrency: Dispatch<SetStateAction<string | null>>
-}) => {
+    }, "currency">,
+    current_selected_currency: string,
+    wallet_currency: string | undefined,
+    form: any,
+    accountLock: boolean,
+    setCurrency: Dispatch<SetStateAction<string | null>>
+}
+
+const SelectCurrency = ({ field, current_selected_currency, wallet_currency, form, setCurrency, accountLock }: SelectCurrencyProps) => {
 
     if (!field.value) {
         form.setValue("currency", current_selected_currency)
@@ -118,7 +136,7 @@ const SelectCurrency = ({ field, current_selected_currency, wallet_currency, for
     }
 
     return (
-        <Select defaultValue={current_selected_currency} onValueChange={field.onChange}>
+        <Select defaultValue={current_selected_currency} onValueChange={field.onChange} disabled={accountLock}>
             <SelectTrigger className="w-full h-[50px]" >
                 <SelectValue placeholder="Please choose currency" />
             </SelectTrigger>
@@ -167,11 +185,35 @@ const Enable2FAPrompt = () => (
 )
 
 
-const OTPPrompt = ({ transactionDetail, sendMoneyAction, formReset, setAllTransactionHistory, verifyOTP }: IOTPPrompt) => {
+const OTPPrompt = ({ transactionDetail, sendMoneyAction, formReset, setAllTransactionHistory, verifyOTP, setAccountLock }: IOTPPrompt) => {
     const [otp, setOtp] = useState("");
     const [isLoading, setIsLoading] = useState(false)
     const [isBtnDisable, setIsBtnDisable] = useState(false)
     const { toast } = useToast()
+
+    useEffect(() => {
+        var expiryDate = new Date(Date.now() + 1000 * 92).getTime()
+        let time = setInterval(() => {
+            var now = new Date().getTime()
+            var distance = expiryDate - now
+            var expiresWithin = Math.floor((distance % (1000 * 92)) / 1000);
+            if (distance < 0) {
+                clearInterval(time)
+            }
+
+            if (expiresWithin > 0) {
+                // @ts-ignore
+                document.getElementById("childSpan").innerHTML = expiresWithin + "s";
+                // @ts-ignore
+                document.getElementById("childSpan").style.color = expiresWithin <= 10 ? "#D62626" : "#9333EA"
+            }
+            // @ts-ignore
+            document.getElementById("parent").innerHTML = expiresWithin <= 0 ? "OTP time expired" : document.getElementById("parent").innerHTML;
+            // @ts-ignore
+            document.getElementById("parent").style.color = expiresWithin <= 0 && "#D62626";
+        }, 1000)
+        return () => { clearTimeout(time) }
+    }, [])
 
     const handleOTPSubmit = async () => {
         try {
@@ -213,6 +255,15 @@ const OTPPrompt = ({ transactionDetail, sendMoneyAction, formReset, setAllTransa
                         title: res.message,
                         variant: "destructive"
                     })
+                    break;
+
+                case 403:
+                    toast({
+                        title: res.message,
+                        variant: "destructive"
+                    })
+                    setAccountLock(true)
+                    formReset({ amount: "", currency: "", phone_number: "", pincode: "" })
                     break;
 
                 case 404:
@@ -273,6 +324,7 @@ const OTPPrompt = ({ transactionDetail, sendMoneyAction, formReset, setAllTransa
                         {isLoading ? "verifying..." : "Continue"}
                     </Button>
                 </form>
+                <div id="parent" className='self-center mt-9 mr-10 text-sm font-medium text-gray-500'>expires at:- <span id="childSpan" className='text-red-500'></span> </div>
             </div>
         </DialogContent>
     )
@@ -280,13 +332,14 @@ const OTPPrompt = ({ transactionDetail, sendMoneyAction, formReset, setAllTransa
 
 
 const FinalCard: React.FC<FinalProps> = ({ sendMoneyAction, children, transactionDetail, modalOpen, session, currency,
-    locale, formReset, setModalOpen, setAllTransactionHistory, sendOTPAction, verifyOTP }) => {
+    locale, formReset, setModalOpen, setAllTransactionHistory, sendOTPAction, verifyOTP, setAccountLock }) => {
     const [isLoading, setIsLoading] = useState(false)
     const [isBtnDisable, setIsBtnDisable] = useState(false)
     const [enable2FAPrompt, setEnable2FAPrompt] = useState(false)
     const [otpPrompt, setOTPPrompt] = useState(false)
     const { toast } = useToast()
     const router = useRouter()
+
 
     const handleClick = async () => {
         if (!session?.user) {
@@ -350,7 +403,7 @@ const FinalCard: React.FC<FinalProps> = ({ sendMoneyAction, children, transactio
                     (
                         otpPrompt ?
                             <OTPPrompt formReset={formReset} sendMoneyAction={sendMoneyAction} transactionDetail={transactionDetail}
-                                setAllTransactionHistory={setAllTransactionHistory} verifyOTP={verifyOTP}
+                                setAllTransactionHistory={setAllTransactionHistory} verifyOTP={verifyOTP} setAccountLock={setAccountLock}
                             />
                             :
                             <DialogContent className="sm:max-w-[400px] bg-white" onInteractOutside={(e) => {
@@ -417,7 +470,7 @@ const FinalCard: React.FC<FinalProps> = ({ sendMoneyAction, children, transactio
 }
 
 export const SendMoneyPage: React.FC<SendMoneyProps> = ({ sendMoneyAction, p2pTransactionHistories, sendVerificationEmailAction,
-    generatePincode, sendEmergencyCode, resetPin, sendOTPAction, verifyOTP }) => {
+    generatePincode, sendEmergencyCode, resetPin, sendOTPAction, verifyOTP, isAccountLock, updateLockStatus, checkAccountLockStatus }) => {
     const t = useTranslations("SendMoneyPage")
     const locale = useLocale()
     const { handleSubmit, control, formState, ...form } = userFormSendMoney()
@@ -434,6 +487,7 @@ export const SendMoneyPage: React.FC<SendMoneyProps> = ({ sendMoneyAction, p2pTr
     const [modalOpen, setModalOpen] = useState(false)
     const [amountError, setAmountError] = useState<string | null>(null)
     const [currency, setCurrency] = useState<null | string>(null)
+    const [accountLock, setAccountLock] = useState<boolean>(isAccountLock)
     const CurrencyLogo = CURRENCY_LOGO[currency]?.Logo
 
 
@@ -538,7 +592,7 @@ export const SendMoneyPage: React.FC<SendMoneyProps> = ({ sendMoneyAction, p2pTr
                                                         <FormItem className="mb-4 flex flex-col">
                                                             <FormLabel>{t("currency")}</FormLabel>
                                                             <FormControl>
-                                                                <SelectCurrency setCurrency={setCurrency} form={form} field={field}
+                                                                <SelectCurrency accountLock={accountLock} setCurrency={setCurrency} form={form} field={field}
                                                                     current_selected_currency={session?.data?.user?.preference.selected_currency}
                                                                     wallet_currency={session?.data?.user?.wallet_currency}
                                                                 />
@@ -565,7 +619,7 @@ export const SendMoneyPage: React.FC<SendMoneyProps> = ({ sendMoneyAction, p2pTr
                                                                     <Input placeholder={t("phone_number")} {...field} defaultValue={countryCode} value={field.value} onChange={(e) => {
                                                                         setCountryCode(field.value)
                                                                         field.onChange(e.target.value)
-                                                                    }} />
+                                                                    }} disabled={accountLock} />
                                                                 </div>
                                                             </FormControl>
                                                             <FormMessage className='text-red-500' />
@@ -584,7 +638,7 @@ export const SendMoneyPage: React.FC<SendMoneyProps> = ({ sendMoneyAction, p2pTr
                                                             <FormLabel>{t("amount")}</FormLabel>
                                                             <FormControl>
                                                                 <div className="flex items-center">
-                                                                    <Input type="number" step="0.01" autoComplete="off" {...field}
+                                                                    <Input disabled={accountLock} type="number" step="0.01" autoComplete="off" {...field}
                                                                         className="border-r-0"
                                                                         onChange={(e) => {
                                                                             const value = formatAmount(e.target.value, 2)
@@ -632,7 +686,7 @@ export const SendMoneyPage: React.FC<SendMoneyProps> = ({ sendMoneyAction, p2pTr
                                                     <FormItem className="mb-3">
                                                         <FormLabel>{t("pincode")}</FormLabel>
                                                         <FormControl>
-                                                            <Input type="number" {...field} onChange={(e) => {
+                                                            <Input disabled={accountLock} type="number" {...field} onChange={(e) => {
                                                                 if (e.target.value.length <= PINCODE_MAX_LENGTH) {
                                                                     field.onChange(e.target.value)
                                                                 }
@@ -658,10 +712,11 @@ export const SendMoneyPage: React.FC<SendMoneyProps> = ({ sendMoneyAction, p2pTr
                                                 currency={currency}
                                                 sendOTPAction={sendOTPAction}
                                                 verifyOTP={verifyOTP}
+                                                setAccountLock={setAccountLock}
                                             >
                                                 <Button type="submit" className="w-full mt-6 bg-purple-600 text-white"
 
-                                                    disabled={!(formState.isValid && (Object.keys(formState.errors).length === 0) && (amountError === null)) || formState.isSubmitting}
+                                                    disabled={accountLock || !(formState.isValid && (Object.keys(formState.errors).length === 0) && (amountError === null)) || formState.isSubmitting}
                                                 >
                                                     {formState.isSubmitting ? t("sending") : t('send_money')}
                                                     <ArrowRight className="ml-2 h-4 w-4" />
@@ -677,6 +732,7 @@ export const SendMoneyPage: React.FC<SendMoneyProps> = ({ sendMoneyAction, p2pTr
                 </CardContent>
                 <CardFooter className="flex flex-col items-start">
                 </CardFooter>
+                {accountLock && <AccountLock updateLockStatus={updateLockStatus} checkAccountLockStatus={checkAccountLockStatus} setAccountLock={setAccountLock} />}
             </Card>
 
             <TransactionHistory p2pTransactionHistories={allTransactionHistory} />
