@@ -83,6 +83,7 @@ model user {
   account                                  account?
   resetpassword                            resetpassword[]
   wallet                                   wallet?
+  masterkey                                masterkey?
 }
 
 model resetpassword {
@@ -111,6 +112,7 @@ model account {
   userId               Int     @unique(map: "Account_userId_key")
   current_email        String
   isLock               Boolean @default(false)
+  lock_expiresAt DateTime?
   email_update_pending Boolean @default(false)
   email_update         Json
   authorization_code   String?
@@ -133,9 +135,19 @@ model wallet {
   withDrawTwoFASecret      String?
   withDrawTwoFAActivated   Boolean   @default(false)
   withDrawOTPVerified      Boolean   @default(false)
+  wrongPincodeAttempts     Int       @default(0)
   user                     user      @relation(fields: [userId], references: [id], map: "Wallet_userId_fkey")
 
   @@index([userId], map: "Wallet_userId_fkey")
+}
+
+model masterkey {
+  id         Int     @id @default(autoincrement())
+  userId     Int     @unique(map: "MasterKey_userId_key")
+  otpVerfied Boolean @default(false)
+  user       user    @relation(fields: [userId], references: [id], map: "MasterKey_userId_fkey")
+
+  @@index([userId], map: "MasterKey_userId_fkey")
 }
 
 enum onramptransaction_status {
