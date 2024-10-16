@@ -4,6 +4,7 @@ import { SendMoneySchema } from "@repo/forms/sendMoneySchema"
 import { authOptions } from "@repo/network"
 import { getServerSession } from "next-auth"
 import { prisma } from "@repo/db/client"
+import { account } from "@repo/db/type"
 import { p2ptransfer, user, $Enums, preference, wallet } from "@repo/db/type"
 import { generateTransactionId } from "./utils"
 import { verify } from "jsonwebtoken"
@@ -13,7 +14,8 @@ import { ZodError } from "@repo/forms/types"
 import { guessCountryByPartialPhoneNumber } from 'react-international-phone';
 import { generateOTP } from "./utils"
 import { sendOTP } from "./mail"
-
+import { WRONG_PINCODE_ATTEMPTS } from "@repo/ui/constants"
+import { updateLockStatus } from "./account"
 
 class SendMoney {
     static instance: Promise<{
@@ -100,6 +102,13 @@ class SendMoney {
                 throw new Error("Please verify your account first to send money")
             }
 
+            /* ------------------- Check Account Lock status -------------------*/
+            const account = await prisma.account.findFirst({ where: { userId: isUserExist.id } }) as account
+            if (account.isLock) {
+                throw new Error("Your account is locked. Please contact support")
+            }
+
+            /* ------------------- Validate wallet Pincode -------------------*/
             const wallet = await prisma.wallet.findFirst({ where: { userId: isUserExist.id } })
             if (!wallet) {
                 throw new Error("You're not verified to make a transaction.Please create a pincode or enter valid OTP sent to your mail")
@@ -115,6 +124,10 @@ class SendMoney {
             const decodedPincode = verify(wallet.pincode, isUserExist.password)
             const isPincodeValid = decodedPincode === transactionDetail.formData.pincode
             if (!isPincodeValid) {
+                const numberOfAttempts = (await prisma.wallet.update({ where: { userId: isUserExist.id }, data: { wrongPincodeAttempts: { increment: 1 } } })).wrongPincodeAttempts
+                if (numberOfAttempts >= WRONG_PINCODE_ATTEMPTS) {
+                    await prisma.account.update({ where: { userId: isUserExist.id }, data: { isLock: true, lock_expiresAt: new Date(Date.now() + 1000 * 43200) } })
+                }
                 throw new Error("Wrong pincode. Please enter the correct pincode")
             }
 
@@ -203,11 +216,15 @@ class SendMoney {
                 }
                 this.currency = (await prisma.preference.findFirst({ where: { userId: this.sender.id } }) as preference)?.currency
                 this.p2pTransfer = await this.createP2PTransfer(transactionDetail, this.currency as string, "Success")
+                await prisma.wallet.update({ where: { userId: this.sender?.id }, data: { wrongPincodeAttempts: 0 } })
             })
             return { message: "Sending money successful", status: 200, transaction: this.p2pTransfer }
 
         } catch (error: any) {
             console.log("--------------->", error.message);
+            if (error.message === "Your account is locked. Please contact support") {
+                return { message: error.message, status: 403 }
+            }
             if (error.message === "Pincode not found. Pincode is required to send money" || error.message === "OTP verification failed. Enter valid OTP sent to your mail"
                 || error.message === "You're not verified to make a transaction.Please create a pincode or enter valid OTP sent to your mail" || false
             ) {
@@ -229,6 +246,7 @@ class SendMoney {
                 return { message: error.message, status: 401 }
             }
             this.p2pTransfer = await this.createP2PTransfer(transactionDetail, this.currency as string, "Failed")
+            await prisma.wallet.update({ where: { userId: this.sender?.id }, data: { wrongPincodeAttempts: 0 } })
             return { message: error.message || "Something went wrong on the bank server", status: 500 }
 
         }
