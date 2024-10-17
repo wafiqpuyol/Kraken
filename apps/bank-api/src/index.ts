@@ -24,6 +24,9 @@ app.post("/api/v1/verify", (req: Request, res: Response) => {
         return res.json({ token: result })
 
     } catch (error) {
+        if (error === "jwt expired") {
+            return res.status(401).json({ message: "Token has expired. Please go back to your wallet and try again" });
+        }
         if (error === "jwt malformed") {
             return res.status(400).json({ message: error });
         } else {
