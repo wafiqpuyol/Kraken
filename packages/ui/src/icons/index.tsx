@@ -108,7 +108,7 @@ export const BDTLogo = ({ width, height }: { height?: string, width?: string }) 
 
 export const Deposit = () => (
     <div className="p-5 bg-purple-200 rounded-full hover:bg-purple-300 transform ease in-out duration-200">
-        <svg width="35" height="35" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" className="ms-ds-0 me-ds-0 mt-ds-0 mb-ds-0 stroke-ds-icon w-ds-icon-md h-ds-icon-md text-[#7F00FF]">
+        <svg width="30" height="30" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" className="ms-ds-0 me-ds-0 mt-ds-0 mb-ds-0 stroke-ds-icon w-ds-icon-md h-ds-icon-md text-[#7F00FF]">
             <path d="M5 20H19" stroke-linecap="round" stroke-linejoin="round" className="fill-transparent stroke-current"></path>
             <path d="M16.2524 12.5846L13.0023 15.8348C12.4487 16.3884 11.5512 16.3884 10.9976 15.8348L7.74744 12.5846M11.9999 15.5968L11.9999 4.25" stroke-linecap="round" stroke-linejoin="round" className="fill-transparent stroke-current">
             </path></svg>
