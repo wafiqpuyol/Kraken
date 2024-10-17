@@ -12,7 +12,7 @@ import { ButtonSkeleton } from "@repo/ui/ButtonSkeleton"
 import { useEffect, useState } from 'react'
 
 interface NavbarProps {
-    disable2fa: () => Promise<void>
+    disable2fa: (twoFAType: "signInTwoFA" | "withDrawTwoFA") => Promise<void>
 }
 
 export const Navbar: React.FC<NavbarProps> = ({ disable2fa }) => {
@@ -23,7 +23,7 @@ export const Navbar: React.FC<NavbarProps> = ({ disable2fa }) => {
     const [showSkeleton, setShowSkeleton] = useState(true)
 
     const handleClick = async () => {
-        await disable2fa()
+        await disable2fa("signInTwoFA")
         signOut({ callbackUrl: `/${locale}/login` })
     }
 
@@ -55,7 +55,7 @@ export const Navbar: React.FC<NavbarProps> = ({ disable2fa }) => {
                                         pathName.endsWith(`/${locale}`)
                                             ?
                                             <Button className="bg-white text-purple-600 px-4 py-2 rounded-lg hover:bg-zinc-200">
-                                                <Link href={`/${locale}/dashboard/home`}>{t("my_account")}</Link>
+                                                <Link href={`/${locale}/dashboard/portfolio`}>{t("my_account")}</Link>
                                             </Button>
                                             :
                                             <Profile>
@@ -84,7 +84,7 @@ export const Navbar: React.FC<NavbarProps> = ({ disable2fa }) => {
                                     ?
                                     pathName.endsWith(`/${locale}`)
                                         ?
-                                        <Button className="bg-white text-purple-600 px-4 py-2 rounded-lg hover:bg-zinc-200"><Link href={`/${locale}/dashboard/home`}>{t("my_account")}</Link></Button>
+                                        <Button className="bg-white text-purple-600 px-4 py-2 rounded-lg hover:bg-zinc-200"><Link href={`/${locale}/dashboard/portfolio`}>{t("my_account")}</Link></Button>
                                         :
                                         <Profile><Button className='bg-white font-medium text-slate-500 px-2 hover:bg-slate-100' onClick={handleClick}>{t("logout")}</Button></Profile>
                                     :
