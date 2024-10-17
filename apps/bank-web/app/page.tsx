@@ -23,6 +23,30 @@ export default function Component() {
     setInputError(false)
   }, [userId])
 
+  useEffect(() => {
+    var expiryDate = new Date(Date.now() + 1000 * 182).getTime()
+    let time = setInterval(() => {
+      var now = new Date().getTime()
+      var distance = expiryDate - now
+      var expiresWithin = Math.floor((distance % (1000 * 182)) / 1000);
+      if (distance < 0) {
+        clearInterval(time)
+      }
+
+      if (expiresWithin > 0) {
+        // @ts-ignore
+        document.getElementById("childSpan").innerHTML = expiresWithin + "s";
+        // @ts-ignore
+        document.getElementById("childSpan").style.color = expiresWithin <= 10 ? "#D62626" : "#9333EA"
+      }
+      // @ts-ignore
+      document.getElementById("parent").innerHTML = expiresWithin <= 0 ? "EXPIRED" : document.getElementById("parent").innerHTML;
+      // @ts-ignore
+      document.getElementById("parent").style.color = expiresWithin <= 0 && "#D62626";
+    }, 1000)
+    return () => { clearTimeout(time) }
+  }, [])
+
 
   const handleClick = async () => {
     setIsLoading(true)
@@ -43,6 +67,12 @@ export default function Component() {
           return setInputError("Invalid User Id")
         }
 
+        if (res.statusCode === 401) {
+          setIsLoading(false)
+          toast({ title: res.message, variant: "destructive" })
+          setTimeout(() => router.push(`${process.env.NEXT_PUBLIC_FRONTEND_URL}${locale}/dashboard/transactions/withdraw-history`), 3500)
+        }
+
         if (res.statusCode === 403) {
           setIsLoading(false)
           toast({ title: res.message, variant: "destructive" })
@@ -51,7 +81,7 @@ export default function Component() {
 
         if (res.statusCode === 498) {
           toast({ title: res.message, variant: "destructive" })
-          setTimeout(() => router.push(`${process.env.NEXT_PUBLIC_FRONTEND_URL}${locale}/dashboard/transfer/deposit`), 3500)
+          setTimeout(() => router.push(`${process.env.NEXT_PUBLIC_FRONTEND_URL}${locale}/dashboard/transactions/withdraw-history`), 3500)
         }
 
         if (res.statusCode === 200) {
@@ -60,7 +90,6 @@ export default function Component() {
           setIsLoading(false)
           setIsDisable(true)
           toast({ title: res.message, variant: "destructive" })
-          setIsDisable(true)
           setTimeout(() => router.push(`${process.env.NEXT_PUBLIC_FRONTEND_URL}${locale}/dashboard/transactions/withdraw-history`), 3500)
         }
 
@@ -82,9 +111,14 @@ export default function Component() {
       <div className="grid md:grid-cols-2 gap-8">
         <div>
           <div className="mb-4">
-            <label htmlFor="userId" className="block text-sm font-medium text-gray-700 mb-1">
-              Customer ID/ User ID
-            </label>
+            <div className="flex justify-between">
+              <label htmlFor="userId" className="block text-sm font-medium text-gray-700 mb-1">
+                Customer ID/ User ID
+              </label>
+              <div className="mb-1">
+                <div id="parent" className='self-center text-sm font-medium text-gray-500'>expires at:- <span id="childSpan" className='text-red-500'></span> </div>
+              </div>
+            </div>
             <Input id="userId" value={userId} className="w-full" onChange={(e) => setUserId(e.target.value)} />
             {inputError && <span className="text-red-500"> {inputError} </span>}
             <Link href="#" className="text-sm text-blue-600 hover:underline">
