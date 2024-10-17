@@ -19,6 +19,8 @@ declare module 'next-auth' {
             preference: any
             country: string
             total_balance: string
+            isWithDrawTwoFAActivated: boolean
+            isWithDrawOTPVerified: boolean
         }
     }
 }
@@ -101,6 +103,12 @@ export const authOptions: NextAuthOptions = {
                                 currency: true,
                                 amount: true,
                             }
+                        },
+                        wallet: {
+                            select: {
+                                withDrawOTPVerified: true,
+                                withDrawTwoFAActivated: true
+                            }
                         }
                     }
                 })
@@ -118,6 +126,8 @@ export const authOptions: NextAuthOptions = {
                 isVerified: existUser?.isVerified,
                 wallet_currency: existUser?.balance?.currency,
                 total_balance: existUser?.balance.amount,
+                isWithDrawTwoFAActivated: existUser.wallet.withDrawTwoFAActivated,
+                isWithDrawOTPVerified: existUser.wallet.withDrawOTPVerified,
                 preference: {
                     language: existUser?.preference?.language,
                     timezone: existUser?.preference?.timezone,

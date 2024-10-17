@@ -1,6 +1,7 @@
 "use server"
 import { prisma } from "@repo/db/client"
 import { getServerSession } from "next-auth"
+import { onramptransaction } from "@repo/db/type"
 import { authOptions } from "@repo/network"
 import { preference } from "@repo/db/type"
 
@@ -25,5 +26,24 @@ export const updatePreference = async (payload: Partial<preference>): Promise<{
     } catch (error) {
         console.log(error)
         return { message: "Something went wrong", statusCode: 500 }
+    }
+}
+
+export const getAllOnRampTransactions = async (userId: number) => {
+    try {
+        const res = await prisma.onramptransaction.findMany({ where: { userId: userId } })
+        return res.reduce((acc: { perDayTotal: number, perMonthTotal: number }, init: onramptransaction) => {
+            if (new Date(init.startTime).getMonth() === new Date(Date.now()).getMonth() && init.status === "Success") {
+                console.log(init)
+                acc.perMonthTotal += (init.amount + init.lockedAmount)
+            }
+            if (new Date(init.startTime).getDate() === new Date(Date.now()).getDate() && init.status === "Success") {
+                console.log(init)
+                acc.perDayTotal += (init.amount + init.lockedAmount)
+            }
+            return acc
+        }, { perDayTotal: 0, perMonthTotal: 0 })
+    } catch (error) {
+        console.log("getAllOnRampTransactions -->", error);
     }
 }
