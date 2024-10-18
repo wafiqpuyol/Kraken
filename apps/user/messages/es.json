@@ -307,7 +307,9 @@
     "desc": "Para reforzar aún más la seguridad de sus cuentas",
     "master_key_desc": "La clave maestra actúa como una clave de cuenta si pierde u olvida su método de inicio de sesión 2FA. También se utiliza en conjunto con otras funciones de seguridad avanzadas.",
     "withdraw_2FA_desc": "WithDraw 2FA es crucial porque agrega una capa adicional de seguridad a sus depósitos de billetera electrónica, reduciendo significativamente el riesgo de acceso no autorizado y evitando transacciones fraudulentas.",
-    "withdraw_2FA": "WithDraw 2FA"
+    "withdraw_2FA": "WithDraw 2FA",
+    "activated": "Activado",
+    "toolTip_text": "Una vez activada la clave maestra, no podrás desactivarla. Esto evitará que pierdas el acceso a tu cuenta. Si pierdes tu clave maestra, no podrás recuperar tu cuenta."
   },
   "SupportedLangDialog": {
     "title": "Idiomas",
@@ -507,7 +509,13 @@
     "withdraw2FA_desc1": "2FA de retiro es crucial porque agrega una capa adicional de seguridad a sus depósitos de la billetera electrónica.",
     "desc2": "Por favor, agregue un",
     "desc3": "antes de eliminar su aplicación de autenticación.",
-    "btn": "Entendido"
+    "btn": "Entendido",
+    "warning": "Advertencia",
+    "remove_2FA_warning": "¿Estás seguro de que quieres eliminar",
+    "signInTwoFA": "signInTwoFA",
+    "withDrawTwoFA": "withDrawTwoFA",
+    "proceed": "Proceder",
+    "proceeding": "Procediendo"
   },
   "AccountLock": {
     "title": "Tu cuenta ha sido bloqueada"

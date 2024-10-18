@@ -307,7 +307,9 @@
     "desc": "Para reforçar ainda mais a segurança de suas contas",
     "master_key_desc": "A chave mestra funciona como uma chave da conta se você perder ou esquecer seu método de login 2FA. Também é usado em conjunto com outros recursos de segurança avançados.",
     "withdraw_2FA_desc": "O WithDraw 2FA é crucial porque adiciona uma camada extra de segurança aos depósitos de sua carteira eletrônica, reduzindo significativamente o risco de acesso não autorizado e evitando transações fraudulentas.",
-    "withdraw_2FA": "WithDraw 2FA"
+    "withdraw_2FA": "WithDraw 2FA",
+    "activated": "Ativado",
+    "toolTip_text": "Uma vez ativada a chave mestra, você não poderá desativá-la. Isso evitará que você perca o acesso à sua conta. Se você perder sua chave mestra, não poderá recuperar sua conta."
   },
   "SupportedLangDialog": {
     "title": "Idiomas",
@@ -507,7 +509,13 @@
     "withdraw2FA_desc1": "O WithDraw 2FA é crucial porque adiciona uma camada extra de segurança aos depósitos em sua carteira eletrônica.",
     "desc2": "Por favor, adicione um",
     "desc3": "antes de excluir seu aplicativo de autenticação.",
-    "btn": "Entendi"
+    "btn": "Entendi",
+    "warning": "Aviso",
+    "remove_2FA_warning": "Tem certeza de que deseja remover",
+    "signInTwoFA": "signInTwoFA",
+    "withDrawTwoFA": "withDrawTwoFA",
+    "proceed": "Prosseguir",
+    "proceeding": "Prosseguindo"
   },
   "AccountLock": {
     "title": "A sua conta foi bloqueada"

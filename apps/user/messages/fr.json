@@ -307,7 +307,9 @@
     "desc": "Pour renforcer encore plus la sécurité de vos comptes",
     "master_key_desc": "La clé principale agit comme une clé de compte si vous perdez ou oubliez votre méthode de connexion 2FA. Il est également utilisé en conjonction avec d'autres fonctionnalités de sécurité avancées.",
     "withdraw_2FA_desc": "WithDraw 2FA est crucial car il ajoute une couche de sécurité supplémentaire à vos dépôts de portefeuille électronique, réduisant considérablement le risque d'accès non autorisé et empêchant les transactions frauduleuses.",
-    "withdraw_2FA": "WithDraw 2FA"
+    "withdraw_2FA": "WithDraw 2FA",
+    "activated": "Activé",
+    "toolTip_text": "Une fois la clé principale activée, vous ne pouvez pas la désactiver. Cela vous empêchera de perdre l'accès à votre compte. Si vous perdez votre clé principale, vous ne pourrez pas récupérer votre compte."
   },
   "SupportedLangDialog": {
     "title": "Langues",
@@ -507,7 +509,13 @@
     "withdraw2FA_desc1": "Le retrait 2FA est crucial car il ajoute une couche de sécurité supplémentaire à vos dépôts sur votre portefeuille électronique.",
     "desc2": "Veuillez ajouter un",
     "desc3": "avant de supprimer votre application d'authentification.",
-    "btn": "Compris"
+    "btn": "Compris",
+    "warning": "Avertissement",
+    "remove_2FA_warning": "Êtes-vous sûr de vouloir supprimer",
+    "signInTwoFA": "signInTwoFA",
+    "withDrawTwoFA": "withDrawTwoFA",
+    "proceed": "Continuer",
+    "proceeding": "En cours"
   },
   "AccountLock": {
     "title": "Votre compte a été verrouillé"

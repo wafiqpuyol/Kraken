@@ -307,7 +307,9 @@
     "desc": "アカウントのセキュリティをさらに強化するため",
     "master_key_desc": "マスターキーは、サインイン 2FA メソッドを紛失または忘れた場合のアカウントキーとして機能します。また、他の高度なセキュリティ機能と組み合わせて使用されます。",
     "withdraw_2FA_desc": "WithDraw 2FA は、電子ウォレットの預金にセキュリティの追加レイヤーを追加するため、不正アクセスのリスクを大幅に軽減し、不正な取引を防ぎます。",
-    "withdraw_2FA": "WithDraw 2FA"
+    "withdraw_2FA": "WithDraw 2FA",
+    "activated": "アクティブ化",
+    "toolTip_text": "マスターキーをアクティブ化すると、非アクティブ化できなくなります。これにより、アカウントへのアクセスを失うことがなくなります。マスターキーを紛失した場合、アカウントを復元できなくなります。"
   },
   "SupportedLangDialog": {
     "title": "言語",
@@ -507,7 +509,13 @@
     "withdraw2FA_desc1": "WithDraw 2FA は、電子ウォレットの入金にさらなるセキュリティ層を追加するため、重要です。",
     "desc2": "追加してください",
     "desc3": "認証アプリを削除する前に。",
-    "btn": "わかりました"
+    "btn": "わかりました",
+    "warning": "警告",
+    "remove_2FA_warning": "2FA を削除してもよろしいですか",
+    "signInTwoFA": "signInTwoFA",
+    "withDrawTwoFA": "withDrawTwoFA",
+    "proceed": "続行",
+    "proceeding": "処理中"
   },
   "AccountLock": {
     "title": "あなたのアカウントはロックされています"

@@ -307,7 +307,9 @@
     "desc": "For hardening your accounts security even further",
     "master_key_desc": "The Master key acts as an account key if you lose or forget your sign-in 2FA method. It is also used in conjunction with other advance security features.",
     "withdraw_2FA_desc": "WithDraw 2FA is crucial because it adds an extra layer of security to your e-wallet deposits, significantly reducing the risk of unauthorized access and preventing fraudulent transactions.",
-    "withdraw_2FA": "WithDraw 2FA"
+    "withdraw_2FA": "WithDraw 2FA",
+    "activated": "Activated",
+    "toolTip_text": "Once master key is activated, you can't deactivate it. This will prevent you from losing access to your account. If you lose your master key, you will not be able to recover your account."
   },
   "Enable2FADialog": {
     "title": "Seems like you haven't enabled your 2FA. Please enable it to enable WithDraw 2FA."
@@ -513,7 +515,13 @@
     "withdraw2FA_desc1": "WithDraw 2FA is crucial because it adds an extra layer of security to your e-wallet deposits.",
     "desc2": "Please add a ",
     "desc3": "before deleting your Authenticator app.",
-    "btn": "Got it"
+    "btn": "Got it",
+    "warning": "Warning",
+    "remove_2FA_warning": "Are you sure you want to remove",
+    "signInTwoFA": "signInTwoFA",
+    "withDrawTwoFA": "withDrawTwoFA",
+    "proceed": "Proceed",
+    "proceeding": "Proceeding"
   },
   "AccountLock": {
     "title": "Your account has been locked"
