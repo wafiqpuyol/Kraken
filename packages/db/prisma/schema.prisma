@@ -108,16 +108,16 @@ model preference {
 }
 
 model account {
-  id                   Int     @id @default(autoincrement())
-  userId               Int     @unique(map: "Account_userId_key")
+  id                   Int       @id @default(autoincrement())
+  userId               Int       @unique(map: "Account_userId_key")
   current_email        String
-  isLock               Boolean @default(false)
-  lock_expiresAt DateTime?
-  email_update_pending Boolean @default(false)
+  isLock               Boolean   @default(false)
+  lock_expiresAt       DateTime?
+  email_update_pending Boolean   @default(false)
   email_update         Json
   authorization_code   String?
   confirmation_code    String?
-  user                 user    @relation(fields: [userId], references: [id], map: "Account_userId_fkey")
+  user                 user      @relation(fields: [userId], references: [id], map: "Account_userId_fkey")
 
   @@index([userId], map: "Account_userId_fkey")
 }
@@ -142,10 +142,15 @@ model wallet {
 }
 
 model masterkey {
-  id         Int     @id @default(autoincrement())
-  userId     Int     @unique(map: "MasterKey_userId_key")
-  otpVerfied Boolean @default(false)
-  user       user    @relation(fields: [userId], references: [id], map: "MasterKey_userId_fkey")
+  id               Int     @id @default(autoincrement())
+  userId           Int     @unique(map: "MasterKey_userId_key")
+  otpVerified      Boolean @default(false)
+  user             user    @relation(fields: [userId], references: [id], map: "MasterKey_userId_fkey")
+  passKeyActivated Boolean @default(false)
+  passkeys         Json?
+  passKeyID        Json?
+  passkeyVerified  Boolean @default(false)
+  transports       Json?
 
   @@index([userId], map: "MasterKey_userId_fkey")
 }
