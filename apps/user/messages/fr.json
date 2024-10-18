@@ -511,5 +511,16 @@
   },
   "AccountLock": {
     "title": "Votre compte a été verrouillé"
+  },
+  "MasterKeyDialog": {
+    "title": "Activer la clé principale",
+    "desc": "Ajoutez une clé principale à votre compte avec l'une des méthodes suivantes",
+    "passkey_title": "Clé de passage",
+    "passkey_desc": "Utilise la biométrie de l'appareil ou la clé de sécurité matérielle",
+    "recommended": "Recommandé",
+    "authenticator_app": "Application d'authentification",
+    "authenticator_app_text": "Saisissez le code d'authentification à deux facteurs (2FA) de votre application d'authentification.",
+    "enter_2fa_code": "Saisissez le code à partir de l'application 2FA",
+    "continue": "Continuer"
   }
 }

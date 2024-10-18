@@ -511,5 +511,16 @@
   },
   "AccountLock": {
     "title": "Tu cuenta ha sido bloqueada"
+  },
+  "MasterKeyDialog": {
+    "title": "Habilitar clave maestra",
+    "desc": "Agregue una clave maestra a su cuenta con uno de los siguientes métodos",
+    "passkey_title": "Clave de acceso",
+    "passkey_desc": "Utiliza biometría del dispositivo o clave de seguridad de hardware",
+    "recommended": "Recomendado",
+    "authenticator_app": "Aplicación de autenticación",
+    "authenticator_app_text": "Ingrese el código de autenticación de dos factores (2FA) de su aplicación de autenticación.",
+    "enter_2fa_code": "Ingrese el código de la aplicación 2FA",
+    "continue": "Continuar"
   }
 }

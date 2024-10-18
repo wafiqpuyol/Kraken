@@ -517,5 +517,16 @@
   },
   "AccountLock": {
     "title": "Your account has been locked"
+  },
+  "MasterKeyDialog": {
+    "title": "Enable Master Key",
+    "desc": "Add master key to your account  with one of the following methods",
+    "passkey_title": "Passkey",
+    "passkey_desc": "Uses device biometrics or hardware security key",
+    "recommended": "Recommended",
+    "authenticator_app": "Authenticator app",
+    "authenticator_app_text": "Enter the Sign-in 2FA code from your authenticator app.",
+    "enter_2fa_code": "Enter code from 2FA app",
+    "continue": "Continue"
   }
 }
