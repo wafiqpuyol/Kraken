@@ -2,7 +2,6 @@
 
 import { Button } from "../../atoms/Button"
 import { Card, CardContent } from "../../atoms/Card"
-import { Badge } from "../../atoms/Badge"
 import { useSession } from "next-auth/react"
 import { TwoFAEnableDialog } from "../../molecules/TwoFAEnableModal"
 import { TwoFADisableDialog } from "../../molecules/TwoFADisableDialog"
@@ -12,7 +11,9 @@ import { useTranslations } from "next-intl"
 import { ChangePasswordDialog } from "../../molecules/ChangePasswordDialog"
 import { changePasswordPayload } from "@repo/forms/changePasswordSchema"
 import { Dialog, DialogContent, DialogTrigger } from "../../molecules/Dialog"
-
+import { MasterKeyDialog } from "../../molecules/MasterKeyDialog"
+import { PublicKeyCredentialCreationOptionsJSON, PublicKeyCredentialRequestOptionsJSON } from "@simplewebauthn/types"
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "../../atoms/ToolTip"
 
 interface SecurityTabProps {
     isTwoFaEnabled: boolean
@@ -39,9 +40,21 @@ interface SecurityTabProps {
         masterKeyOTPVerified?: boolean;
     } | undefined>
     isMasterKeyOTPVerified: boolean
+    createMasterKey: (step: "generateRegistration" | "verifyRegistration", regCred?: any) => Promise<{
+        message: string; status: number; challenge?: PublicKeyCredentialCreationOptionsJSON
+    }>
+    verifyPasskey: (step: "generateAuthentication" | "verifyAuthentication", regCred?: any) => Promise<{
+        message: string; status: number; challenge?: PublicKeyCredentialRequestOptionsJSON
+    }>
+    isMasterKeyActivated: boolean
+    remove2fa: (twoFAType: "signInTwoFA" | "withDrawTwoFA") => Promise<{
+        message: string;
+        status: number;
+    }>
 }
+
 export const SecurityTab: React.FC<SecurityTabProps> = ({ getTwoFASecret, isTwoFaEnabled, activate2fa, changePasswordAction,
-    getWithDrawTwoFASecret, isWithDrawTwoFaEnabled, verifyMasterKeyOTP, isMasterKeyOTPVerified }) => {
+    getWithDrawTwoFASecret, isWithDrawTwoFaEnabled, verifyMasterKeyOTP, isMasterKeyOTPVerified, createMasterKey, verifyPasskey, isMasterKeyActivated, remove2fa }) => {
     const session = useSession()
     const { toast } = useToast()
     const [code, setCode] = useState("");
@@ -138,19 +151,6 @@ export const SecurityTab: React.FC<SecurityTabProps> = ({ getTwoFASecret, isTwoF
                     <h2 className="text-2xl font-semibold mb-4">{t("twoFA_title")}</h2>
                     <div className="space-y-4">
                         <div className="flex justify-between items-start">
-                            <div className="flex items-center justify-between space-x-32 w-[1050px]">
-                                <div className="flex flex-col items-start">
-                                    <h3 className="text-sm font-medium text-gray-500 mb-1">{t("passkeys")}</h3>
-                                    <Badge variant="outline" className="bg-green-50 text-green-700 border-green-200 rounded-md">{t("recommended")}</Badge>
-                                </div>
-                                <p className="mt-1 text-sm text-slate-600">
-                                    {t("passkeys_text")}
-                                    <a href="#" className="text-purple-600 hover:underline font-medium"> {t("learn_more")}</a>
-                                </p>
-                            </div>
-                            <Button variant="outline" className="text-purple-600 bg-purple-200">{t("add_passkey")}</Button>
-                        </div>
-                        <div className="flex justify-between items-start">
                             <div className="flex items-center justify-between space-x-28">
                                 <h3 className="text-sm font-medium text-gray-500">{t("authenticator_app")}</h3>
                                 <p className="mt-1 text-sm text-slate-600">
@@ -160,12 +160,15 @@ export const SecurityTab: React.FC<SecurityTabProps> = ({ getTwoFASecret, isTwoF
                             </div>
                             {
                                 twoFAEnabled ?
-                                    <TwoFADisableDialog twoFAType="signInTwoFA"><Button variant="outline" className="text-purple-600 bg-purple-200">{t("remove")}</Button></TwoFADisableDialog>
+                                    <TwoFADisableDialog isMasterKeyActivated={isMasterKeyActivated} twoFAType="signInTwoFA" verifyPasskey={verifyPasskey}
+                                        setWithDrawTwoFAEnabled={setWithDrawTwoFAEnabled} setTwoFAEnabled={setTwoFAEnabled} remove2fa={remove2fa}>
+                                        <Button variant="outline" className="text-purple-600 bg-purple-200" >{t("remove")}</Button>
+                                    </TwoFADisableDialog>
                                     :
-                                    <TwoFAEnableDialog
-                                        setTwoFAEnabled={setTwoFAEnabled} code={code} activate2fa={activate2fa} twoFAType="signInTwoFA"><Button variant="outline" className="text-purple-600 bg-purple-200"
+                                    <TwoFAEnableDialog setTwoFAEnabled={setTwoFAEnabled} code={code} activate2fa={activate2fa} twoFAType="signInTwoFA">
+                                        <Button variant="outline" className="text-purple-600 bg-purple-200"
                                             onClick={handleSignInTwoFABtn}>
-                                            Enable
+                                            {t("enable")}
                                         </Button>
                                     </TwoFAEnableDialog>
                             }
@@ -182,6 +185,35 @@ export const SecurityTab: React.FC<SecurityTabProps> = ({ getTwoFASecret, isTwoF
                     </div>
 
                     <div className="space-y-4">
+                        <div className="flex justify-between items-start">
+                            <div className="flex items-center justify-between space-x-[110px] w-[1050px]">
+                                <div className="w-[150px]">
+                                    <h3 className="text-sm font-medium text-gray-500 mb-1">{t("master_key")}</h3>
+                                </div>
+                                <p className="mt-1 text-sm text-slate-600">
+                                    {t("master_key_desc")}
+                                    <a href="#" className="text-purple-600 hover:underline font-medium"> {t("learn_more")}</a>
+                                </p>
+                            </div>
+                            {
+                                isMasterKeyActivated ?
+                                    <TooltipProvider>
+                                        <Tooltip>
+                                            <TooltipTrigger asChild>
+                                                <Button variant="outline" className="text-purple-600 bg-purple-200">{t("activated")}</Button>
+                                            </TooltipTrigger>
+                                            <TooltipContent className="w-[400px] bg-white rounded-lg font-medium text-slate-600">
+                                                <p>{t("toolTip_text")}</p>
+                                            </TooltipContent>
+                                        </Tooltip>
+                                    </TooltipProvider>
+
+                                    :
+                                    <MasterKeyDialog verifyPasskey={verifyPasskey} createMasterKey={createMasterKey} isMasterKeyOTPVerified={isMasterKeyOTPVerified} activate2fa={activate2fa} verifyMasterKeyOTP={verifyMasterKeyOTP}>
+                                        <Button variant="outline" className="text-purple-600 bg-purple-200">{t("enable")}</Button>
+                                    </MasterKeyDialog>
+                            }
+                        </div>
 
                         <div className="flex justify-between items-start">
                             <div className="flex items-center justify-between space-x-[100px] w-[1050px]">
@@ -192,22 +224,30 @@ export const SecurityTab: React.FC<SecurityTabProps> = ({ getTwoFASecret, isTwoF
                                 </p>
                             </div>
                             {
-                                twoFAEnabled
+                                isMasterKeyActivated || twoFAEnabled
                                     ?
                                     withDrawTwoFAEnabled
                                         ?
-                                        <TwoFADisableDialog twoFAType="withDrawTwoFA"><Button variant="outline" className="text-purple-600 bg-purple-200">{t("remove")}</Button></TwoFADisableDialog>
+                                        <TwoFADisableDialog isMasterKeyActivated={isMasterKeyActivated} twoFAType="withDrawTwoFA" verifyPasskey={verifyPasskey}
+                                            setWithDrawTwoFAEnabled={setWithDrawTwoFAEnabled} setTwoFAEnabled={setTwoFAEnabled} remove2fa={remove2fa}>
+                                            <Button variant="outline" className="text-purple-600 bg-purple-200" >{t("remove")}</Button>
+                                        </TwoFADisableDialog>
                                         :
-                                        <TwoFAEnableDialog
-                                            setTwoFAEnabled={setTwoFAEnabled} code={code} setWithDrawTwoFAEnabled={setWithDrawTwoFAEnabled} activate2fa={activate2fa}
-                                            twoFAType="withDrawTwoFA"><Button variant="outline" className="text-purple-600 bg-purple-200"
-                                                onClick={handleWithDrawTwoFABtn}>
-                                                {t("enable")}
-                                            </Button>
-                                        </TwoFAEnableDialog>
-
+                                        (twoFAEnabled
+                                            ? <TwoFAEnableDialog
+                                                setTwoFAEnabled={setTwoFAEnabled} code={code} setWithDrawTwoFAEnabled={setWithDrawTwoFAEnabled} activate2fa={activate2fa}
+                                                twoFAType="withDrawTwoFA"><Button variant="outline" className="text-purple-600 bg-purple-200"
+                                                    onClick={handleWithDrawTwoFABtn}>
+                                                    {t("enable")}
+                                                </Button>
+                                            </TwoFAEnableDialog>
+                                            :
+                                            <Enable2FADialog>
+                                                <Button variant="outline" className="text-purple-600 bg-purple-200">{t("enable")}</Button>
+                                            </Enable2FADialog>
+                                        )
                                     :
-                                    <Enable2FADialog t={t}>
+                                    <Enable2FADialog>
                                         <Button variant="outline" className="text-purple-600 bg-purple-200">{t("enable")}</Button>
                                     </Enable2FADialog>
                             }
@@ -220,16 +260,18 @@ export const SecurityTab: React.FC<SecurityTabProps> = ({ getTwoFASecret, isTwoF
     )
 }
 
-const Enable2FADialog = ({ children, t }: { children: React.ReactNode, t: any }) => (
-    <Dialog >
-        <DialogTrigger>{children}</DialogTrigger>
-        <DialogContent className="sm:max-w-[440px] bg-white p-8" onInteractOutside={(e) => {
-            e.preventDefault();
-        }}>
-            <p className="my-4 font-semibold text-lg">{t("title")}</p>
-            <span className="px-2 text-sm font-medium text-slate-500 leading-[1.8rem]">Got to settings &gt; select <span className="font-bold py-[2px] border-black/40 px-[5px] rounded-lg border-[1px] mr-2">Security</span> Tab &gt; click on {" "}
-                <span className="font-bold py-[2px] border-black/40 px-[5px] rounded-lg border-[1px] mr-2">{"Authenticator app"}</span>
-                Enable Button.</span>
-        </DialogContent>
-    </Dialog>
-)
+const Enable2FADialog = ({ children }: { children: React.ReactNode }) => {
+    const t = useTranslations("Enable2FADialog");
+    return (
+        <Dialog >
+            <DialogTrigger asChild>{children}</DialogTrigger>
+            <DialogContent className="sm:max-w-[440px] bg-white p-8" onInteractOutside={(e) => {
+                e.preventDefault();
+            }}>
+                <p className="my-4 font-semibold text-lg">{t("title")}</p>
+                <span className="px-2 text-sm font-medium text-slate-500 leading-[1.8rem]">{t("desc1")} &gt; {t("select")} <span className="font-bold py-[2px] border-black/40 px-[5px] rounded-lg border-[1px] mr-2">{t("security")}</span> {t("desc2")} &gt; {t("click_on")} {" "}
+                    <span className="font-bold py-[2px] border-black/40 px-[5px] rounded-lg border-[1px] mr-2">{t("authenticator_app")}</span>
+                    {t("desc3")}.</span>
+            </DialogContent>
+        </Dialog>)
+}

@@ -2,7 +2,7 @@
 
 import { prisma } from "@repo/db/client"
 import { onramptransaction, user } from "@repo/db/type"
-import axios from "axios"
+import axios, { AxiosError } from "axios"
 
 interface IWebhookPayload {
     amount: number
@@ -66,6 +66,7 @@ class TransactionAction {
                 throw new Error("Invalid Token",)
             }
             const isUserExist = await this.validateUser(userId)
+            console.log(isUserExist);
             if (!isUserExist) {
                 console.log("indie --->", isUserExist);
                 throw new Error("Invalid User Id")
@@ -74,7 +75,7 @@ class TransactionAction {
             const isTokenValid = await axios.post(`${process.env.NEXT_PUBLIC_BANK_API_URL}/verify`, { token: token })
             const tokenDecodedData = isTokenValid.data.token.data
             if (!tokenDecodedData || tokenDecodedData !== isUserExist.id) {
-                throw new Error("Invalid Token")
+                throw new Error("Invalid User Id")
             }
 
             const isOnRampExist = await this.validateOnRampExist(userId, token)
@@ -86,13 +87,21 @@ class TransactionAction {
             await webHookCall({ amount: isOnRampExist.amount, lockedAmount: isOnRampExist.lockedAmount, userId, token, tokenValidation: "Success", })
             return { message: "Onramp Successful", statusCode: 200, language: isUserExist.preference?.language! }
         } catch (error: any) {
-            console.log("--------------->", error.message);
+            if (error instanceof AxiosError) {
+                error.message = error.response?.data.message
+            }
+
+            if (error.message === "Invalid User Id") {
+                return { message: error.message, statusCode: 400 }
+            }
+
             await webHookCall({ amount: this.onRamp?.amount || 0, lockedAmount: this.onRamp?.lockedAmount || 0, userId, token, tokenValidation: "Failed" })
+
             switch (error.message) {
+                case "Token has expired. Please go back to your wallet and try again":
+                    return { message: error.message, statusCode: 401 }
                 case "Invalid Token":
                     return { message: error.message, statusCode: 498 }
-                case "Invalid User Id":
-                    return { message: error.message, statusCode: 400 }
                 case "Onramp doesn't exist. You are not authorized. Please login to your wallet account or create one.":
                     return { message: error.message, statusCode: 403 }
                 default:
@@ -111,6 +120,6 @@ class TransactionAction {
 
 export const transactionAction = (userId: number, token: string | null) => {
     const a = TransactionAction.getInstance(userId, token)
-    console.log(a);
+    // console.log("===>", a);
     return a;
 }
