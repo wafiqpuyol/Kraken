@@ -33,7 +33,7 @@ export const SideBar = () => {
         <div className="w-52 border-r border-slate-300 min-h-screen pt-28 fixed bg-[#f2f1f5] text-[17px]">
             <div className="">
                 <SidebarItem href={`/${locale}/dashboard/portfolio`} icon={<HomeIcon />} title={"Portfolio"} />
-                <SidebarItem href={`/${locale}/dashboard/transfer/deposit`} icon={<TransferIcon />} title={t("transfer")} />
+                <SidebarItem href={`/${locale}/dashboard/transfer/withdraw`} icon={<TransferIcon />} title={t("transfer")} />
                 <SidebarItem href={`/${locale}/dashboard/transactions/p2p-history`} icon={<TransactionsIcon />} title={t("transactions")} />
                 <SidebarItem href={`/${locale}/dashboard/p2p`} icon={<Send />} title={t("send_money")} />
             </div>

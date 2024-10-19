@@ -117,6 +117,7 @@ model account {
   email_update         Json
   authorization_code   String?
   confirmation_code    String?
+  dailyLimitExceed     Boolean   @default(false)
   user                 user      @relation(fields: [userId], references: [id], map: "Account_userId_fkey")
 
   @@index([userId], map: "Account_userId_fkey")

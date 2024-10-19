@@ -27,7 +27,7 @@ export const EmailVerification: React.FC<EmailVerificationProps> = ({ sendVerifi
 
     const handleClick = async () => {
         if (content.status === 200) {
-            return router.push(`/${content.locale}/dashboard/home`)
+            return router.push(`/${content.locale}/dashboard/portfolio`)
         }
         try {
             const res = await sendVerificationEmailAction(content.locale);

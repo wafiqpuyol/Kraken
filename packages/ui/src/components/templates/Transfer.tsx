@@ -18,8 +18,7 @@ export const Transfer: React.FC<TransferProps> = ({ children }) => {
                 {t("title")}
             </div>
             <div className="flex gap-5">
-                <Button className={cn("rounded-lg px-4 py-3 text-lg ", pathName.endsWith("/deposit") ? `bg-white text-black/85` : `bg-gray-100 text-gray-500/90`)}><Link href="deposit">{t("deposit_tab")}</Link></Button>
-                <Button className={cn("rounded-lg px-4 py-3 text-lg ", pathName.endsWith("/withdraw") ? `bg-white text-black/85` : `bg-gray-100 text-gray-500/90`)}><Link href="withdraw">{t("withdraw_tab")}</Link></Button>
+                <Button className={cn("rounded-lg px-4 py-3 text-lg ", pathName.endsWith("/withdraw") ? `bg-white text-black/85` : `bg-gray-100 text-gray-500/90`)}><Link href="withdraw">Withdraw</Link></Button>
             </div>
             <div className="mt-10">
                 {children}
