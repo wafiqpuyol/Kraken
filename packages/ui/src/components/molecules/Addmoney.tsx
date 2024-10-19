@@ -1,7 +1,7 @@
 "use client"
 import { BANK } from "../../lib/constant"
 import { Select, SelectTrigger, SelectContent, SelectItem, SelectValue } from "../atoms/Select"
-import { ChangeEvent, useState } from "react"
+import { ChangeEvent, Dispatch, SetStateAction, useEffect, useState } from "react"
 import { useRouter } from 'next/navigation'
 import { useSession } from "next-auth/react"
 import { cn } from "@/src/lib/utils"
@@ -20,18 +20,30 @@ import { Loader } from "../atoms/Loader"
 import { LOCK_AMOUNT, WITHDRAW_LIMIT } from "../../lib/constant"
 import { BiSolidErrorAlt } from "react-icons/bi";
 import { formatAmount } from "../../lib/utils"
-import { useModal } from "../molecules/ModalProvider"
+import { InputOTP, InputOTPGroup, InputOTPSlot, InputOTPSeparator } from "../atoms/InputOTP"
+import { Dialog, DialogContent } from "./Dialog"
+import { Session } from "next-auth"
+import { responseHandler } from "../../lib/utils"
 
 interface AddMoneyProps {
-    addMoneyAction: (arg: addMoneyPayload, token: string) => Promise<{
+    onRampTransactionLimitDetail: {
+        perDayTotal: number;
+        perMonthTotal: number;
+    } | undefined
+    addMoneyAction: (arg: addMoneyPayload, token: string, withDrawLimit: AddMoneyProps["onRampTransactionLimitDetail"]) => Promise<{
         message: string;
-        statusCode: number;
+        status: number;
     }>
     userBalance: Omit<UserBalance, "id" | "userId">
     sendVerificationEmailAction: (locale: string) => Promise<{
         message: string;
         status: number;
     }>
+    activate2fa: (otp: string, twoFAType: "signInTwoFA" | "withDrawTwoFA") => Promise<{
+        message: string;
+        status: number;
+    }>
+    disable2fa: (twoFAType: "signInTwoFA" | "withDrawTwoFA") => Promise<void>
 }
 
 interface IInputError {
@@ -39,25 +51,53 @@ interface IInputError {
     lockAmountError: string | null
     amountError: string | null
 }
+interface Enable2FADialogProps {
+    title: string
+    twoFaType: "SignIn" | "WithDraw"
+    enable2FAPrompt?: boolean
+    setEnable2FAPrompt?: Dispatch<SetStateAction<boolean>>
+    isWithDraw2FAActive?: boolean
+    seIsWithDraw2FAActive?: Dispatch<SetStateAction<boolean>>
+}
 
-export const AddMoney: React.FC<AddMoneyProps> = ({ addMoneyAction, userBalance, sendVerificationEmailAction }) => {
+interface WithDrawOTPDialogProps {
+    session: Session,
+    addMoneyAction: AddMoneyProps["addMoneyAction"],
+    payload: addMoneyPayload | null,
+    setEnableWithDraw2FAOTP: Dispatch<SetStateAction<boolean>>,
+    enableWithDraw2FAOTP: boolean,
+    isLoading: boolean,
+    setIsLoading: Dispatch<SetStateAction<boolean>>,
+    activate2fa: AddMoneyProps["activate2fa"],
+    onRampTransactionLimitDetail: {
+        perDayTotal: number;
+        perMonthTotal: number;
+    } | undefined
+}
+
+export const AddMoney: React.FC<AddMoneyProps> = ({ disable2fa, addMoneyAction, userBalance, sendVerificationEmailAction, activate2fa, onRampTransactionLimitDetail }) => {
     const locale = useLocale()
     const t = useTranslations("AddMoney")
-    const { toast } = useToast()
-    const { setOpen } = useModal()
     const router = useRouter()
     const session = useSession()
     const { handleSubmit, control, formState, ...form } = userFormAddMoney()
     const [inputError, setInputError] = useState<IInputError>({ phone_numberError: null, lockAmountError: null, amountError: null })
-    const [isLockInputDisable, setIsLockInputDisable] = useState(true)
     const [isLoading, setIsLoading] = useState(false)
     const [isBtnDisable, setIsBtnDisable] = useState(false)
+    const [isLockInputDisable, setIsLockInputDisable] = useState(true)
+    const [enable2FAPrompt, setEnable2FAPrompt] = useState(false)
+    const [isWithDraw2FAActive, seIsWithDraw2FAActive] = useState(false)
+    const [enableWithDraw2FAOTP, setEnableWithDraw2FAOTP] = useState(false)
+    const [payloadData, setPayloadData] = useState<addMoneyPayload | null>(null)
 
-    // console.log(session);
-    // console.log("Lock value ===>", form.getValues("lock"));
-    // console.log(inputError);
-    // console.log(formState.isValid);
-    // console.log("*************", userBalance);
+    useEffect(() => {
+        if (session.data?.user && session.data?.user.isWithDrawOTPVerified) {
+            (async () => {
+                disable2fa("withDrawTwoFA")
+            })()
+            window.location.reload()
+        }
+    }, [session?.data?.user])
 
     const handleAmountChange = (e: ChangeEvent<HTMLInputElement>, fieldOnchange: (...event: any[]) => void) => {
         const value = formatAmount(e.target.value, 0)
@@ -65,7 +105,6 @@ export const AddMoney: React.FC<AddMoneyProps> = ({ addMoneyAction, userBalance,
         form.clearErrors("amount")
         setInputError((prev) => ({ ...prev, amountError: null }))
         fieldOnchange(value);
-        console.log(value);
         if (isNaN(parseInt(value))) {
             setInputError((prev) => ({ ...prev, amountError: `Amount cannot be less than ${withDrawCurrency.perTransactionLimit.min}${withDrawCurrency.symbol}` }))
         }
@@ -78,6 +117,7 @@ export const AddMoney: React.FC<AddMoneyProps> = ({ addMoneyAction, userBalance,
             return
         }
     }
+
     const handleLockAmountChange = (e: ChangeEvent<HTMLInputElement>, fieldOnchange: (...event: any[]) => void) => {
         const value = formatAmount(e.target.value, 0);
         form.clearErrors("lock")
@@ -111,7 +151,10 @@ export const AddMoney: React.FC<AddMoneyProps> = ({ addMoneyAction, userBalance,
     }
 
     const submit = async (payload: addMoneyPayload) => {
-        setIsLoading(true)
+        setPayloadData(payload)
+        if (session.status === "unauthenticated" || session.data === null || !session.data.user) {
+            return router.push(`/${locale}/login`);
+        }
         if (!isLockInputDisable && typeof form.getValues("lock") === 'undefined') {
             setInputError((prev) => ({ ...prev, lockAmountError: "Please specify an amount" }))
             return
@@ -121,71 +164,27 @@ export const AddMoney: React.FC<AddMoneyProps> = ({ addMoneyAction, userBalance,
         if (isLockInputDisable) {
             payload.lock = "0"
         }
-        try {
-            if (session.status === "unauthenticated" || session.data === null || !session.data.user) {
-                return router.push(`/${locale}/login`);
-            }
 
-            if (payload.phone_number !== session.data.user.number) {
-                setInputError((prev) => ({ ...prev, phone_numberError: "Phone number not matched" }))
-                return;
-            }
+        if (payload.phone_number !== session.data.user.number) {
+            setInputError((prev) => ({ ...prev, phone_numberError: "Phone number not matched" }))
+            return;
+        }
+        if (!session.data.user.isOtpVerified) {
+            setEnable2FAPrompt(true)
+            return
+        }
 
-            // const isBankAvailable = await axios.get(`${process.env.NEXT_PUBLIC_BANK_FRONTEND_URL}/`)
-            // console.log("isBankAvailable==>", isBankAvailable);
-            const token = await axios.post(`${process.env.NEXT_PUBLIC_BANK_API_URL}/token`, { uid: session.data?.user.uid })
-            const res = await addMoneyAction(payload, token.data.token);
-            console.log(res);
-            if (res.statusCode === 401 || res.statusCode === 404) {
-                toast({
-                    title: res.message,
-                    variant: "destructive",
-                    className: "bg-red-500 text-white font-medium",
-                })
-                return router.push(`/${locale}/login`);
-            }
-            if (res.statusCode === 400) {
-                toast({
-                    title: res.message,
-                    variant: "destructive",
-                    className: "bg-red-500 text-white font-medium",
-                })
-            }
-            if (res.statusCode === 500) {
-                throw new Error(res.message)
-            }
-            res.statusCode === 200 ? setIsBtnDisable(true) : setIsBtnDisable(false)
-            router.push(`${process.env.NEXT_PUBLIC_BANK_FRONTEND_URL}?token=${token.data.token}`)
+        if (!session.data.user.isWithDrawTwoFAActivated) {
+            seIsWithDraw2FAActive(true)
+            return
+        }
 
-        } catch (error: any) {
-            console.log("Indie --->", error)
-            if (error.message === "Network Error" && error.config?.url === `${process.env.NEXT_PUBLIC_BANK_FRONTEND_URL}`) {
-                toast({
-                    title: "Failed to redirect to Bank page",
-                    description: "Sorry for your inconvenience. Currently Bank website unavailable. Please try again later",
-                    className: "bg-red-500 text-white font-medium",
-                    variant: "destructive",
-                })
-                return
-            }
-            if (error instanceof AxiosError) {
-                if (error.message === "Network Error" && error.config?.url === `${process.env.NEXT_PUBLIC_BANK_API_URL}/token`) {
-                    toast({
-                        title: "Bank Server is down. Please again later",
-                        variant: "destructive",
-                        className: "bg-red-500 text-white font-medium",
-                    })
-                    return
-                }
-            }
-            toast({
-                title: error.message || "Something went wrong while adding money",
-                className: "bg-red-500 text-white font-medium",
-                variant: "destructive",
-            })
-            setIsLoading(false)
+        if (!session.data.user.isWithDrawOTPVerified) {
+            setEnableWithDraw2FAOTP(true)
+            return
         }
     }
+
     return (
         <div className="flex items-center relative">
             <div className="flex flex-col self-start bg-white dark:bg-card-foreground text-card-foreground dark:text-card p-6 rounded-lg shadow-lg w-[650px]">
@@ -265,16 +264,13 @@ export const AddMoney: React.FC<AddMoneyProps> = ({ addMoneyAction, userBalance,
                                                             <div>
                                                                 <input className="cursor-pointer" type="checkbox" checked={isLockInputDisable}
                                                                     onChange={(e: ChangeEvent<HTMLInputElement>) => {
-                                                                        console.log("Checked --->", e.currentTarget.checked)
                                                                         if (e.currentTarget.checked) {
-                                                                            console.log("Checked has changed");
                                                                             setIsLockInputDisable(true)
                                                                             form.setValue("lock", "undefined")
                                                                             setInputError((prev) => ({ ...prev, lockAmountError: null }));
                                                                             form.clearErrors("amount")
                                                                         }
                                                                         if (!e.currentTarget.checked) {
-                                                                            console.log("Unchecked has changed");
                                                                             form.resetField("lock")
                                                                             setIsLockInputDisable(false)
                                                                         }
@@ -319,6 +315,29 @@ export const AddMoney: React.FC<AddMoneyProps> = ({ addMoneyAction, userBalance,
                                                 </FormItem>
                                             )}
                                         />
+                                        {
+                                            enable2FAPrompt
+                                            &&
+                                            <Enable2FADialog enable2FAPrompt={enable2FAPrompt} setEnable2FAPrompt={setEnable2FAPrompt}
+                                                title={t("title1")} twoFaType="SignIn">
+                                            </Enable2FADialog>
+                                        }
+                                        {
+                                            isWithDraw2FAActive
+                                            &&
+                                            <Enable2FADialog isWithDraw2FAActive={isWithDraw2FAActive} seIsWithDraw2FAActive={seIsWithDraw2FAActive}
+                                                title={t("title2")} twoFaType="WithDraw">
+                                            </Enable2FADialog>
+                                        }
+                                        {
+                                            enableWithDraw2FAOTP
+                                            &&
+                                            <WithDrawOTPDialog addMoneyAction={addMoneyAction} payload={payloadData} session={session.data}
+                                                isLoading={isLoading} setIsLoading={setIsLoading} setEnableWithDraw2FAOTP={setEnableWithDraw2FAOTP}
+                                                enableWithDraw2FAOTP={enableWithDraw2FAOTP} activate2fa={activate2fa}
+                                                onRampTransactionLimitDetail={onRampTransactionLimitDetail}>
+                                            </WithDrawOTPDialog>
+                                        }
 
                                         <Button type="submit"
                                             disabled={formState.isSubmitting ||
@@ -327,7 +346,6 @@ export const AddMoney: React.FC<AddMoneyProps> = ({ addMoneyAction, userBalance,
                                                 !formState.isValid
                                                 || isBtnDisable
                                             }
-
                                             className={cn("text-white", formState.isSubmitting ? "bg-gray-500" : "bg-black hover:bg-black/80")}
                                         >
 
@@ -345,5 +363,110 @@ export const AddMoney: React.FC<AddMoneyProps> = ({ addMoneyAction, userBalance,
                 }
             </div>
         </div>
+    )
+}
+
+const Enable2FADialog: React.FC<Enable2FADialogProps> = ({ isWithDraw2FAActive, title, twoFaType, setEnable2FAPrompt, enable2FAPrompt, seIsWithDraw2FAActive }) => {
+    const t = useTranslations("Enable2FADialog")
+    return (
+        <Dialog open={twoFaType === "WithDraw" ? isWithDraw2FAActive : enable2FAPrompt}
+            onOpenChange={() => twoFaType === "WithDraw" ? seIsWithDraw2FAActive!(false) : setEnable2FAPrompt!(false)}>
+            <DialogContent className="sm:max-w-[440px] bg-white p-8" onInteractOutside={(e) => {
+                e.preventDefault();
+            }}>
+                <p className="my-4 font-semibold text-lg">{title}</p>
+                <span className="px-2 text-sm font-medium text-slate-500 leading-[1.8rem]">{t("desc1")} &gt; {t("select")} <span className="font-bold py-[2px] border-black/40 px-[5px] rounded-lg border-[1px] mr-2">{t("security")}</span>{t("desc2")} &gt; {t("click_on")} {" "}
+                    <span className="font-bold py-[2px] border-black/40 px-[5px] rounded-lg border-[1px] mr-2">{twoFaType === "SignIn" ? t("authenticator_app") : t("security")}</span>
+                    {t("desc3")}.</span>
+            </DialogContent>
+        </Dialog>
+    )
+}
+
+const WithDrawOTPDialog: React.FC<WithDrawOTPDialogProps> = ({ activate2fa, session, addMoneyAction, payload, setIsLoading, isLoading,
+    enableWithDraw2FAOTP, setEnableWithDraw2FAOTP, onRampTransactionLimitDetail
+}) => {
+    const [otp, setOtp] = useState("");
+    const { toast } = useToast()
+    const [isBtnDisable, setIsBtnDisable] = useState(false)
+    const router = useRouter()
+
+    const handleOTPSubmit = async () => {
+        try {
+            let res = await activate2fa(otp, "withDrawTwoFA");
+            if (res.status === 200) {
+                setTimeout(async () => {
+                    const token = await axios.post(`${process.env.NEXT_PUBLIC_BANK_API_URL}/token`, { uid: session?.user?.uid })
+                    res = await addMoneyAction(payload, token.data.token, onRampTransactionLimitDetail);
+                    responseHandler(res)
+                    if (res.status === 200) router.push(`${process.env.NEXT_PUBLIC_BANK_FRONTEND_URL}?token=${token.data.token}`)
+                    setOtp("")
+                }, 1200)
+            }
+            responseHandler(res)
+            res.status === 200 ? setIsBtnDisable(true) : setIsBtnDisable(false)
+            setIsLoading(false)
+        } catch (error: any) {
+            if (error.message === "Network Error" && error.config?.url === `${process.env.NEXT_PUBLIC_BANK_FRONTEND_URL}`) {
+                toast({
+                    title: "Failed to redirect to Bank page",
+                    description: "Sorry for your inconvenience. Currently Bank website is unavailable. Please try again later",
+                    className: "bg-red-500 text-white font-medium",
+                    variant: "destructive",
+                })
+                return
+            }
+            if (error instanceof AxiosError) {
+                if (error.message === "Network Error" && error.config?.url === `${process.env.NEXT_PUBLIC_BANK_API_URL}/token`) {
+                    toast({
+                        title: "Bank Server is down. Please again later",
+                        variant: "destructive",
+                        className: "bg-red-500 text-white font-medium",
+                    })
+                    return
+                }
+            }
+            toast({
+                title: `${error.message}`,
+                variant: "destructive",
+                className: "bg-red-500 text-white font-medium",
+            })
+            setIsLoading(false)
+        }
+    }
+
+    return (
+        <Dialog open={enableWithDraw2FAOTP} onOpenChange={() => {
+            setEnableWithDraw2FAOTP(false)
+            setIsLoading(false)
+        }}>
+            <DialogContent className="sm:max-w-[425px] bg-white p-8" onInteractOutside={(e) => {
+                e.preventDefault();
+            }}>
+                <div className="flex flex-col items-center">
+                    <form onSubmit={handleOTPSubmit} className="flex flex-col gap-4">
+                        <p className="text-xl font-medium text-slate-00 mb-10 mt-3">
+                            Enter otp from your authenticator app
+                        </p>
+                        <InputOTP maxLength={6} value={otp} onChange={setOtp} className="border-purple-500">
+                            <InputOTPGroup>
+                                <InputOTPSlot index={0} />
+                                <InputOTPSlot index={1} />
+                                <InputOTPSlot index={2} />
+                            </InputOTPGroup>
+                            <InputOTPSeparator />
+                            <InputOTPGroup>
+                                <InputOTPSlot index={3} />
+                                <InputOTPSlot index={4} />
+                                <InputOTPSlot index={5} />
+                            </InputOTPGroup>
+                        </InputOTP>
+                        <Button disabled={otp.length !== 6 || isLoading || isBtnDisable} type="submit" className="bg-purple-500 text-white mt-2">
+                            {isLoading ? "verifying..." : "Continue"}
+                        </Button>
+                    </form>
+                </div>
+            </DialogContent>
+        </Dialog>
     )
 }
