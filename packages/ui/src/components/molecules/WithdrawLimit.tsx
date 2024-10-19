@@ -5,16 +5,17 @@ import { WITHDRAW_LIMIT } from "../../lib/constant"
 import { useSession } from "next-auth/react"
 import { Loader } from "../atoms/Loader"
 import { useTranslations } from "next-intl"
-
+import { useModal } from "./ModalProvider"
 interface WithdrawLimitsProps {
     onRampTransactionLimitDetail: {
         perDayTotal: number;
         perMonthTotal: number;
-    } | undefined
+    } | undefined;
 }
 
 export const WithDrawLimits: React.FC<WithdrawLimitsProps> = ({ onRampTransactionLimitDetail }) => {
     const t = useTranslations("WithDrawLimits")
+    const { setOpen } = useModal()
     const session = useSession({ required: true })
     const [view, setView] = useState<'daily' | 'monthly'>('daily')
     const [currentWithdrawal, setCurrentWithdrawal] = useState({
@@ -22,17 +23,16 @@ export const WithDrawLimits: React.FC<WithdrawLimitsProps> = ({ onRampTransactio
         monthly: onRampTransactionLimitDetail!.perMonthTotal / 100,
     })
     const currency = session.data?.user?.wallet_currency
-
+    const limit = view === 'daily' ? WITHDRAW_LIMIT[currency]?.totalTransactionLimit.day : WITHDRAW_LIMIT[currency]?.totalTransactionLimit.month
+    const withdrawal = view === 'daily' ? currentWithdrawal.daily : currentWithdrawal.monthly
     const formatCurrency = (amount: number | string) => {
         return `${WITHDRAW_LIMIT[currency]?.symbol}${Number(amount)}`
     }
-
-    const calculateProgress = (withdrawal: number, limit: string) => {
-        return Math.min((withdrawal / Number(limit)) * 100, 100)
+    const calculateProgress = (withdrawal: number, limit: string) => Math.min((withdrawal / Number(limit)) * 100, 100)
+    if (calculateProgress(withdrawal, limit) === 100) {
+        setOpen(true)
     }
 
-    const limit = view === 'daily' ? WITHDRAW_LIMIT[currency]?.totalTransactionLimit.day : WITHDRAW_LIMIT[currency]?.totalTransactionLimit.month
-    const withdrawal = view === 'daily' ? currentWithdrawal.daily : currentWithdrawal.monthly
 
     return (
         <div className="bg-white rounded-lg p-6 max-w-full shadow-md">
