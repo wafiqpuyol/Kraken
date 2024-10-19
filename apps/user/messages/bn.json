@@ -375,7 +375,9 @@
     },
     "Jamuna Bank": {
       "name": "যমুনা ব্যাংক"
-    }
+    },
+    "title1": "এটি দেখে মনে হচ্ছে আপনি আপনার 2FA সক্রিয় করেননি। লেনদেন আরও নিরাপদ করার জন্য এটি সক্রিয় করুন।",
+    "title2": "দয়া করে WithDraw2FA সক্রিয় করুন। এটি প্রত্যাহার আরও নিরাপদ করবে।"
   },
   "Balance": {
     "title": "হিসাব",
@@ -499,6 +501,17 @@
     "per_transaction_limit": "লেনদেন সীমা",
     "withdraw_limit": "উত্তোলন সীমা"
   },
+  "Enable2FADialog": {
+    "title": "এটি দেখে মনে হচ্ছে আপনি আপনার 2FA সক্রিয় করেননি। WithDraw 2FA সক্রিয় করার জন্য এটি সক্রিয় করুন।",
+    "desc1": "সেটিংসে যান",
+    "select": "নির্বাচন করুন",
+    "desc2": "ট্যাব",
+    "click_on": "ক্লিক করুন",
+    "desc3": "বোতাম সক্রিয় করুন",
+    "security": "সুরক্ষা",
+    "authenticator_app": "প্রমাণীকরণ অ্যাপ্লিকেশন",
+    "withDraw_2FA": "প্রত্যাহার 2FA"
+  },
   "TwoFADisableDialog": {
     "signIn2FA_title": "প্রমাণীকরণ অ্যাপটি সরানো যাবে না",
     "withdraw2FA_title": "WithDraw 2FA সরানো যাবে না",
@@ -513,6 +526,14 @@
     "withDrawTwoFA": "withDrawTwoFA",
     "proceed": "আগান",
     "proceeding": "অগ্রগতি"
+  },
+  "TwoFAEnableDialog": {
+    "title": "2FA অ্যাপ থেকে কোড প্রবেশ করান",
+    "header": "অথেনটিকেটর অ্যাপ যোগ করুন",
+    "instruction_1": "1. আপনার ডিভাইসে 2FA অ্যাপ ডাউনলোড এবং ইনস্টল করুন। আমরা Google Authenticator সুপারিশ করি।",
+    "instruction_2": "2. QR কোড স্ক্যান করুন।",
+    "instruction_3": "3. অ্যাপ থেকে প্রমাণীকরণ কোড প্রবেশ করান।",
+    "continue": "জারি রাখুন"
   },
   "AccountLock": {
     "title": "আপনার অ্যাকাউন্ট লক হয়েছে  গিয়েছেে"

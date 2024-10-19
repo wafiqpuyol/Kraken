@@ -312,7 +312,15 @@
     "toolTip_text": "Once master key is activated, you can't deactivate it. This will prevent you from losing access to your account. If you lose your master key, you will not be able to recover your account."
   },
   "Enable2FADialog": {
-    "title": "Seems like you haven't enabled your 2FA. Please enable it to enable WithDraw 2FA."
+    "title": "Seems like you haven't enabled your 2FA. Please enable it to enable WithDraw 2FA.",
+    "desc1": "Got to settings",
+    "select": "select",
+    "desc2": "Tab",
+    "click_on": "click on",
+    "desc3": "Enable Button",
+    "security": "Security",
+    "authenticator_app": "Authenticator app",
+    "withDraw_2FA": "WithDraw 2FA"
   },
   "SupportedLangDialog": {
     "title": "Languages",
@@ -382,7 +390,9 @@
     },
     "Jamuna Bank": {
       "name": "Jamuna Bank"
-    }
+    },
+    "title1": "Seems like you haven't enabled your 2FA. Please enable to make the transaction more secure.",
+    "title2": "Please Enable WithDraw2FA. As it'll make the withDrawal more secure."
   },
   "Balance": {
     "title": "Balances",
@@ -522,6 +532,14 @@
     "withDrawTwoFA": "withDrawTwoFA",
     "proceed": "Proceed",
     "proceeding": "Proceeding"
+  },
+  "TwoFAEnableDialog": {
+    "title": "Enter code from 2FA app",
+    "header": "Add Authenticator app",
+    "instruction_1": "1. Download and install a 2FA app on your device. We recommend Google Authenticator.",
+    "instruction_2": "2. Scan the QR code.",
+    "instruction_3": "3. Enter the authentication code from the app.",
+    "continue": "Continue"
   },
   "AccountLock": {
     "title": "Your account has been locked"

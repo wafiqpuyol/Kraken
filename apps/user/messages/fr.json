@@ -379,7 +379,9 @@
     },
     "Jamuna Bank": {
       "name": "Jamuna Bank"
-    }
+    },
+    "title1": "Il semble que vous n'avez pas activé votre 2FA. Veuillez l'activer pour sécuriser davantage la transaction.",
+    "title2": "Veuillez activer WithDraw2FA. Cela rendra le retrait plus sûr."
   },
   "Balance": {
     "title": "Soldes",
@@ -517,6 +519,14 @@
     "proceed": "Continuer",
     "proceeding": "En cours"
   },
+  "TwoFAEnableDialog": {
+    "title": "Saisissez le code de l'application 2FA",
+    "header": "Ajouter l'application d'authentification",
+    "instruction_1": "1. Téléchargez et installez une application 2FA sur votre appareil. Nous recommandons Google Authenticator.",
+    "instruction_2": "2. Scannez le code QR.",
+    "instruction_3": "3. Saisissez le code d'authentification de l'application.",
+    "continue": "Continuer"
+  },
   "AccountLock": {
     "title": "Votre compte a été verrouillé"
   },
@@ -530,5 +540,16 @@
     "authenticator_app_text": "Saisissez le code d'authentification à deux facteurs (2FA) de votre application d'authentification.",
     "enter_2fa_code": "Saisissez le code à partir de l'application 2FA",
     "continue": "Continuer"
+  },
+  "Enable2FADialog": {
+    "title": "Il semble que vous n'avez pas activé votre 2FA. Veuillez l'activer pour activer WithDraw 2FA.",
+    "desc1": "Accédez aux paramètres",
+    "select": "sélectionner",
+    "desc2": "Onglet",
+    "click_on": "cliquez sur",
+    "desc3": "Bouton Activer",
+    "security": "Sécurité",
+    "authenticator_app": "Application d'authentification",
+    "withDraw_2FA": "WithDraw 2FA"
   }
 }

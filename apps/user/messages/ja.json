@@ -379,7 +379,9 @@
     },
     "Jamuna Bank": {
       "name": "ジャムナ銀行"
-    }
+    },
+    "title1": "2FA を有効にしていないようです。トランザクションをより安全にするために有効にしてください。",
+    "title2": "WithDraw2FA を有効にしてください。これにより、引き出しがより安全になります。"
   },
   "Balance": {
     "title": "残高",
@@ -517,6 +519,14 @@
     "proceed": "続行",
     "proceeding": "処理中"
   },
+  "TwoFAEnableDialog": {
+    "title": "2FA アプリからコードを入力",
+    "header": "認証アプリを追加",
+    "instruction_1": "1. デバイスに 2FA アプリをダウンロードしてインストールしてください。 Google Authenticator をお勧めします。",
+    "instruction_2": "2. QR コードをスキャンします。",
+    "instruction_3": "3. アプリから認証コードを入力してください。",
+    "continue": "続ける"
+  },
   "AccountLock": {
     "title": "あなたのアカウントはロックされています"
   },
@@ -530,5 +540,16 @@
     "authenticator_app_text": "認証アプリからサインイン 2FA コードを入力してください。",
     "enter_2fa_code": "2FA アプリからコードを入力",
     "continue": "続ける"
+  },
+  "Enable2FADialog": {
+    "title": "2FA を有効にしていないようです。2FA を有効にして WithDraw 2FA を有効にしてください。",
+    "desc1": "設定に行く",
+    "select": "選択",
+    "desc2": "タブ",
+    "click_on": "クリックする",
+    "desc3": "有効にするボタン",
+    "security": "セキュリティ",
+    "authenticator_app": "認証アプリ",
+    "withDraw_2FA": "WithDraw 2FA"
   }
 }

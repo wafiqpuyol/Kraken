@@ -379,7 +379,9 @@
     },
     "Jamuna Bank": {
       "name": "Jamuna Bank"
-    }
+    },
+    "title1": "Parece que você não ativou seu 2FA. Por favor, ative-o para tornar a transação mais segura.",
+    "title2": "Por favor, ative WithDraw2FA. Isso tornará o saque mais seguro."
   },
   "Balance": {
     "title": "Saldos",
@@ -517,6 +519,14 @@
     "proceed": "Proceder",
     "proceeding": "Procediendo"
   },
+  "TwoFAEnableDialog": {
+    "title": "Ingrese el código desde la aplicación 2FA",
+    "header": "Agregar aplicación de autenticación",
+    "instruction_1": "1. Descargue e instale una aplicación 2FA en su dispositivo. Recomendamos Google Authenticator.",
+    "instruction_2": "2. Escanee el código QR.",
+    "instruction_3": "3. Ingrese el código de autenticación desde la aplicación.",
+    "continue": "Continuar"
+  },
   "AccountLock": {
     "title": "Tu cuenta ha sido bloqueada"
   },
@@ -530,5 +540,16 @@
     "authenticator_app_text": "Ingrese el código de autenticación de dos factores (2FA) de su aplicación de autenticación.",
     "enter_2fa_code": "Ingrese el código de la aplicación 2FA",
     "continue": "Continuar"
+  },
+  "Enable2FADialog": {
+    "title": "Parece que você não ativou seu 2FA. Ative-o para ativar o WithDraw 2FA.",
+    "desc1": "Vá para as configurações",
+    "select": "selecionar",
+    "desc2": "aba",
+    "click_on": "clique em",
+    "desc3": "Botão Ativar",
+    "security": "Segurança",
+    "authenticator_app": "Aplicativo de autenticação",
+    "withDraw_2FA": "WithDraw 2FA"
   }
 }
