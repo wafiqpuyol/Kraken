@@ -4,8 +4,7 @@ import { SendMoneySchema } from "@repo/forms/sendMoneySchema"
 import { authOptions } from "@repo/network"
 import { getServerSession } from "next-auth"
 import { prisma } from "@repo/db/client"
-import { account } from "@repo/db/type"
-import { p2ptransfer, user, $Enums, preference, wallet } from "@repo/db/type"
+import { p2ptransfer, user, $Enums, preference, wallet, account } from "@repo/db/type"
 import { generateTransactionId } from "./utils"
 import { verify } from "jsonwebtoken"
 import { ITransactionDetail } from "@repo/ui/types"
@@ -287,13 +286,27 @@ export const getAllP2PTransactionHistories = async (): Promise<p2ptransfer[] | [
                     }
                 }
             },
+            take: 12,
             orderBy: { timestamp: "desc" }
         })
-        // console.log(p2pTransactionHistories);
         return p2pTransactionHistories
     } catch (error) {
         console.log("getAllP2PTransactions =========>", error);
         return []
+    }
+}
+
+export const getAllP2PTransactionByTrxnID = async (trxn_id: string) => {
+    let res: [] | [p2ptransfer] = []
+    try {
+        const p2pTransactionHistory = await prisma.p2ptransfer.findFirst({ where: { transactionID: trxn_id } })
+        if (p2pTransactionHistory) {
+            res.push(p2pTransactionHistory)
+        }
+        return res
+    } catch (error) {
+        console.log("getAllP2PTransactionByTrxnID =========>", error);
+        return res
     }
 }
 
