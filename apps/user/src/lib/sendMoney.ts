@@ -105,7 +105,7 @@ class SendMoney {
             /* ------------------- Check Account Lock status -------------------*/
             const account = await prisma.account.findFirst({ where: { userId: isUserExist.id } }) as account
             if (account.isLock) {
-                throw new Error("Your account is locked. Please contact support")
+                throw new Error("Your account is locked.")
             }
 
             /* ------------------- Validate wallet Pincode -------------------*/
@@ -177,7 +177,7 @@ class SendMoney {
             console.log("final ------>", senderTotalAmount);
 
             if (senderBalance?.amount < senderTotalAmount) {
-                throw new Error("You're wallet does not have sufficient balance to make this transaction.")
+                throw new Error("You're wallet does not have sufficient balance to make this transfer.")
             }
 
             const deductedAmount = (senderBalance?.amount - senderTotalAmount)
@@ -190,7 +190,6 @@ class SendMoney {
             if (deductedAmount < 0) {
                 throw new Error("You're wallet does not have sufficient balance to make this transfer.")
             }
-
             /* ------------------- Create P2P Transfer -------------------*/
             await prisma.$transaction(async (tx) => {
                 await tx.$queryRaw`SELECT * FROM Balance WHERE userId=${isUserExist.id} FOR UPDATE`;

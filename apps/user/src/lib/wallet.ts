@@ -106,8 +106,13 @@ export const resetPin = async (emergency_code: string) => {
             return { message: "Emergency code has expired", status: 400 }
         }
 
-        await prisma.wallet.delete({
-            where: { userId: isUserExist.id }
+        await prisma.wallet.update({
+            where: { userId: isUserExist.id },
+            data: {
+                emergency_code: null,
+                emergency_code_expiresAt: null,
+                pincode: null,
+            }
         })
         return { message: "Pincode has been reset successfully. Now you can create a new pincode.", status: 200 }
     } catch (error) {
