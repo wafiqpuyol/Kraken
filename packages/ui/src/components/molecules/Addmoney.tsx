@@ -395,6 +395,8 @@ const WithDrawOTPDialog: React.FC<WithDrawOTPDialogProps> = ({ activate2fa, sess
         try {
             let res = await activate2fa(otp, "withDrawTwoFA");
             if (res.status === 200) {
+                // check bank serve availability
+                await axios.get(`${process.env.NEXT_PUBLIC_BANK_API_URL}/health`);
                 setTimeout(async () => {
                     const token = await axios.post(`${process.env.NEXT_PUBLIC_BANK_API_URL}/token`, { uid: session?.user?.uid })
                     res = await addMoneyAction(payload, token.data.token, onRampTransactionLimitDetail);
@@ -407,21 +409,14 @@ const WithDrawOTPDialog: React.FC<WithDrawOTPDialogProps> = ({ activate2fa, sess
             res.status === 200 ? setIsBtnDisable(true) : setIsBtnDisable(false)
             setIsLoading(false)
         } catch (error: any) {
-            if (error.message === "Network Error" && error.config?.url === `${process.env.NEXT_PUBLIC_BANK_FRONTEND_URL}`) {
-                toast({
-                    title: "Failed to redirect to Bank page",
-                    description: "Sorry for your inconvenience. Currently Bank website is unavailable. Please try again later",
-                    className: "bg-red-500 text-white font-medium",
-                    variant: "destructive",
-                })
-                return
-            }
+            console.log("===>", error);
             if (error instanceof AxiosError) {
-                if (error.message === "Network Error" && error.config?.url === `${process.env.NEXT_PUBLIC_BANK_API_URL}/token`) {
+                if (error.message === "Network Error" && error.config?.url === `${process.env.NEXT_PUBLIC_BANK_API_URL}/health`) {
                     toast({
-                        title: "Bank Server is down. Please again later",
-                        variant: "destructive",
+                        title: "Currently Bank Server is down. Please try again later",
                         className: "bg-red-500 text-white font-medium",
+                        variant: "destructive",
+                        duration: 3000
                     })
                     return
                 }

@@ -220,7 +220,7 @@ class SendMoney {
 
         } catch (error: any) {
             console.log("--------------->", error.message);
-            if (error.message === "Your account is locked. Please contact support") {
+            if (error.message === "Your account is locked.") {
                 return { message: error.message, status: 403 }
             }
             if (error.message === "Pincode not found. Pincode is required to send money" || error.message === "OTP verification failed. Enter valid OTP sent to your mail"

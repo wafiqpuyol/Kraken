@@ -9,7 +9,7 @@ app.use(cors({
     origin: ["http://localhost:3000", "http://localhost:3001"],
 }))
 
-app.get("/", (req: Request, res: Response) => res.send("Hello World"))
+app.get("/api/v1/health", (req: Request, res: Response) => res.send("Server is running"))
 
 app.post("/api/v1/token", (req: Request, res: Response) => {
     const uId = req.body.uid;
