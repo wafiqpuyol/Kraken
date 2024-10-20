@@ -410,11 +410,6 @@
     "title": "Transação recente",
     "view_transaction_button": "Ver transação"
   },
-  "Transaction": {
-    "title": "Transação",
-    "history_tab": "Histórico",
-    "scheduled_tab": "Agendado"
-  },
   "SendMoneyPage": {
     "title": "Enviar dinheiro",
     "desc": "Transfira fundos para outro usuário com segurança.",
@@ -551,5 +546,53 @@
     "security": "Segurança",
     "authenticator_app": "Aplicativo de autenticação",
     "withDraw_2FA": "Retirar 2FA"
+  },
+  "Filter": {
+    "withdrawals": "Saques",
+    "p2p_transactions": "Transações P2P",
+    "all": "Tudo",
+    "domestic": "Doméstico",
+    "international": "Internacional",
+    "Last_7-days": "Últimos 7 dias",
+    "Last_30_days": "Últimos 30 dias",
+    "last_90_days": "Últimos 90 dias",
+    "from": "De",
+    "to": "Para",
+    "success": "Sucesso",
+    "failed": "Falhou",
+    "search": "Pesquisar",
+    "clear": "Limpar"
+  },
+  "page": {
+    "time": "Hora",
+    "type": "Tipo",
+    "amount": "Valor",
+    "lock": "Bloqueio",
+    "provider": "Fornecedor",
+    "status": "Status",
+    "Received": "Recebido",
+    "Failed": "Falha",
+    "Success": "Sucesso",
+    "trxn_id": "ID da transação",
+    "category": "Categoria",
+    "contact_number": "Número de contato",
+    "account_name": "Nome da conta",
+    "fee": "Taxa",
+    "sent": "Enviado",
+    "International": "Internacional",
+    "Domestic": "Doméstico",
+    "footer1": "Nenhuma transferência encontrada",
+    "footer2": "Nenhum saque encontrado"
+  },
+  "PaginationNext": {
+    "next": "Próximo"
+  },
+  "PaginationPrevious": {
+    "previous": "Anterior"
+  },
+  "Transaction": {
+    "title": "Transação",
+    "p2pHistory_tab": "Histórico P2P",
+    "withDrawalHistory_tab": "Histórico de Saque"
   }
 }

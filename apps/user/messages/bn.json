@@ -407,11 +407,6 @@
     "title": "সাম্প্রতিক লেনদেন",
     "view_transaction_button": "লেনদেন দেখুন"
   },
-  "Transaction": {
-    "title": "লেনদেন",
-    "history_tab": "হিস্ট্রি",
-    "scheduled_tab": "তালিকাভুক্ত"
-  },
   "SendMoneyPage": {
     "title": "টাকা পাঠান",
     "desc": "নিরাপদে অন্য ব্যবহারকারীর কাছে তহবিল স্থানান্তর করুন।",
@@ -548,5 +543,53 @@
     "authenticator_app_text": "আপনার প্রমাণীকরণ অ্যাপ থেকে সাইন-ইন 2FA কোড প্রবেশ করান",
     "enter_2fa_code": "2FA অ্যাপ থেকে কোড প্রবেশ করান",
     "continue": "চালিয়ে যান"
+  },
+  "Filter": {
+    "withdrawals": "প্রত্যাহার",
+    "p2p_transactions": "P2P লেনদেন",
+    "all": "সব",
+    "domestic": "ঘরোয়া",
+    "international": "আন্তর্জাতিক",
+    "Last_7-days": "গত 7 দিন",
+    "Last_30_days": "গত 30 দিন",
+    "last_90_days": "গত 90 দিন",
+    "from": "থেকে",
+    "to": "থেকে",
+    "success": "সফল",
+    "failed": "ব্যর্থ",
+    "search": "খুঁজুন",
+    "clear": "স্পষ্ট"
+  },
+  "page": {
+    "time": "সময়",
+    "type": "প্রকার",
+    "amount": "মোট",
+    "lock": "লক",
+    "provider": "প্রদানকারী",
+    "status": "স্ট্যাটাস",
+    "Received": "প্রাপ্ত",
+    "Failed": "ব্যর্থ",
+    "Success": "সফল",
+    "trxn_id": "ট্রান্সেকশন আইডি",
+    "category": "বিভাগ",
+    "contact_number": "যোগাযোগ নম্বর",
+    "account_name": "অ্যাকাউন্ট নাম",
+    "fee": "ফি",
+    "sent": "প্রেরিত",
+    "International": "আন্তর্জাতিক",
+    "Domestic": "ঘরোয়া",
+    "footer1": "কোনো ট্রান্সফার পাওয়া যায়নি",
+    "footer2": "কোনো উত্তোলন পাওয়া যায়নি"
+  },
+  "PaginationNext": {
+    "next": "পরবর্তী"
+  },
+  "PaginationPrevious": {
+    "previous": "পূর্ব"
+  },
+  "Transaction": {
+    "title": "ট্রান্সঅ্যাকশন",
+    "p2pHistory_tab": "P2P ইতিহাস",
+    "withDrawalHistory_tab": "প্রত্যাহার ইতিহাস"
   }
 }

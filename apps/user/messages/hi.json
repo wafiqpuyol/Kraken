@@ -410,11 +410,6 @@
     "title": "हाल का लेनदेन",
     "view_transaction_button": "लेनदेन देखें"
   },
-  "Transaction": {
-    "title": "लेन-देन",
-    "history_tab": "इतिहास",
-    "scheduled_tab": "अनुसूचित"
-  },
   "SendMoneyPage": {
     "title": "पैसा भेजें",
     "desc": "किसी अन्य उपयोगकर्ता को सुरक्षित रूप से धन स्थानांतरित करें।",
@@ -551,5 +546,53 @@
     "security": "सुरक्षा",
     "authenticator_app": "प्रमाणीकर्ता ऐप",
     "withDraw_2FA": "WithDraw 2FA"
+  },
+  "Filter": {
+    "withdrawals": "निकासी",
+    "p2p_transactions": "P2P लेनदेन",
+    "all": "सभी",
+    "domestic": "घरेलू",
+    "international": "अंतर्राष्ट्रीय",
+    "Last_7-days": "पिछले 7 दिन",
+    "Last_30_days": "पिछले 30 दिन",
+    "last_90_days": "पिछले 90 दिन",
+    "from": "से",
+    "to": "तक",
+    "success": "सफल",
+    "failed": "विफल",
+    "search": "खोज",
+    "clear": "साफ़"
+  },
+  "page": {
+    "time": "समय",
+    "type": "प्रकार",
+    "amount": "राशि",
+    "lock": "लॉक",
+    "provider": "प्रदाता",
+    "status": "स्थिति",
+    "Received": "प्राप्त",
+    "Failed": "विफल",
+    "Success": "सफल",
+    "trxn_id": "Trxn ID",
+    "category": "श्रेणी",
+    "contact_number": "संपर्क नंबर",
+    "account_name": "खाता नाम",
+    "fee": "शुल्क",
+    "International": "अंतर्राष्ट्रीय",
+    "Domestic": "घरेलू",
+    "footer1": "कोई स्थानांतरण नहीं मिला",
+    "footer2": "कोई निकासी नहीं मिली",
+    "sent": "भेज दिया"
+  },
+  "PaginationNext": {
+    "next": "अगला"
+  },
+  "PaginationPrevious": {
+    "previous": "पिछला"
+  },
+  "Transaction": {
+    "title": "लेन-देन",
+    "p2pHistory_tab": "P2P इतिहास",
+    "withDrawalHistory_tab": "निकासी इतिहास"
   }
 }

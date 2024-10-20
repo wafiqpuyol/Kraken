@@ -421,11 +421,6 @@
     "title": "Recent Transaction",
     "view_transaction_button": "View Transaction"
   },
-  "Transaction": {
-    "title": "Transaction",
-    "history_tab": "History",
-    "scheduled_tab": "Scheduled"
-  },
   "SendMoneyPage": {
     "title": "Send Money",
     "desc": "Transfer funds to another user securely.",
@@ -554,5 +549,53 @@
     "authenticator_app_text": "Enter the Sign-in 2FA code from your authenticator app.",
     "enter_2fa_code": "Enter code from 2FA app",
     "continue": "Continue"
+  },
+  "Filter": {
+    "withdrawals": "Withdrawals",
+    "p2p_transactions": "P2P Transactions",
+    "all": "All",
+    "domestic": "domestic",
+    "international": "International",
+    "Last_7-days": "Last 7 days",
+    "Last_30_days": "Last 30 days",
+    "last_90_days": "Last 90 days",
+    "from": "From",
+    "to": "To",
+    "success": "success",
+    "failed": "Failed",
+    "search": "Search",
+    "clear": "Clear"
+  },
+  "page": {
+    "time": "Time",
+    "type": "Type",
+    "amount": "Amount",
+    "lock": "Lock",
+    "provider": "Provider",
+    "status": "Status",
+    "Received": "Received",
+    "Failed": "Failed",
+    "Success": "Success",
+    "trxn_id": "Trxn ID",
+    "category": "Category",
+    "contact_number": "Contact Number",
+    "account_name": "Account Name",
+    "fee": "Fee",
+    "sent": "Sent",
+    "International": "International",
+    "Domestic": "Domestic",
+    "footer1": "No transfers found",
+    "footer2": "No withdrawals found"
+  },
+  "PaginationNext": {
+    "next": "Next"
+  },
+  "PaginationPrevious": {
+    "previous": "Previous"
+  },
+  "Transaction": {
+    "title": "Transaction",
+    "p2pHistory_tab": "P2P History",
+    "withDrawalHistory_tab": "WithDrawal History"
   }
 }

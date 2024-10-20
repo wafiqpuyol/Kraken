@@ -410,11 +410,6 @@
     "title": "最近のトランザクション",
     "view_transaction_button": "トランザクションを表示"
   },
-  "Transaction": {
-    "title": "トランザクション",
-    "history_tab": "履歴",
-    "scheduled_tab": "スケジュール済み"
-  },
   "SendMoneyPage": {
     "title": "送金",
     "desc": "別のユーザーに安全に資金を転送します。",
@@ -551,5 +546,53 @@
     "security": "セキュリティ",
     "authenticator_app": "認証アプリ",
     "withDraw_2FA": "WithDraw 2FA"
+  },
+  "Filter": {
+    "withdrawals": "引き出し",
+    "p2p_transactions": "P2P トランザクション",
+    "all": "すべて",
+    "domestic": "国内",
+    "international": "国際",
+    "Last_7-days": "過去 7 日間",
+    "Last_30_days": "過去 30 日間",
+    "last_90_days": "過去 90 日間",
+    "from": "から",
+    "to": "に",
+    "success": "成功",
+    "failed": "失敗",
+    "search": "検索",
+    "clear": "クリア"
+  },
+  "page": {
+    "time": "時間",
+    "type": "タイプ",
+    "amount": "金額",
+    "lock": "ロック",
+    "provider": "プロバイダー",
+    "status": "ステータス",
+    "Received": "受信",
+    "Failed": "失敗",
+    "Success": "成功",
+    "trxn_id": "トランザクション ID",
+    "category": "カテゴリ",
+    "contact_number": "連絡先番号",
+    "account_name": "アカウント名",
+    "fee": "手数料",
+    "International": "国際",
+    "Domestic": "国内",
+    "footer1": "転送が見つかりません",
+    "footer2": "引き出しが見つかりません",
+    "sent": "送信"
+  },
+  "PaginationNext": {
+    "next": "次へ"
+  },
+  "PaginationPrevious": {
+    "previous": "前へ"
+  },
+  "Transaction": {
+    "title": "トランザクション",
+    "p2pHistory_tab": "P2P履歴",
+    "withDrawalHistory_tab": "引き出し履歴"
   }
 }
