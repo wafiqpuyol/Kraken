@@ -13,7 +13,7 @@ import { useRouter } from "next/navigation"
 import { useEffect, useState } from "react"
 import { signOut } from "next-auth/react"
 import { RedirectingLoader } from "../organisms/RedirectingLoader"
-
+import { useTranslations } from "next-intl";
 
 interface ChangeEmailDialogProps {
     children: React.ReactNode
@@ -39,6 +39,7 @@ export const ChangeEmailDialog: React.FC<ChangeEmailDialogProps> = ({ children, 
     const router = useRouter()
     const [toggleDialog, setToggleDialog] = useState(account.email_update_pending)
     const [isRedirectedToLogin, setIsRedirectedToLogin] = useState(false)
+    const t = useTranslations("ChangeEmailDialog")
     const [newEmail, setNewEmail] = useState<string>(() =>
         account.email_update ? JSON.parse(account.email_update?.toLocaleString()).email_address : ""
     )
@@ -191,7 +192,7 @@ export const ChangeEmailDialog: React.FC<ChangeEmailDialogProps> = ({ children, 
                     e.preventDefault();
                 }}>
                     <DialogHeader>
-                        <DialogTitle className="text-xl mb-3">Change Email</DialogTitle>
+                        <DialogTitle className="text-xl mb-3">{t("title")}</DialogTitle>
                     </DialogHeader>
 
                     {
@@ -209,16 +210,16 @@ export const ChangeEmailDialog: React.FC<ChangeEmailDialogProps> = ({ children, 
                                         name="email"
                                         render={({ field }) => (
                                             <FormItem>
-                                                <FormDescription className="text-sm text-slate-500 mb-4">Enter the new email you'd like to use on your account.We'll ask you to verify it to make the change</FormDescription>
+                                                <FormDescription className="text-sm text-slate-500 mb-4">{t("desc")}</FormDescription>
                                                 <FormLabel>Email</FormLabel>
                                                 <FormControl>
-                                                    <Input type="text" {...field} placeholder="Enter new email" />
+                                                    <Input type="text" {...field} placeholder={t("email_placeholder")} />
                                                 </FormControl>
                                                 <FormMessage className='text-red-500' />
                                             </FormItem>
                                         )}
                                     />
-                                    <Button type="submit" className="bg-[#7132F5] w-full text-white text-lg">Continue</Button>
+                                    <Button type="submit" className="bg-[#7132F5] w-full text-white text-lg">{t("continue")}</Button>
                                 </form>
                             </ Form>
                             :
@@ -233,9 +234,9 @@ export const ChangeEmailDialog: React.FC<ChangeEmailDialogProps> = ({ children, 
                                         name="authorization_code"
                                         render={({ field }) => (
                                             <FormItem>
-                                                <p className="font-medium text-slate-600 mb-4">We sent an authorization code to your current email. Enter it here.</p>
+                                                <p className="font-medium text-slate-600 mb-4">{t("authCode_desc")}</p>
                                                 <FormControl>
-                                                    <Input type="text" {...field} placeholder="Authorization code" />
+                                                    <Input type="text" {...field} placeholder="authCode_desc_placeHolder" />
                                                 </FormControl>
                                                 <FormMessage className='text-red-500' />
                                             </FormItem>
@@ -247,18 +248,18 @@ export const ChangeEmailDialog: React.FC<ChangeEmailDialogProps> = ({ children, 
                                         name="confirmation_code"
                                         render={({ field }) => (
                                             <FormItem>
-                                                <p className="font-medium text-slate-600 mb-4">We also sent a confirmation code to your new email - <span className="font-bold text-slate-800">{newEmail}</span>. Enter it here.</p>
+                                                <p className="font-medium text-slate-600 mb-4">{("confirmCode_desc")}<span className="font-bold text-slate-800">{newEmail}</span>.{t("enter")}</p>
                                                 <FormControl>
-                                                    <Input type="text" {...field} placeholder="Confirmation code" />
+                                                    <Input type="text" {...field} placeholder="confirmCode_placeHolder" />
                                                 </FormControl>
                                                 <FormMessage className='text-red-500' />
                                             </FormItem>
                                         )}
                                     />
-                                    <p className="text-slate-800 mb-4 font-medium">If you didn't receive these emails, check your junk/spam folder or you can resend emails.</p>
+                                    <p className="text-slate-800 mb-4 font-medium">{t("footer")}</p>
                                     <div className="flex gap-x-4">
-                                        <Button type="button" onClick={() => handleCancelBtn()} name="cancel" className="rounded-2xl bg-[#7132F5] w-full text-white text-lg">Cancel</Button>
-                                        <Button type="submit" name="confirm" className="rounded-2xl bg-[#7132F5] w-full text-white text-lg">Confirm new email</Button>
+                                        <Button type="button" onClick={() => handleCancelBtn()} name="cancel" className="rounded-2xl bg-[#7132F5] w-full text-white text-lg">{t("cancel")}</Button>
+                                        <Button type="submit" name="confirm" className="rounded-2xl bg-[#7132F5] w-full text-white text-lg">{t("confirm_new_email")}</Button>
                                     </div>
                                 </form>
                             </ Form>

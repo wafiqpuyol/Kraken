@@ -597,5 +597,19 @@
     "title": "Transaction",
     "p2pHistory_tab": "P2P History",
     "withDrawalHistory_tab": "WithDrawal History"
+  },
+  "ChangeEmailDialog": {
+    "title": "Change Email",
+    "desc": "Enter the new email you'd like to use on your account.We'll ask you to verify it to make the change",
+    "continue": "Continue",
+    "email_placeholder": "Enter new email",
+    "authCode_desc": "We sent an authorization code to your current email. Enter it here.  ",
+    "confirmCode_desc:": "We also sent a confirmation code to your new email - ",
+    "confirmCode_placeHolder": "Confirmation code",
+    "authCode_desc_placeHolder": "Authorization code",
+    "footer": "If you didn't receive these emails, check your junk/spam folder or you can resend emails.",
+    "confirm_new_email": "Confirm new email",
+    "enter": "Enter it here.",
+    "Cancel": "cancel"
   }
 }

@@ -594,5 +594,19 @@
     "title": "Transação",
     "p2pHistory_tab": "Histórico P2P",
     "withDrawalHistory_tab": "Histórico de Saque"
+  },
+  "ChangeEmailDialog": {
+    "title": "Alterar e-mail",
+    "desc": "Insira o novo e-mail que você gostaria de usar em sua conta. Pediremos que você o verifique para fazer a alteração",
+    "continue": "Continuar",
+    "email_placeholder": "Insira o novo e-mail",
+    "authCode_desc": "Enviamos um código de autorização para o seu e-mail atual. Insira-o aqui.",
+    "confirmCode_desc:": "Também enviamos um código de confirmação para o seu novo e-mail -",
+    "confirmCode_placeHolder": "Código de confirmação",
+    "authCode_desc_placeHolder": "Código de autorização",
+    "footer": "Se você não recebeu esses e-mails, verifique sua pasta de lixo/spam ou pode reenviar os e-mails.",
+    "confirm_new_email": "Confirmar novo e-mail",
+    "enter": "Digite aqui.",
+    "Cancel": "Cancelar"
   }
 }

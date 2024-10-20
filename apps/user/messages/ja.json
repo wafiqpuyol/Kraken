@@ -594,5 +594,19 @@
     "title": "トランザクション",
     "p2pHistory_tab": "P2P履歴",
     "withDrawalHistory_tab": "引き出し履歴"
+  },
+  "ChangeEmailDialog": {
+    "title": "メールを変更する",
+    "desc": "アカウントで使用したい新しいメールアドレスを入力してください。変更するには、メールアドレスの確認を求められます。",
+    "continue": "続ける",
+    "email_placeholder": "新しいメールを入力",
+    "authCode_desc": "認証コードを現在のメールアドレスに送信しました。ここにそれを入力してください。",
+    "confirmCode_desc:": "確認コードを新しいメールアドレスにも送信しました - ",
+    "confirmCode_placeHolder": "確認コード",
+    "authCode_desc_placeHolder": "認証コード",
+    "footer": "これらのメールが届かない場合は、ジャンク/スパムフォルダを確認するか、メールを再送信できます。",
+    "confirm_new_email": "新しいメールアドレスを確認する",
+    "enter": "ここにそれを入力してください。",
+    "Cancel": "キャンセル"
   }
 }

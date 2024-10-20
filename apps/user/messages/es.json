@@ -594,5 +594,19 @@
     "title": "Transacción",
     "p2pHistory_tab": "Historial de P2P",
     "withDrawalHistory_tab": "Historial de retiros"
+  },
+  "ChangeEmailDialog": {
+    "title": "Cambiar correo electrónico",
+    "desc": "Ingrese el nuevo correo electrónico que desea usar en su cuenta. Le pediremos que lo verifique para realizar el cambio",
+    "continue": "Continuar",
+    "email_placeholder": "Ingrese el nuevo correo electrónico",
+    "authCode_desc": "Le enviamos un código de autorización a su correo electrónico actual. Ingréselo aquí.",
+    "confirmCode_desc:": "También le enviamos un código de confirmación a su nuevo correo electrónico -",
+    "confirmCode_placeHolder": "Código de confirmación",
+    "authCode_desc_placeHolder": "Código de autorización",
+    "footer": "Si no recibió estos correos electrónicos, verifique su carpeta de correo no deseado/spam o puede reenviar los correos electrónicos.",
+    "confirm_new_email": "Confirmar nuevo correo electrónico",
+    "enter": "Ingreselo aquí.",
+    "Cancel": "Cancelar"
   }
 }
