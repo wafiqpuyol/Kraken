@@ -6,7 +6,8 @@ import { forgotPasswordPayload } from '@repo/forms/forgotPasswordSchema'
 import { useFormForgotPassword } from "@repo/forms/forgotPassword"
 import { useToast } from "../molecules/Toaster/use-toast"
 import { useTranslations, useLocale } from "next-intl"
-
+import { useState } from "react"
+import { responseHandler } from "../../lib/utils"
 
 interface forgotPasswordProps {
     forgotPasswordAction: (payload: forgotPasswordPayload, locale: string) => Promise<{
@@ -19,39 +20,25 @@ export const ForgotPasswordForm: React.FC<forgotPasswordProps> = ({ forgotPasswo
     const { toast } = useToast()
     const { handleSubmit, control, ...form } = useFormForgotPassword()
     const t = useTranslations("ForgotPasswordForm");
+    const [isLoading, setIsLoading] = useState(false)
+    const [isBtnDisable, setIsBtnDisable] = useState(false)
+
     const submit = async (payload: forgotPasswordPayload) => {
         try {
+            setIsLoading(true)
             const res = await forgotPasswordAction(payload, locale)
+            responseHandler(res)
             switch (res.status) {
                 case 200:
                     toast({
                         title: `${res.message}`,
-                        variant: "destructive"
+                        variant: "default",
+                        className: "bg-green-500 text-white rounded-xl",
+                        duration: 3000
                     })
+                    setIsBtnDisable(true)
+                    form.reset({ email: "" })
                     break;
-                case 400:
-                    toast({
-                        title: `${res.message}`,
-                        variant: "destructive"
-                    })
-                    break;
-                case 404:
-                    toast({
-                        title: `${res.message}`,
-                        variant: "destructive"
-                    })
-                    break;
-                case 409:
-                    toast({
-                        title: `${res.message}`,
-                        variant: "destructive"
-                    })
-                    break;
-                case 500:
-                    toast({
-                        title: `${res.message}`,
-                        variant: "destructive"
-                    })
             }
         } catch (err: any) {
             toast({
@@ -59,6 +46,7 @@ export const ForgotPasswordForm: React.FC<forgotPasswordProps> = ({ forgotPasswo
                 variant: "destructive"
             })
         }
+        setIsLoading(false)
     }
     return (
 
@@ -80,13 +68,19 @@ export const ForgotPasswordForm: React.FC<forgotPasswordProps> = ({ forgotPasswo
                                 <FormItem>
                                     <FormLabel>{t("email")}</FormLabel>
                                     <FormControl>
-                                        <Input type="text" {...field} />
+                                        <Input type="text" {...field} onChange={(e) => {
+                                            isBtnDisable && setIsBtnDisable(false)
+                                            console.log(field.value);
+                                            field.onChange(e.target.value)
+                                        }} />
                                     </FormControl>
                                     <FormMessage className='text-red-500' />
                                 </FormItem>
                             )}
                         />
-                        <Button type="submit" className="bg-[#7132F5] w-full text-white text-lg">{t("send_button")}</Button>
+                        <Button disabled={isLoading || isBtnDisable} type="submit" className="bg-[#7132F5] w-full text-white text-lg">
+                            {isLoading ? t("sending_button") : t("send_button")}
+                        </Button>
                     </form>
                 </ Form>
             </div>

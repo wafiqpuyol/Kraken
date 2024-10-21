@@ -1,13 +1,17 @@
 "use client"
 import { Input } from '../atoms/Input'
+import { useState } from "react"
 import { Button } from '../atoms/Button'
 import { Form, FormField, FormItem, FormLabel, FormControl, FormMessage } from '../molecules/Form'
 import { resetPasswordPayload } from '@repo/forms/resetPasswordSchema'
+import { PasswordMatchSchema } from '@repo/forms/changePasswordSchema'
 import { userFormResetPassword } from "@repo/forms/resetPassword"
 import { useToast } from "../molecules/Toaster/use-toast"
 import { useRouter } from "next/navigation"
 import { useLocale, useTranslations } from "next-intl"
-
+import { responseHandler } from "../../lib/utils"
+import { Eye, ClosedEye } from "../../icons"
+import { error } from 'console'
 
 interface resetPasswordProps {
     resetPasswordAction: (payload: resetPasswordPayload, resetPasswordToken: string | undefined) => Promise<{
@@ -22,46 +26,31 @@ export const ResetPasswordForm: React.FC<resetPasswordProps> = ({ resetPasswordA
     const { handleSubmit, control, ...form } = userFormResetPassword()
     const locale = useLocale()
     const t = useTranslations("ResetPasswordForm")
-    console.log(resetPasswordToken);
+    const [toogleInput, setToogleInput] = useState({
+        newPassword: "password",
+        confirmPassword: "password",
+        disable: false
+    })
+
+    const checkDisable = () => form.formState.isValid
+
     const submit = async (payload: resetPasswordPayload) => {
         try {
             const res = await resetPasswordAction(payload, resetPasswordToken)
+            responseHandler(res)
             switch (res.status) {
                 case 201:
-                    toast({
-                        title: `${res.message}`,
-                        variant: "default"
-                    })
-                    router.push(`/${locale}/dashboard/home`);
+                    form.reset({ "ConfirmPassword": "", "newPassword": "" })
+                    router.push(`/${locale}/dashboard/portfolio`);
                     break;
-                case 400:
-                    toast({
-                        title: `${res.message}`,
-                        variant: "destructive"
-                    })
-                    break;
-                case 401:
-                    toast({
-                        title: `${res.message}`,
-                        variant: "destructive"
-                    })
-                    break;
-                case 409:
-                    toast({
-                        title: `${res.message}`,
-                        variant: "destructive"
-                    })
-                    break;
-                case 500:
-                    toast({
-                        title: `${res.message}`,
-                        variant: "destructive"
-                    })
             }
+
         } catch (err: any) {
             toast({
                 title: `${err.message}`,
-                variant: "destructive"
+                variant: "destructive",
+                className: "bg-red-500 text-white rounded-xl",
+                duration: 3000
             })
         }
     }
@@ -85,9 +74,25 @@ export const ResetPasswordForm: React.FC<resetPasswordProps> = ({ resetPasswordA
                                 <FormItem>
                                     <FormLabel>{t("new_password")}</FormLabel>
                                     <FormControl>
-                                        <Input type="password" {...field} placeholder={t("password_placeholder_text")} />
+                                        <div className='flex items-center border rounded-lg pr-1 focus-visible:ring-1 focus-visible:ring-ring focus-visible:ring-offset-2'>
+                                            <Input type={toogleInput.newPassword} disabled={toogleInput.disable} className='border-none focus-visible:ring-offset-0 focus-visible:ring-0' {...field} placeholder={t("password_placeholder_text")} />
+                                            {
+                                                toogleInput.newPassword == "password"
+                                                    ?
+                                                    <div className='cursor-pointer'
+                                                        onClick={() => setToogleInput(prev => ({ ...prev, newPassword: "text" }))}>
+                                                        <Eye />
+                                                    </div>
+                                                    :
+                                                    <div className='cursor-pointer' onClick={() => {
+                                                        setToogleInput(prev => ({ ...prev, newPassword: "password" }))
+                                                    }}><ClosedEye /></div>
+                                            }
+                                        </div>
                                     </FormControl>
-                                    <FormMessage className='text-red-500' />
+                                    <FormMessage className='text-red-500'>{
+                                        form.getFieldState("newPassword").isTouched && !toogleInput.disable && !form.formState.isValid && PasswordMatchSchema.safeParse(form.watch()).error?.errors.find(e => e.path[0] === "newPassword")?.message}
+                                    </FormMessage>
                                 </FormItem>
                             )}
                         />
@@ -98,13 +103,29 @@ export const ResetPasswordForm: React.FC<resetPasswordProps> = ({ resetPasswordA
                                 <FormItem>
                                     <FormLabel>{t("confirm_new_password")}</FormLabel>
                                     <FormControl>
-                                        <Input type="password" {...field} placeholder={t("password_placeholder_text")} />
+                                        <div className='flex items-center border rounded-lg pr-1 focus-visible:ring-1 focus-visible:ring-ring focus-visible:ring-offset-2'>
+                                            <Input type={toogleInput.confirmPassword} disabled={toogleInput.disable} className='border-none focus-visible:ring-offset-0 focus-visible:ring-0' {...field} placeholder={t("password_placeholder_text")} />
+                                            {
+                                                toogleInput.confirmPassword == "password"
+                                                    ?
+                                                    <div className='cursor-pointer'
+                                                        onClick={() => setToogleInput(prev => ({ ...prev, confirmPassword: "text" }))}>
+                                                        <Eye />
+                                                    </div>
+                                                    :
+                                                    <div className='cursor-pointer' onClick={() => {
+                                                        setToogleInput(prev => ({ ...prev, confirmPassword: "password" }))
+                                                    }}><ClosedEye /></div>
+                                            }
+                                        </div>
                                     </FormControl>
-                                    <FormMessage className='text-red-500' />
+                                    <FormMessage className='text-red-500'>{
+                                        form.getFieldState("ConfirmPassword").isTouched && !toogleInput.disable && !form.formState.isValid && PasswordMatchSchema.safeParse(form.watch()).error?.errors.find(e => e.path[0] === "ConfirmPassword")?.message}
+                                    </FormMessage>
                                 </FormItem>
                             )}
                         />
-                        <Button type="submit" className="bg-[#7132F5] w-full text-white text-lg">{t("save_button")}</Button>
+                        <Button type="submit" disabled={!checkDisable()} className="bg-[#7132F5] w-full text-white text-lg">{t("save_button")}</Button>
                     </form>
                 </ Form>
             </div>
