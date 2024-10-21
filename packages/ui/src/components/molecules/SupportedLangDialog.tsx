@@ -1,11 +1,11 @@
 import { Dialog, DialogTrigger, DialogContent, DialogTitle, DialogHeader } from "./Dialog"
 import { SUPPORTED_LANGUAGE } from "../../lib/constant"
 import { cn } from "../../lib/utils"
-import { Dispatch, SetStateAction, useState } from "react"
+import { Dispatch, SetStateAction, useEffect, useState } from "react"
 import { Tick } from "../../icons/index"
 import { preference } from "@repo/db/type"
 import { useParams, usePathname, useRouter } from "next/navigation";
-import { useTranslations } from 'next-intl';
+import { useTranslations, useLocale } from 'next-intl';
 
 interface SupportedLangDialogProps {
     children: React.ReactNode
@@ -22,6 +22,7 @@ export const SupportedLangDialog: React.FC<SupportedLangDialogProps> = ({ childr
     const params = useParams()
     const path = usePathname()
     const router = useRouter()
+    const locale = useLocale()
     const t = useTranslations("SupportedLangDialog")
     const redirectURL = path.replace(`/${params.locale}`, "")
     const [supportedLang, setSupportedLang] = useState({
@@ -29,6 +30,18 @@ export const SupportedLangDialog: React.FC<SupportedLangDialogProps> = ({ childr
         code: params.locale
     });
     const [save, setSave] = useState(false);
+
+    useEffect(() => {
+        const a = SUPPORTED_LANGUAGE.find(e => e.title === supportedLang.language)?.code
+        if (locale !== a) {
+            console.log("fuck you", locale, SUPPORTED_LANGUAGE.find(e => e.code === locale)?.title);
+            (async () => await updatePreference({ language: SUPPORTED_LANGUAGE.find(e => e.code === locale)?.title }).then((res) => {
+                setPreference((prev: any) => ({ ...prev, language: res.updatedPreference?.language }))
+                setSave(false)
+            }))()
+        }
+    }, [locale])
+
     const handleClick = async () => {
         (() => setSave(true))()
         await updatePreference({ language: supportedLang.language }).then((res) => {
