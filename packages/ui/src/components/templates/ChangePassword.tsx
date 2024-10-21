@@ -9,6 +9,8 @@ import { useState } from 'react'
 import { ChangePasswordSchema } from "@repo/forms/changePasswordSchema"
 import { DialogClose } from "../molecules/Dialog"
 import { useTranslations } from "next-intl"
+import { Eye, ClosedEye } from "../../icons"
+import { responseHandler } from "../../lib/utils"
 
 interface ChangePasswordFormProps {
     changePasswordAction: (payload: changePasswordPayload) => Promise<{
@@ -20,6 +22,12 @@ export const ChangePasswordForm: React.FC<ChangePasswordFormProps> = ({ changePa
     const { toast } = useToast()
     const { handleSubmit, control, ...form } = useFormChangePassword()
     const [isSubmissionSuccessful, setIsSubmissionSuccessful] = useState(false)
+    const [toogleInput, setToogleInput] = useState({
+        currentPassword: "password",
+        newPassword: "password",
+        confirmPassword: "password",
+        disable: false
+    })
     const t = useTranslations("ChangePasswordForm")
 
     const checkDisable = () => {
@@ -30,36 +38,14 @@ export const ChangePasswordForm: React.FC<ChangePasswordFormProps> = ({ changePa
     const submit = async (payload: changePasswordPayload) => {
         try {
             const res = await changePasswordAction(payload)
-            console.log(res);
-
+            responseHandler(res)
+            setIsSubmissionSuccessful(true)
             switch (res.status) {
                 case 201:
-                    toast({
-                        title: `${res.message}`,
-                        variant: "default"
-                    })
-                    setIsSubmissionSuccessful(true)
+                    form.reset({ "ConfirmPassword": "", "currentPassword": "", "newPassword": "" })
+                    form.clearErrors()
+                    setToogleInput(prev => ({ ...prev, disable: true }))
                     break;
-                case 400:
-                    toast({
-                        title: `${res.message}`,
-                        variant: "destructive"
-                    })
-                    setIsSubmissionSuccessful(true)
-                    break;
-                case 401:
-                    toast({
-                        title: `${res.message}`,
-                        variant: "destructive"
-                    })
-                    setIsSubmissionSuccessful(true)
-                    break;
-                case 500:
-                    setIsSubmissionSuccessful(true)
-                    toast({
-                        title: `${res.message}`,
-                        variant: "destructive"
-                    })
             }
         } catch (err: any) {
             setIsSubmissionSuccessful(true)
@@ -69,6 +55,7 @@ export const ChangePasswordForm: React.FC<ChangePasswordFormProps> = ({ changePa
             })
         }
     }
+
     return (
         <div className="flex flex-col bg-card rounded-lg p-y-6 max-w-md w-full">
             {/* @ts-ignore */}
@@ -85,12 +72,27 @@ export const ChangePasswordForm: React.FC<ChangePasswordFormProps> = ({ changePa
                             <FormItem>
                                 <FormLabel className='text-slate-600'>{t("current_password")}</FormLabel>
                                 <FormControl>
-                                    <Input type="text" {...field} placeholder={t("password_placeholder_text")} onChange={(e) => {
-                                        field.onChange(e.target.value)
-                                        setIsSubmissionSuccessful(false)
-                                    }} />
+                                    <div className='flex items-center border rounded-lg pr-1 focus-visible:ring-1 focus-visible:ring-ring focus-visible:ring-offset-2'>
+                                        <Input type={toogleInput.currentPassword} disabled={toogleInput.disable} className='border-none focus-visible:ring-offset-0 focus-visible:ring-0'  {...field} placeholder={t("password_placeholder_text")}
+                                            onChange={(e) => {
+                                                field.onChange(e.target.value)
+                                                setIsSubmissionSuccessful(false)
+                                            }} />
+                                        {
+                                            toogleInput.currentPassword == "password"
+                                                ?
+                                                <div className='cursor-pointer'
+                                                    onClick={() => setToogleInput(prev => ({ ...prev, currentPassword: "text" }))}>
+                                                    <Eye />
+                                                </div>
+                                                :
+                                                <div className='cursor-pointer' onClick={() => {
+                                                    setToogleInput(prev => ({ ...prev, currentPassword: "password" }))
+                                                }}><ClosedEye /></div>
+                                        }
+                                    </div>
                                 </FormControl>
-                                <FormMessage className='text-red-500' />
+                                <FormMessage className='text-red-500'>{!toogleInput.disable && ChangePasswordSchema.safeParse(form.watch()).error?.errors.find(e => e.path[0] === "currentPassword")?.message}</FormMessage>
                             </FormItem>
                         )}
                     />
@@ -101,9 +103,23 @@ export const ChangePasswordForm: React.FC<ChangePasswordFormProps> = ({ changePa
                             <FormItem>
                                 <FormLabel className='text-slate-600'>{t("new_password")}</FormLabel>
                                 <FormControl>
-                                    <Input type="password" placeholder={t("password_placeholder_text")} {...field} />
+                                    <div className='flex items-center border rounded-lg pr-1 focus-visible:ring-1 focus-visible:ring-ring focus-visible:ring-offset-2'>
+                                        <Input type={toogleInput.newPassword} disabled={toogleInput.disable} className='border-none focus-visible:ring-offset-0 focus-visible:ring-0' placeholder={t("password_placeholder_text")} {...field} />
+                                        {
+                                            toogleInput.newPassword == "password"
+                                                ?
+                                                <div className='cursor-pointer'
+                                                    onClick={() => setToogleInput(prev => ({ ...prev, newPassword: "text" }))}>
+                                                    <Eye />
+                                                </div>
+                                                :
+                                                <div className='cursor-pointer' onClick={() => {
+                                                    setToogleInput(prev => ({ ...prev, newPassword: "password" }))
+                                                }}><ClosedEye /></div>
+                                        }
+                                    </div>
                                 </FormControl>
-                                <FormMessage className='text-red-500' />
+                                <FormMessage className='text-red-500'>{!toogleInput.disable && !form.formState.isValid && ChangePasswordSchema.safeParse(form.watch()).error?.errors.find(e => e.path[0] === "newPassword")?.message}</FormMessage>
                             </FormItem>
                         )}
                     />
@@ -115,15 +131,28 @@ export const ChangePasswordForm: React.FC<ChangePasswordFormProps> = ({ changePa
                             <FormItem>
                                 <FormLabel className='text-slate-600'>{t("confirm_new_password")}</FormLabel>
                                 <FormControl>
-                                    <Input type="password" placeholder={t("password_placeholder_text")} {...field} />
+                                    <div className='flex items-center border rounded-lg pr-1 focus-visible:ring-1 focus-visible:ring-ring focus-visible:ring-offset-2'>
+                                        <Input type={toogleInput.confirmPassword} disabled={toogleInput.disable} className='border-none focus-visible:ring-offset-0 focus-visible:ring-0' placeholder={t("password_placeholder_text")} {...field} />
+                                        {
+                                            toogleInput.confirmPassword == "password"
+                                                ?
+                                                <div className='cursor-pointer'
+                                                    onClick={() => setToogleInput(prev => ({ ...prev, confirmPassword: "text" }))}>
+                                                    <Eye />
+                                                </div>
+                                                :
+                                                <div className='cursor-pointer'
+                                                    onClick={() => setToogleInput(prev => ({ ...prev, confirmPassword: "password" }))}>
+                                                    <ClosedEye />
+                                                </div>
+                                        }
+                                    </div>
                                 </FormControl>
-                                <FormMessage className='text-red-500' />
+                                <FormMessage className='text-red-500'>{!toogleInput.disable && !form.formState.isValid && ChangePasswordSchema.safeParse(form.watch()).error?.errors.find(e => e.path[0] === "ConfirmPassword")?.message}</FormMessage>
                             </FormItem>
                         )}
                     />
-                    {!!form?.formState?.errors?.ConfirmPassword?.message && (
-                        <FormMessage>{form.formState.errors.ConfirmPassword.message}</FormMessage>
-                    )}
+
                     <div className="flex gap-4 w-full">
                         <DialogClose className='w-full'>
                             <Button disabled={!checkDisable()} className="bg-purple-600 w-full text-white rounded-xl">

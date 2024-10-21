@@ -11,8 +11,8 @@ export const SignUpSchema = z.object({
     password: z
         .string()
         .describe("Password")
-        .min(6, { message: "Password must be atleast 6 characters" })
-        .max(14, { message: "Password must be within 14 characters" }),
+        .min(12, { message: "Password must be atleast 12 characters" })
+        .max(36, { message: "Password must be within 36 characters" }),
 })
     .superRefine(({ password }, checkPassComplexity) => {
         const containsUppercase = (ch: string) => /[A-Z]/.test(ch);
