@@ -2,7 +2,7 @@ import type { DefaultSession } from 'next-auth'
 import { NextAuthOptions, getServerSession } from 'next-auth'
 import GoogleProvider from 'next-auth/providers/google'
 import CredentialsProvider from 'next-auth/providers/credentials'
-export const MAX_AGE = 1 * 24 * 60 * 60
+import { MAX_AGE } from "./constants"
 import { sign } from 'jsonwebtoken'
 import { loginPayload, LoginSchema } from "@repo/forms/loginSchema"
 import { prisma } from "@repo/db/client"
@@ -90,7 +90,7 @@ export const authOptions: NextAuthOptions = {
         //     return true
         // },
         async session({ token, session }) {
-            let existUser: user | undefined | null = undefined;
+            let existUser: user | null = null;
             if (token.email) {
                 existUser = await prisma.user.findUnique({
                     where: {
@@ -126,8 +126,8 @@ export const authOptions: NextAuthOptions = {
                 isVerified: existUser?.isVerified,
                 wallet_currency: existUser?.balance?.currency,
                 total_balance: existUser?.balance.amount,
-                isWithDrawTwoFAActivated: existUser.wallet.withDrawTwoFAActivated,
-                isWithDrawOTPVerified: existUser.wallet.withDrawOTPVerified,
+                isWithDrawTwoFAActivated: existUser.wallet.withDrawTwoFAActivated || false,
+                isWithDrawOTPVerified: existUser.wallet.withDrawOTPVerified || false,
                 preference: {
                     language: existUser?.preference?.language,
                     timezone: existUser?.preference?.timezone,
