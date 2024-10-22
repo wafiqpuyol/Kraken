@@ -472,7 +472,10 @@
     "receiver_name": "受信者名",
     "amount": "金額",
     "time": "時間",
-    "download_button": "ダウンロード"
+    "download_button": "ダウンロード",
+    "status": "ステータス",
+    "category": "カテゴリ",
+    "fee": "手数料"
   },
   "Portfolio": {
     "title": "ポートフォリオ",
@@ -608,5 +611,27 @@
     "confirm_new_email": "新しいメールアドレスを確認する",
     "enter": "ここにそれを入力してください。",
     "Cancel": "キャンセル"
+  },
+  "PincodeDialog": {
+    "pincode": {
+      "title": "安全な PIN コードを作成してください",
+      "desc": "誕生日、電話番号、連続番号などの簡単に推測できる組み合わせは避けてください。",
+      "btnText": "作成"
+    },
+    "email": {
+      "title": "新しい PIN コードをリクエストする",
+      "desc": "アカウントに関連付けられているメールアドレスを入力してください。新しい PIN コードをリセットするために緊急コードがメールに送信されます。",
+      "btnText": "次へ"
+    },
+    "eneergencyCode": {
+      "title": "PIN コードをリセットする",
+      "desc": "メールに送信された緊急コードを入力してください。",
+      "btnText": "続行"
+    },
+    "forgot": "忘れた",
+    "cancel": "キャンセル",
+    "pincode_placeholder": "PIN コードを入力してください",
+    "email_placeholder": "メールを入力してください",
+    "emergencyCode_placeholder": "緊急コードを入力してください"
   }
 }

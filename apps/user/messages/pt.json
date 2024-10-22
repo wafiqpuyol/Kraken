@@ -472,7 +472,10 @@
     "receiver_name": "Nome do destinatário",
     "amount": "Montante",
     "time": "Tempo",
-    "download_button": "Baixar"
+    "download_button": "Baixar",
+    "status": "Status",
+    "category": "Categoria",
+    "fee": "Taxa"
   },
   "Portfolio": {
     "title": "Carteira",
@@ -608,5 +611,27 @@
     "confirm_new_email": "Confirmar novo e-mail",
     "enter": "Digite aqui.",
     "Cancel": "Cancelar"
+  },
+  "PincodeDialog": {
+    "pincode": {
+      "title": "Crie seu código PIN seguro",
+      "desc": "Escolha um PIN forte: evite combinações facilmente adivináveis como datas de nascimento, números de telefone ou números consecutivos.",
+      "btnText": "Criar"
+    },
+    "email": {
+      "title": "Solicitar um novo código PIN",
+      "desc": "Insira o endereço de e-mail associado à sua conta. Um código de emergência será enviado para o seu e-mail para redefinir seu código PIN.",
+      "btnText": "Próximo"
+    },
+    "eneergencyCode": {
+      "title": "Redefinir seu código PIN",
+      "desc": "Insira o código de emergência enviado para o seu e-mail.",
+      "btnText": "Prosseguir"
+    },
+    "forgot": "Esqueceu",
+    "cancel": "Cancelar",
+    "pincode_placeholder": "Insira seu código PIN",
+    "email_placeholder": "Insira seu e-mail",
+    "emergencyCode_placeholder": "Insira seu código de emergência"
   }
 }

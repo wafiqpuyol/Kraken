@@ -472,7 +472,10 @@
     "receiver_name": "Nom du destinataire",
     "amount": "Montant",
     "time": "Heure",
-    "download_button": "Télécharger"
+    "download_button": "Télécharger",
+    "status": "Statut",
+    "category": "Catégorie",
+    "fee": "Frais"
   },
   "Portfolio": {
     "title": "Portefeuille",
@@ -608,5 +611,27 @@
     "confirm_new_email": "Confirmer le nouvel e-mail",
     "enter": "Entrez-le ici.",
     "Cancel": "Annuler"
+  },
+  "PincodeDialog": {
+    "pincode": {
+      "title": "Créez votre code PIN sécurisé",
+      "desc": "Choisissez un code PIN fort : évitez les combinaisons facilement devinables comme les dates de naissance, les numéros de téléphone ou les numéros consécutifs.",
+      "btnText": "Créer"
+    },
+    "email": {
+      "title": "Demander un nouveau code PIN",
+      "desc": "Saisissez l'adresse e-mail associée à votre compte. Nous vous enverrons un code d'urgence à votre adresse e-mail pour réinitialiser votre code PIN.",
+      "btnText": "Suivant"
+    },
+    "eneergencyCode": {
+      "title": "Réinitialisez votre code PIN",
+      "desc": "Saisissez le code d'urgence envoyé à votre e-mail.",
+      "btnText": "Continuer"
+    },
+    "forgot": "Oublié",
+    "cancel": "Annuler",
+    "pincode_placeholder": "Saisissez votre code PIN",
+    "email_placeholder": "Saisissez votre e-mail",
+    "emergencyCode_placeholder": "Saisissez votre code d'urgence"
   }
 }
