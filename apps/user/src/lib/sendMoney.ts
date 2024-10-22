@@ -206,7 +206,9 @@ class SendMoney {
                         userId: this.receiver?.id
                     },
                     data: {
-                        amount: parseFloat(transactionDetail.formData.amount) * 100
+                        amount: {
+                            increment: parseFloat(transactionDetail.formData.amount) * 100
+                        }
                     }
                 })
                 if (transactionDetail.additionalData.trxn_type === "International") {

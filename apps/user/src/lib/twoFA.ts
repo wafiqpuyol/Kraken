@@ -55,6 +55,7 @@ export const activate2fa = async (otp: string, twoFAType: "signInTwoFA" | "withD
 }> => {
     try {
         const session = await getServerSession(authOptions)
+
         if (!session?.user?.uid) {
             return { message: "Unauthorized. Please login first", status: 401, }
         }
@@ -97,9 +98,8 @@ export const activate2fa = async (otp: string, twoFAType: "signInTwoFA" | "withD
             })
         }
         if (twoFAType === "masterKeyTwoFA") {
-            await prisma.masterkey.update({ where: { userId: session.user.uid }, data: { otpVerfied: true } })
+            await prisma.masterkey.update({ where: { userId: session.user.uid }, data: { otpVerified: true } })
         }
-
 
         let message = ""
         if (twoFAType === "signInTwoFA") message = "SignInTwoFA enabled successfully"
@@ -111,7 +111,6 @@ export const activate2fa = async (otp: string, twoFAType: "signInTwoFA" | "withD
         console.log(error);
         return { message: error.message || "Something while verifying 2FA", status: 500 }
     }
-
 }
 
 // @ts-ignore
@@ -132,19 +131,16 @@ export const isTwoFAEnabled = async (): Promise<{ message: string, status: numbe
     }
 }
 
-export const disable2fa = async (twoFAType: "signInTwoFA" | "withDrawTwoFA") => {
+export const disable2fa = async (twoFAType: "signInTwoFA" | "withDrawTwoFA", uid?: number) => {
     const session = await getServerSession(authOptions)
-    if (!session?.user?.uid) {
-        return
-    }
 
     if (twoFAType === "signInTwoFA") {
-        const user = await prisma.user.findFirst({ where: { id: session.user.uid } })
+        const user = await prisma.user.findFirst({ where: { id: uid || session?.user?.uid } })
         if (!user) return
         if (user.otpVerified) {
             await prisma.user.update({
                 where: {
-                    id: session.user.uid
+                    id: uid || session?.user?.uid
                 },
                 data: {
                     otpVerified: false
@@ -153,12 +149,15 @@ export const disable2fa = async (twoFAType: "signInTwoFA" | "withDrawTwoFA") => 
         }
     }
     else {
-        const wallet = await prisma.wallet.findFirst({ where: { userId: session.user.uid } })
+        if (!session?.user?.uid) {
+            return { message: "Unauthorized. Please login first to change password", status: 401 }
+        }
+        const wallet = await prisma.wallet.findFirst({ where: { userId: session?.user?.uid } })
         if (!wallet) return
         if (wallet.otpVerified) {
             await prisma.wallet.update({
                 where: {
-                    userId: session.user.uid
+                    userId: session?.user?.uid
                 },
                 data: {
                     withDrawOTPVerified: false
@@ -222,5 +221,56 @@ export const getWithDrawTwoFASecret = async (): Promise<{
     } catch (error) {
         console.log("getWithDrawTwoFASecret ==>", error);
         return { message: "Something went wrong while generating withDrawTwoFA secret", status: 500 }
+    }
+}
+
+export const remove2fa = async (twoFAType: "signInTwoFA" | "withDrawTwoFA"): Promise<{
+    message: string;
+    status: number;
+}> => {
+    try {
+        const session = await getServerSession(authOptions)
+        if (!session?.user?.uid) {
+            return { message: "Unauthorized. Please login first", status: 401 }
+        }
+
+        const isMasterKeyExist = await prisma.masterkey.findFirst({ where: { userId: session.user.uid } })
+        if (!isMasterKeyExist?.passKeyActivated || (isMasterKeyExist?.passKeyActivated && !isMasterKeyExist?.passkeyVerified)) {
+            return { message: `MasterKey is not activated or verified yet. Please activate or verify your MasterKey first to remove ${twoFAType}`, status: 401 }
+        }
+
+        if (twoFAType === "signInTwoFA") {
+            const user = await prisma.user.findFirst({ where: { id: session.user.uid } })
+            if (!user) return { message: "Unauthorized User Not Found", status: 401 }
+            await prisma.user.update({
+                where: {
+                    id: session.user.uid
+                },
+                data: {
+                    twoFactorActivated: false,
+                    twoFactorSecret: null,
+                    otpVerified: false
+                }
+            })
+        }
+        else {
+            const wallet = await prisma.wallet.findFirst({ where: { userId: session.user.uid } })
+            if (!wallet) return { message: "Wallet associated with user not found", status: 401 }
+            await prisma.wallet.update({
+                where: {
+                    userId: session.user.uid
+                },
+                data: {
+                    withDrawOTPVerified: false,
+                    withDrawTwoFASecret: null,
+                    wrongPincodeAttempts: 0,
+                    withDrawTwoFAActivated: false
+                }
+            })
+        }
+        return { message: `${twoFAType} removed successfully`, status: 201 }
+    } catch (error) {
+        console.log("remove2fa ==>", error);
+        return { message: `Something went wrong while removing ${twoFAType}`, status: 500 }
     }
 }
