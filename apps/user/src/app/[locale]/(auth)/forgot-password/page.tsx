@@ -4,7 +4,7 @@ import { forgotPasswordAction } from "../../../../lib/auth"
 import { useRedirect } from "../../../../hooks/useRedirect"
 
 const page = async ({ params }: { params: { locale: string } }) => {
-    await useRedirect(params.locale, "/dashboard/home")
+    await useRedirect(params.locale, "/dashboard/portfolio")
 
     return (
         <ForgotPasswordForm forgotPasswordAction={forgotPasswordAction} />

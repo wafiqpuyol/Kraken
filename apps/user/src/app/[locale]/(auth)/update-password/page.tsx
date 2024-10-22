@@ -4,7 +4,7 @@ import { ResetPasswordForm } from "@repo/ui/ResetPasswordForm"
 import { useRedirect } from "../../../../hooks/useRedirect"
 
 const page = async ({ searchParams, params }: { searchParams: { token?: string }, params: { locale: string } }) => {
-    await useRedirect(params.locale, "/dashboard/home")
+    await useRedirect(params.locale, "/dashboard/portfolio")
 
     const { token } = searchParams
     return (

@@ -73,11 +73,14 @@ export const ChangePasswordForm: React.FC<ChangePasswordFormProps> = ({ changePa
                                 <FormLabel className='text-slate-600'>{t("current_password")}</FormLabel>
                                 <FormControl>
                                     <div className='flex items-center border rounded-lg pr-1 focus-visible:ring-1 focus-visible:ring-ring focus-visible:ring-offset-2'>
-                                        <Input type={toogleInput.currentPassword} disabled={toogleInput.disable} className='border-none focus-visible:ring-offset-0 focus-visible:ring-0'  {...field} placeholder={t("password_placeholder_text")}
+                                        <Input type={toogleInput.currentPassword} disabled={toogleInput.disable}
+                                            className='border-none focus-visible:ring-offset-0 focus-visible:ring-0'  {...field}
+                                            placeholder={t("password_placeholder_text")}
                                             onChange={(e) => {
                                                 field.onChange(e.target.value)
                                                 setIsSubmissionSuccessful(false)
-                                            }} />
+                                            }}
+                                        />
                                         {
                                             toogleInput.currentPassword == "password"
                                                 ?
@@ -92,7 +95,12 @@ export const ChangePasswordForm: React.FC<ChangePasswordFormProps> = ({ changePa
                                         }
                                     </div>
                                 </FormControl>
-                                <FormMessage className='text-red-500'>{!toogleInput.disable && ChangePasswordSchema.safeParse(form.watch()).error?.errors.find(e => e.path[0] === "currentPassword")?.message}</FormMessage>
+                                <FormMessage className='text-red-500'>
+                                    {
+                                        form.getFieldState("currentPassword").isTouched && !toogleInput.disable
+                                        && ChangePasswordSchema.safeParse(form.watch()).error?.errors.find(e => e.path[0] === "currentPassword")?.message
+                                    }
+                                </FormMessage>
                             </FormItem>
                         )}
                     />
@@ -104,7 +112,10 @@ export const ChangePasswordForm: React.FC<ChangePasswordFormProps> = ({ changePa
                                 <FormLabel className='text-slate-600'>{t("new_password")}</FormLabel>
                                 <FormControl>
                                     <div className='flex items-center border rounded-lg pr-1 focus-visible:ring-1 focus-visible:ring-ring focus-visible:ring-offset-2'>
-                                        <Input type={toogleInput.newPassword} disabled={toogleInput.disable} className='border-none focus-visible:ring-offset-0 focus-visible:ring-0' placeholder={t("password_placeholder_text")} {...field} />
+                                        <Input type={toogleInput.newPassword} disabled={toogleInput.disable}
+                                            className='border-none focus-visible:ring-offset-0 focus-visible:ring-0' placeholder={t("password_placeholder_text")}
+                                            {...field}
+                                        />
                                         {
                                             toogleInput.newPassword == "password"
                                                 ?
@@ -119,7 +130,11 @@ export const ChangePasswordForm: React.FC<ChangePasswordFormProps> = ({ changePa
                                         }
                                     </div>
                                 </FormControl>
-                                <FormMessage className='text-red-500'>{!toogleInput.disable && !form.formState.isValid && ChangePasswordSchema.safeParse(form.watch()).error?.errors.find(e => e.path[0] === "newPassword")?.message}</FormMessage>
+                                <FormMessage className='text-red-500'>
+                                    {form.getFieldState("newPassword").isTouched && !toogleInput.disable && !form.formState.isValid
+                                        && ChangePasswordSchema.safeParse(form.watch()).error?.errors.find(e => e.path[0] === "newPassword")?.message
+                                    }
+                                </FormMessage>
                             </FormItem>
                         )}
                     />
@@ -148,7 +163,11 @@ export const ChangePasswordForm: React.FC<ChangePasswordFormProps> = ({ changePa
                                         }
                                     </div>
                                 </FormControl>
-                                <FormMessage className='text-red-500'>{!toogleInput.disable && !form.formState.isValid && ChangePasswordSchema.safeParse(form.watch()).error?.errors.find(e => e.path[0] === "ConfirmPassword")?.message}</FormMessage>
+                                <FormMessage className='text-red-500'>
+                                    {form.getFieldState("ConfirmPassword").isTouched && !toogleInput.disable && !form.formState.isValid
+                                        && ChangePasswordSchema.safeParse(form.watch()).error?.errors.find(e => e.path[0] === "ConfirmPassword")?.message
+                                    }
+                                </FormMessage>
                             </FormItem>
                         )}
                     />

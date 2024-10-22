@@ -4,7 +4,7 @@ import { signUpAction } from "../../../../lib/auth"
 import { useRedirect } from '../../../../hooks/useRedirect'
 
 async function page({ params: { locale } }: { params: { locale: string } }) {
-    await useRedirect(locale, "/dashboard/transfer/deposit")
+    await useRedirect(locale, "/dashboard/portfolio")
 
     return (
         <div className='grid grid-cols-10 min-h-[640px]'>

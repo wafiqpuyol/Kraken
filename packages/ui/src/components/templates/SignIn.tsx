@@ -16,6 +16,7 @@ import { useTranslations } from 'next-intl';
 import { useLocale } from 'next-intl';
 import { Eye, ClosedEye } from "../../icons"
 import { SELECTED_COUNTRY } from "@repo/ui/constants"
+import { PublicKeyCredentialRequestOptionsJSON } from "@simplewebauthn/types"
 
 interface LoginProps {
     isTwoFAEnabledFunc: () => Promise<{
@@ -24,13 +25,18 @@ interface LoginProps {
         isTwoFAEnabled?: boolean;
         isOTPVerified?: boolean
     }>
-    activate2fa: (otp: string) => Promise<{
+    activate2fa: (otp: string, twoFAType: "signInTwoFA" | "withDrawTwoFA") => Promise<{
         message: string;
         status: number;
     }>
+    verifyPasskey: (step: "generateAuthentication" | "verifyAuthentication", regCred?: any) => Promise<{
+        message: string;
+        status: number;
+        challenge?: PublicKeyCredentialRequestOptionsJSON;
+    }>
 }
 
-export const SignInForm: React.FC<LoginProps> = ({ isTwoFAEnabledFunc, activate2fa }) => {
+export const SignInForm: React.FC<LoginProps> = ({ isTwoFAEnabledFunc, activate2fa, verifyPasskey }) => {
     const [isTwoFAFormShow, setIsTwoFAFormShow] = useState(false)
     const [isOTPVerified, setIsOTPVerified] = useState(false)
     const locale = useLocale();
@@ -55,13 +61,13 @@ export const SignInForm: React.FC<LoginProps> = ({ isTwoFAEnabledFunc, activate2
                     })
                 }
                 const twoFA = await isTwoFAEnabledFunc()
-                console.log("client ____________________>", twoFA);
                 toast({
                     title: `Login Successful`,
                     variant: "default"
                 })
+
                 if (!twoFA.isTwoFAEnabled) {
-                    router.push(`/${locale}/dashboard/home`);
+                    router.push(`/${locale}/dashboard/portfolio`);
                 }
                 setIsTwoFAFormShow(twoFA.isTwoFAEnabled!)
                 setIsOTPVerified(twoFA.isOTPVerified!)
@@ -150,10 +156,9 @@ export const SignInForm: React.FC<LoginProps> = ({ isTwoFAEnabledFunc, activate2
                     </>
                 }
                 {
-                    isTwoFAFormShow && !isOTPVerified && <TwoFAForm activate2fa={activate2fa} />
+                    isTwoFAFormShow && !isOTPVerified && <TwoFAForm activate2fa={activate2fa} verifyPasskey={verifyPasskey} />
                 }
             </div>
-
         </div >
     )
 }

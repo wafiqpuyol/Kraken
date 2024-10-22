@@ -3,9 +3,10 @@ import React from 'react'
 import { SignInForm } from "@repo/ui/SignInForm"
 import { activate2fa, isTwoFAEnabled } from "../../../../../lib/twoFA"
 import { useRedirect } from '../../../../../hooks/useRedirect'
+import { verifyPasskey } from "../../../../../lib/masterkey"
 
 const page = async ({ params: { locale } }: { params: { locale: string } }) => {
-    await useRedirect(locale, "/dashboard/home");
+    await useRedirect(locale, "/dashboard/portfolio");
 
     return (
         <div className='grid grid-cols-10 min-h-[640px]'>
@@ -13,7 +14,7 @@ const page = async ({ params: { locale } }: { params: { locale: string } }) => {
                 <img src="../login.svg" alt="Signup" width={100} height={100} className="w-full h-full object-cover object-center" />
             </div>
             <div className='col-span-full xl:col-span-5'>
-                <SignInForm activate2fa={activate2fa} isTwoFAEnabledFunc={isTwoFAEnabled} />
+                <SignInForm activate2fa={activate2fa} isTwoFAEnabledFunc={isTwoFAEnabled} verifyPasskey={verifyPasskey} />
             </div>
         </div>
     )

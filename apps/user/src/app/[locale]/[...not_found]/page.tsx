@@ -1,7 +1,11 @@
+"use client"
+
 import Link from "next/link"
-import { LINK } from "../../../lib/constants"
+import { LINK } from "@repo/ui/constants"
+import { useLocale } from "next-intl"
 
 export default function page() {
+    const locale = useLocale()
     return (
         <div className="flex flex-col items-center">
             <div>
@@ -11,7 +15,7 @@ export default function page() {
                         <h1 className="text-3xl font-semibold text-slate-800 mb-3">Page not found</h1>
                         <p className="text-slate-500/85 text-[0.95rem] font-medium">The page you were looking for was not found.</p>
                         <div className="w-full mt-12">
-                            <Link href="/" >
+                            <Link href={`/${locale}/dashboard/portfolio`} >
                                 <button className="w-full text-white bg-purple-600 px-4 py-2 rounded-lg font-medium">Back to Home page</button>
                             </Link>
                         </div>
