@@ -36,3 +36,14 @@ export const updateLockStatus = async () => {
         console.log("updateLockStatus ===>", error);
     }
 }
+export const updateAccount = async (update: Partial<account>) => {
+    try {
+        const session = await getServerSession(authOptions)
+        if (!session?.user?.uid) {
+            return
+        }
+        await prisma.account.update({ where: { userId: session.user.uid }, data: { ...update } })
+    } catch (error) {
+        console.log("updateAccount ===>", error);
+    }
+}

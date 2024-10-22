@@ -135,6 +135,9 @@ export const disable2fa = async (twoFAType: "signInTwoFA" | "withDrawTwoFA", uid
     const session = await getServerSession(authOptions)
 
     if (twoFAType === "signInTwoFA") {
+        if (!session?.user?.uid && !uid) {
+            return
+        }
         const user = await prisma.user.findFirst({ where: { id: uid || session?.user?.uid } })
         if (!user) return
         if (user.otpVerified) {
@@ -150,7 +153,7 @@ export const disable2fa = async (twoFAType: "signInTwoFA" | "withDrawTwoFA", uid
     }
     else {
         if (!session?.user?.uid) {
-            return { message: "Unauthorized. Please login first to change password", status: 401 }
+            return
         }
         const wallet = await prisma.wallet.findFirst({ where: { userId: session?.user?.uid } })
         if (!wallet) return
