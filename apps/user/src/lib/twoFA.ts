@@ -118,7 +118,7 @@ export const isTwoFAEnabled = async (): Promise<{ message: string, status: numbe
     try {
         const session = await getServerSession(authOptions)
         if (!session?.user?.uid) {
-            return { message: "Unauthorized. Please login first to change password", status: 401 }
+            return { message: "Unauthorized. Please login first.", status: 401 }
         }
         const isTwoFAEnable = await prisma.user.findFirst({ where: { id: session?.user?.uid } }) as user
         if (!isTwoFAEnable.twoFactorSecret) {
