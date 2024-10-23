@@ -633,5 +633,16 @@
     "pincode_placeholder": "PIN コードを入力してください",
     "email_placeholder": "メールを入力してください",
     "emergencyCode_placeholder": "緊急コードを入力してください"
+  },
+  "FinalCard": {
+    "Send": "送金",
+    "receiver_number": "受信者番号",
+    "sender_number": "送信者番号",
+    "amount": "金額",
+    "proceed": "続行",
+    "proceeding": "処理中",
+    "category": "カテゴリ",
+    "converted_amount": "換算額",
+    "fee": "手数料"
   }
 }

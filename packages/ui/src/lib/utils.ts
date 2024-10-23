@@ -4,6 +4,9 @@ import { CHARGE, EXCHANGE_RATE } from "@repo/ui/constants"
 import { SUPPORTED_CURRENCY_ENUM } from "@repo/ui/types"
 import { Dispatch, SetStateAction } from "react"
 import { Session } from "next-auth"
+import { toast, } from "../components/molecules/Toaster/use-toast"
+import { startAuthentication } from "@simplewebauthn/browser"
+import { PublicKeyCredentialRequestOptionsJSON } from "@simplewebauthn/types"
 
 export function cn(...inputs: ClassValue[]) {
     return twMerge(clsx(inputs))
@@ -15,8 +18,152 @@ export function formatAmount(val: string, precision: number): string {
         return val;
     } else {
         const firstHalf = val.split(".")[0]
+        // @ts-ignore
         if (precision === 0) return firstHalf
+        // @ts-ignore
         const secondHalf = val.split(".")[1].slice(0, 2)
         return firstHalf + "." + secondHalf
+    }
+}
+
+export const formatDay = () => {
+    const date = new Date(Date.now()).getDate().toString()
+    if (date.toString().length === 1) {
+        return 0 + date
+    }
+    return date
+}
+
+export const senderAmountWithFee = (payload: { amount: string, walletCurrency: SUPPORTED_CURRENCY_ENUM, transactionType: string, selectedCurrency: SUPPORTED_CURRENCY_ENUM }) => {
+
+    const senderAmount = parseFloat(payload.amount)
+    if (payload.transactionType === "Domestic") {
+        return (senderAmount + parseInt(CHARGE[payload.walletCurrency].domestic_charge)) * 100
+    }
+    if (payload.transactionType === "International") {
+        const convertedExchangeRate = 1 / parseFloat(EXCHANGE_RATE[payload.walletCurrency][payload.selectedCurrency] as string)
+        const amountWithExchangeRate = ((senderAmount * convertedExchangeRate) + parseInt(CHARGE[payload.walletCurrency].international_charge)) * 100
+        // @ts-ignore
+        return parseInt(amountWithExchangeRate)
+    }
+}
+// @ts-ignore
+export const calculateAmountOnDemand = (setAmountError?: Dispatch<SetStateAction<string | null>>, session?: Session, selectedCurrency: string | null, walletCurrency: string | undefined, amount: string) => {
+    if (isNaN(parseFloat(amount))) return;
+    const userBalance = session?.user?.total_balance
+    const senderAmount = parseFloat(amount)
+    const convertedExchangeRate = 1 / parseFloat(EXCHANGE_RATE[walletCurrency as keyof typeof SUPPORTED_CURRENCY_ENUM][selectedCurrency as keyof typeof SUPPORTED_CURRENCY_ENUM] as string)
+    const amountWithExchangeRate = ((senderAmount * convertedExchangeRate) + parseInt(CHARGE[walletCurrency as keyof typeof SUPPORTED_CURRENCY_ENUM].international_charge)) * 100
+    // @ts-ignore
+    const isExceeding = amountWithExchangeRate > (parseInt(userBalance))
+
+    if (setAmountError && isExceeding) {
+        setAmountError("Can't send more than the current balance")
+    }
+
+    return parseInt(amountWithExchangeRate.toString()) / 100
+}
+
+export const responseHandler = (res: any) => {
+    switch (res.status) {
+        case 200:
+            return toast({
+                title: `${res.message}`,
+                variant: "default",
+                className: "bg-green-500 text-white rounded-xl",
+                duration: 3000
+            })
+            break;
+        case 201:
+            return toast({
+                title: `${res.message}`,
+                variant: "default",
+                className: "bg-green-500 text-white rounded-xl"
+            })
+            break;
+        case 400:
+            return toast({
+                title: `${res.message}`,
+                variant: "destructive",
+                className: "bg-red-500 text-white rounded-xl",
+                duration: 3000
+            })
+            break;
+        case 401:
+            return toast({
+                title: `${res.message}`,
+                variant: "destructive",
+                className: "bg-red-500 text-white rounded-xl",
+                duration: 3000
+            })
+            break;
+        case 404:
+            return toast({
+                title: `${res.message}`,
+                variant: "destructive",
+                className: "bg-red-500 text-white rounded-xl",
+                duration: 3000
+            })
+            break;
+        case 409:
+            return toast({
+                title: `${res.message}`,
+                variant: "destructive",
+                className: "bg-red-500 text-white rounded-xl",
+                duration: 3000
+            })
+            break;
+        case 422:
+            return toast({
+                title: `${res.message}`,
+                variant: "destructive",
+                className: "bg-red-500 text-white rounded-xl",
+                duration: 3000
+            })
+            break;
+        case 500:
+            return toast({
+                title: `${res.message}`,
+                variant: "destructive",
+                className: "bg-red-500 text-white rounded-xl",
+                duration: 3000
+            })
+        case 503:
+            return toast({
+                title: `${res.message}`,
+                variant: "destructive",
+                className: "bg-red-500 text-white rounded-xl",
+                duration: 3000
+            })
+        default:
+            toast({
+                title: res.message,
+                variant: "destructive",
+                className: "text-white bg-red-500",
+                duration: 3000
+            })
+            break;
+    }
+}
+
+export const validatePasskey = async (verifyPasskey: (step: "generateAuthentication" | "verifyAuthentication", regCred?: any) => Promise<{
+    message: string; status: number; challenge?: PublicKeyCredentialRequestOptionsJSON
+}>, res: {
+    message: string;
+    status: number;
+    challenge?: PublicKeyCredentialRequestOptionsJSON;
+}) => {
+    try {
+        res = await verifyPasskey("generateAuthentication")
+        if (res.status === 200) {
+            const authResponse = await startAuthentication(res.challenge)
+            res = await verifyPasskey("verifyAuthentication", { challenge: res.challenge, authResponseJSON: authResponse })
+            return res
+        }
+        if (res.status !== 200) {
+            return res
+        }
+    } catch (error) {
+        return res
     }
 }

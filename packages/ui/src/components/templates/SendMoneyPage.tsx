@@ -307,6 +307,7 @@ const OTPPrompt = ({ transactionDetail, sendMoneyAction, formReset, setAllTransa
 
 const FinalCard: React.FC<FinalProps> = ({ sendMoneyAction, children, transactionDetail, modalOpen, session, currency,
     locale, formReset, setModalOpen, setAllTransactionHistory, sendOTPAction, verifyOTP, setAccountLock }) => {
+    const t = useTranslations("FinalCard")
     const [isLoading, setIsLoading] = useState(false)
     const [isBtnDisable, setIsBtnDisable] = useState(false)
     const [enable2FAPrompt, setEnable2FAPrompt] = useState(false)
@@ -381,15 +382,15 @@ const FinalCard: React.FC<FinalProps> = ({ sendMoneyAction, children, transactio
                                 <div className="flex justify-between mb-3">
                                     <div className="flex flex-col gap-y-3">
                                         <div className="flex flex-col">
-                                            <span className="text-sm text-gray-500">{("sender_number")}</span>
+                                            <span className="text-sm text-gray-500">{t("sender_number")}</span>
                                             <span className="font-medium text-sm">{transactionDetail.additionalData.sender_number}</span>
                                         </div>
                                         <div className="flex flex-col">
-                                            <span className="text-sm text-gray-500">{("receiver_number")}</span>
+                                            <span className="text-sm text-gray-500">{t("receiver_number")}</span>
                                             <span className="font-medium text-sm">{transactionDetail.additionalData.receiver_number}</span>
                                         </div>
                                         <div className="flex flex-col">
-                                            <span className="text-sm text-gray-500">{("amount")}</span>
+                                            <span className="text-sm text-gray-500">{t("amount")}</span>
                                             <span className="font-medium text-sm">
                                                 {transactionDetail.formData.amount}
                                                 <span className="ml-1">{transactionDetail.additionalData.trxn_type === "International" ? transactionDetail.additionalData.international_trxn_currency : transactionDetail.additionalData.domestic_trxn_currency}</span>
@@ -399,11 +400,11 @@ const FinalCard: React.FC<FinalProps> = ({ sendMoneyAction, children, transactio
 
                                     <div className="flex flex-col gap-y-3">
                                         <div className="flex flex-col">
-                                            <span className="text-sm text-gray-500">{("transaction_type")}</span>
+                                            <span className="text-sm text-gray-500">{t("category")}</span>
                                             <span className="font-medium text-sm">{transactionDetail.additionalData.trxn_type}</span>
                                         </div>
                                         <div className="flex flex-col">
-                                            <span className="text-sm text-gray-500">{("Fee")}</span>
+                                            <span className="text-sm text-gray-500">{t("fee")}</span>
                                             <div className="font-medium text-sm">
                                                 <span className="font-extrabold text-lg">{transactionDetail.additionalData.symbol}</span>
                                                 <span>{transactionDetail.additionalData.trxn_type === "Domestic" ? transactionDetail.additionalData.domestic_trxn_fee : transactionDetail.additionalData.international_trxn_fee}</span>
@@ -412,7 +413,7 @@ const FinalCard: React.FC<FinalProps> = ({ sendMoneyAction, children, transactio
                                         {
                                             transactionDetail.additionalData.trxn_type === "International" &&
                                             <div className="flex flex-col">
-                                                <span className="text-sm text-gray-500">{("Converted Amount")}</span>
+                                                <span className="text-sm text-gray-500">{t("converted_amount")}</span>
                                                 <div className="font-medium text-sm">
                                                     <span>
                                                         {calculateAmountOnDemand(undefined, undefined, currency, session.user?.wallet_currency, transactionDetail.formData.amount)}
@@ -425,7 +426,7 @@ const FinalCard: React.FC<FinalProps> = ({ sendMoneyAction, children, transactio
                                     </div>
                                 </div>
                                 <Button className="w-full bg-purple-600 text-white" onClick={() => handleClick()} disabled={isLoading || isBtnDisable}>
-                                    {isLoading ? "Proceeding" : "Proceed"}
+                                    {isLoading ? t("proceeding") : t("proceed")}
                                 </Button>
                             </DialogContent>
                     )

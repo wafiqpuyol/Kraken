@@ -87,11 +87,11 @@ model user {
 }
 
 model resetpassword {
-  id          Int      @id @default(autoincrement())
+  id          Int       @id @default(autoincrement())
   userId      Int
-  token       String
-  tokenExpiry DateTime
-  user        user     @relation(fields: [userId], references: [id], map: "ResetPassword_userId_fkey")
+  token       String?
+  tokenExpiry DateTime?
+  user        user      @relation(fields: [userId], references: [id], map: "ResetPassword_userId_fkey")
 
   @@index([userId], map: "ResetPassword_userId_fkey")
 }

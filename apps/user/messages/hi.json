@@ -633,5 +633,16 @@
     "pincode_placeholder": "अपना पिनकोड दर्ज करें",
     "email_placeholder": "अपना ईमेल दर्ज करें",
     "emergencyCode_placeholder": "अपना आपातकालीन कोड दर्ज करें"
+  },
+  "FinalCard": {
+    "Send": "पैसा भेजें",
+    "receiver_number": "प्राप्तकर्ता का नंबर",
+    "sender_number": "प्रेषक का नंबर",
+    "amount": "राशि",
+    "proceed": "आगे बढ़ें",
+    "proceeding": "अग्रसर हो रहा है",
+    "category": "श्रेणी",
+    "converted_amount": "रूपांतरित राशि",
+    "fee": "शुल्क"
   }
 }

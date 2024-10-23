@@ -633,5 +633,16 @@
     "pincode_placeholder": "Ingrese su código PIN",
     "email_placeholder": "Ingrese su correo electrónico",
     "emergencyCode_placeholder": "Ingrese su código de emergencia"
+  },
+  "FinalCard": {
+    "Send": "Enviar dinero",
+    "receiver_number": "Número del destinatario",
+    "sender_number": "Número del remitente",
+    "amount": "Monto",
+    "proceed": "Proceder",
+    "proceeding": "Procesando",
+    "category": "Categoría",
+    "converted_amount": "Monto convertido",
+    "fee": "Cuota"
   }
 }

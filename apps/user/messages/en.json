@@ -634,5 +634,16 @@
     "pincode_placeholder": "Enter your pincode",
     "email_placeholder": "Enter your email",
     "emergencyCode_placeholder": "Enter your emergency code"
+  },
+  "FinalCard": {
+    "Send": "Send Money",
+    "receiver_number": "Receiver Number",
+    "sender_number": "Sender Number",
+    "amount": "Amount",
+    "proceed": "Proceed",
+    "proceeding": "Proceeding",
+    "category": "Category",
+    "converted_amount": "Converted Amount",
+    "fee": "Fee"
   }
 }

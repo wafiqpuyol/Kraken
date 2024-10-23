@@ -524,7 +524,7 @@
     "signInTwoFA": "signInTwoFA",
     "withDrawTwoFA": "withDrawTwoFA",
     "proceed": "আগান",
-    "proceeding": "অগ্রগতি"
+    "proceeding": "অগ্রসর হচ্ছে"
   },
   "TwoFAEnableDialog": {
     "title": "2FA অ্যাপ থেকে কোড প্রবেশ করান",
@@ -631,5 +631,16 @@
     "pincode_placeholder": "আপনার পিনকোড প্রবেশ করান",
     "email_placeholder": "আপনার ইমেল প্রবেশ করান",
     "emergencyCode_placeholder": "আপনার জরুরি কোড প্রবেশ করান"
+  },
+  "FinalCard": {
+    "Send": "টাকা পাঠান",
+    "receiver_number": "প্রাপকের নম্বর",
+    "sender_number": "প্রেরকের নম্বর",
+    "amount": "মোট",
+    "proceed": "আগান",
+    "proceeding": "অগ্রসর হচ্ছে",
+    "category": "বিভাগ",
+    "converted_amount": "রূপান্তরিত পরিমাণ",
+    "fee": "ফি"
   }
 }
