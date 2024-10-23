@@ -14,6 +14,7 @@ import { sendPasswordResetEmail, sendVerificationEmail, sendChangeEmailVerificat
 import { resetPasswordPayload } from "@repo/forms/resetPasswordSchema"
 import { PasswordMatchSchema } from "@repo/forms/changePasswordSchema"
 import { SUPPORTED_CURRENCY } from "@repo/ui/constants"
+import { verify, sign, JwtPayload } from "jsonwebtoken"
 
 export const signUpAction = async (payload: signUpPayload, countryName: string): Promise<{ message: string, status: number }> => {
     try {
@@ -103,7 +104,13 @@ export const changePasswordAction = async (payload: changePasswordPayload): Prom
             return { message: "Current password is incorrect", status: 401 }
         }
 
-        await prisma.user.update({
+        const isWalletExist = await prisma.wallet.findFirst({ where: { userId: isUserExist.id } })
+        let decodedPincode: null | string | JwtPayload = null
+        if (isWalletExist && isWalletExist.pincode) {
+            decodedPincode = verify(isWalletExist.pincode, isUserExist.password)
+        }
+
+        const updatedUserData = await prisma.user.update({
             where: {
                 id: session.user.uid
             },
@@ -111,6 +118,11 @@ export const changePasswordAction = async (payload: changePasswordPayload): Prom
                 password: await generateHash(payload.newPassword)
             }
         })
+
+        if (decodedPincode !== null) {
+            const encryptedPin = sign(decodedPincode, updatedUserData.password)
+            await prisma.wallet.update({ where: { userId: isUserExist.id }, data: { pincode: encryptedPin } })
+        }
         return { message: "Password changed successfully", status: 201 }
 
     } catch (error) {
@@ -175,25 +187,45 @@ export const resetPasswordAction = async (payload: resetPasswordPayload, token: 
         const resetPasswordTableData = await prisma.resetpassword.findFirst({
             where: { token }
         })
-
+        if (!resetPasswordTableData) {
+            return { message: "Invalid token. Please request a new one mail to reset", status: 401 }
+        }
         const now = new Date();
         if (resetPasswordTableData) {
             if (resetPasswordTableData.token !== token) {
                 return { message: "Invalid token. Please try again", status: 401 }
             }
-            if (now > resetPasswordTableData?.tokenExpiry) {
+            if (now > resetPasswordTableData?.tokenExpiry!) {
                 return { message: "Token has expired. Please try again", status: 401 }
             }
         }
-
-        await prisma.user.update({
-            where: {
-                id: resetPasswordTableData?.userId
-            },
-            data: {
-                password: await generateHash(payload.newPassword)
+        await prisma.$transaction(async () => {
+            const user = await prisma.user.findFirst({ where: { id: resetPasswordTableData.userId } }) as user
+            const isWalletExist = await prisma.wallet.findFirst({ where: { userId: user.id } })
+            let decodedPincode: null | string | JwtPayload = null
+            if (isWalletExist && isWalletExist.pincode) {
+                decodedPincode = verify(isWalletExist.pincode, user.password)
             }
+            const updatedUserData = await prisma.user.update({
+                where: {
+                    id: resetPasswordTableData.userId
+                },
+                data: {
+                    password: await generateHash(payload.newPassword)
+                }
+            })
+
+            if (decodedPincode !== null) {
+                const encryptedPin = sign(decodedPincode, updatedUserData.password)
+                await prisma.wallet.update({ where: { userId: user.id }, data: { pincode: encryptedPin } })
+            }
+            await prisma.resetpassword.delete({
+                where: {
+                    id: resetPasswordTableData.id
+                }
+            })
         })
+
         return { message: "Password reset successful", status: 201 }
 
     } catch (error) {
@@ -220,7 +252,6 @@ export const sendVerificationEmailAction = async (locale: string): Promise<{ mes
             verificationTokenExpiresAt: new Date(Date.now() + 1000 * 60 * 60 * 24 * 1),
         }
         await prisma.user.update({ where: { id: isUserExist.id }, data: payload })
-        console.log(payload.verificationToken);
         return await sendVerificationEmail(isUserExist.email!, payload.verificationToken, locale)
     } catch (error) {
         console.log("sendVerificationEmailAction", error);
@@ -232,7 +263,6 @@ export const verifyEmail = async (token: string): Promise<{
     message: string;
     status: number;
 }> => {
-    console.log(token);
     try {
         if (!token) {
             return { message: "Token is missing", status: 401 }

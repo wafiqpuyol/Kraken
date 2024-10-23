@@ -11,7 +11,6 @@ import { useRouter } from "next/navigation"
 import { useLocale, useTranslations } from "next-intl"
 import { responseHandler } from "../../lib/utils"
 import { Eye, ClosedEye } from "../../icons"
-import { error } from 'console'
 
 interface resetPasswordProps {
     resetPasswordAction: (payload: resetPasswordPayload, resetPasswordToken: string | undefined) => Promise<{
@@ -41,7 +40,7 @@ export const ResetPasswordForm: React.FC<resetPasswordProps> = ({ resetPasswordA
             switch (res.status) {
                 case 201:
                     form.reset({ "ConfirmPassword": "", "newPassword": "" })
-                    router.push(`/${locale}/dashboard/portfolio`);
+                    router.push(`/${locale}/login`);
                     break;
             }
 
