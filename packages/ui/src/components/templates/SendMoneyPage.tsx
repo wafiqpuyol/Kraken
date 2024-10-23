@@ -37,6 +37,7 @@ import { TrxnToolTip } from "../molecules/TrxnToolTip"
 import { Session } from "next-auth"
 import { InputOTP, InputOTPGroup, InputOTPSeparator, InputOTPSlot } from "../atoms/InputOTP"
 import { AccountLock } from "../molecules/Lock"
+import { responseHandler } from "../../lib/utils"
 
 export interface SendMoneyProps {
     sendMoneyAction: (arg: ITransactionDetail) => Promise<{
@@ -76,7 +77,8 @@ export interface SendMoneyProps {
         status: number;
         isLock?: boolean;
         lockExpiry?: Date | null;
-    }>
+    }>,
+    getAllP2PTransactionByTrxnID: (trxn_id: string) => Promise<[]>
 }
 
 interface FinalProps {
@@ -173,16 +175,17 @@ const SelectCurrency = ({ field, current_selected_currency, wallet_currency, for
 }
 
 
-const Enable2FAPrompt = () => (
-    <DialogContent className="sm:max-w-[425px] bg-white p-8" onInteractOutside={(e) => {
+const Enable2FAPrompt = () => {
+    const t = useTranslations("AddMoney")
+    return (<DialogContent className="sm:max-w-[425px] bg-white p-8" onInteractOutside={(e) => {
         e.preventDefault();
     }}>
-        <p className="my-4 font-semibold text-lg">Seems like you haven't enabled your 2FA. Please enable to make the transaction more secure.</p>
+        <p className="my-4 font-semibold text-lg">{t("title1")}</p>
         <span className="px-2 text-sm font-medium text-slate-500 leading-[1.8rem]">Got to settings &gt; select <span className="font-bold py-[2px] border-black/40 px-[5px] rounded-lg border-[1px] mr-2">Security</span> Tab &gt; click on {" "}
             <span className="font-bold py-[2px] border-black/40 px-[5px] rounded-lg border-[1px] mr-2">Authenticator app</span>
             Enable Button.</span>
-    </DialogContent>
-)
+    </DialogContent>)
+}
 
 
 const OTPPrompt = ({ transactionDetail, sendMoneyAction, formReset, setAllTransactionHistory, verifyOTP, setAccountLock }: IOTPPrompt) => {
@@ -232,7 +235,9 @@ const OTPPrompt = ({ transactionDetail, sendMoneyAction, formReset, setAllTransa
                 case 200:
                     toast({
                         title: res.message,
-                        variant: "default"
+                        variant: "default",
+                        className: "text-white bg-green-500",
+                        duration: 3000
                     })
                     setAllTransactionHistory((prev) => {
                         const updatedArr = [...prev]
@@ -243,61 +248,30 @@ const OTPPrompt = ({ transactionDetail, sendMoneyAction, formReset, setAllTransa
                     setOtp("")
                     break
 
-                case 400:
-                    toast({
-                        title: res.message || "User input data is invalid",
-                        variant: "destructive"
-                    })
-                    break;
-
-                case 401:
-                    toast({
-                        title: res.message,
-                        variant: "destructive"
-                    })
-                    break;
-
                 case 403:
                     toast({
                         title: res.message,
-                        variant: "destructive"
+                        variant: "destructive",
+                        className: "text-white bg-red-500",
+                        duration: 3000
                     })
                     setAccountLock(true)
                     formReset({ amount: "", currency: "", phone_number: "", pincode: "" })
                     break;
-
-                case 404:
-                    toast({
-                        title: res.message,
-                        variant: "destructive"
-                    })
-                    break;
-
-                case 500:
-                    toast({
-                        title: res.message,
-                        variant: "destructive"
-                    })
-                    break;
-
-                default:
-                    toast({
-                        title: res.message,
-                        variant: "destructive"
-                    })
-                    break;
             }
+            responseHandler(res)
             res.status === 200 ? setIsBtnDisable(true) : setIsBtnDisable(false)
             setIsLoading(false)
         } catch (error: any) {
             toast({
                 title: error.message,
-                variant: "default"
+                variant: "destructive",
+                className: "text-white bg-red-500",
+                duration: 3000
             })
             setIsLoading(false)
         }
     }
-
     return (
         <DialogContent className="sm:max-w-[400px] bg-white p-8" onInteractOutside={(e) => {
             e.preventDefault();
@@ -357,28 +331,22 @@ const FinalCard: React.FC<FinalProps> = ({ sendMoneyAction, children, transactio
                 case 200:
                     toast({
                         title: res.message,
-                        variant: "default"
+                        variant: "default",
+                        className: "text-white bg-green-500",
+                        duration: 3000
                     })
                     setIsLoading(false)
                     setOTPPrompt(true)
                     break
-                case 401:
-                    toast({
-                        title: res.message,
-                        variant: "destructive"
-                    })
-                    break;
-                case 500:
-                    toast({
-                        title: res.message,
-                        variant: "destructive"
-                    })
-                    break;
             }
+            responseHandler(res)
+            setIsLoading(false)
         } catch (error: any) {
             toast({
                 title: error.message,
-                variant: "default"
+                variant: "destructive",
+                className: "text-white bg-red-500",
+                duration: 3000
             })
             setIsLoading(false)
         }
@@ -470,7 +438,7 @@ const FinalCard: React.FC<FinalProps> = ({ sendMoneyAction, children, transactio
 }
 
 export const SendMoneyPage: React.FC<SendMoneyProps> = ({ sendMoneyAction, p2pTransactionHistories, sendVerificationEmailAction,
-    generatePincode, sendEmergencyCode, resetPin, sendOTPAction, verifyOTP, isAccountLock, updateLockStatus, checkAccountLockStatus }) => {
+    generatePincode, sendEmergencyCode, resetPin, sendOTPAction, verifyOTP, isAccountLock, updateLockStatus, checkAccountLockStatus, getAllP2PTransactionByTrxnID }) => {
     const t = useTranslations("SendMoneyPage")
     const locale = useLocale()
     const { handleSubmit, control, formState, ...form } = userFormSendMoney()
@@ -489,7 +457,6 @@ export const SendMoneyPage: React.FC<SendMoneyProps> = ({ sendMoneyAction, p2pTr
     const [currency, setCurrency] = useState<null | string>(null)
     const [accountLock, setAccountLock] = useState<boolean>(isAccountLock)
     const CurrencyLogo = CURRENCY_LOGO[currency]?.Logo
-
 
     const submit = async (payload: sendMoneyPayload) => {
         const recipientCountry = guessCountryByPartialPhoneNumber({ phone: payload.phone_number })?.country?.name
@@ -735,7 +702,7 @@ export const SendMoneyPage: React.FC<SendMoneyProps> = ({ sendMoneyAction, p2pTr
                 {accountLock && <AccountLock updateLockStatus={updateLockStatus} checkAccountLockStatus={checkAccountLockStatus} setAccountLock={setAccountLock} />}
             </Card>
 
-            <TransactionHistory p2pTransactionHistories={allTransactionHistory} />
+            <TransactionHistory p2pTransactionHistories={allTransactionHistory} getAllP2PTransactionByTrxnID={getAllP2PTransactionByTrxnID} />
         </div >
     )
 }

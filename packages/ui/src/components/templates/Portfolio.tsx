@@ -51,7 +51,6 @@ const p2pConfig = {
 } satisfies ChartConfig
 
 const OnRampTooltip = ({ active, payload, nameKey, session, t }: { t: any, active: boolean, payload: any, nameKey: string, session: Session | null }) => {
-    console.log(nameKey);
     if (active && payload && payload.length) {
         return (
             <div className="bg-white shadow-2xl rounded-lg text-[12px] font-bold text-slate-700">
@@ -70,7 +69,6 @@ const OnRampTooltip = ({ active, payload, nameKey, session, t }: { t: any, activ
 };
 
 const P2PTooltip = ({ active, payload, nameKey, t }: { t: any, active: boolean, payload: any, nameKey: string, session: Session | null }) => {
-    console.log(nameKey, payload);
     if (active && payload && payload.length) {
         return (
             <div className="bg-white shadow-2xl rounded-lg text-[12px] font-bold text-slate-700">
@@ -111,7 +109,7 @@ const PortfolioBalance = ({ totalBalance = "0", currency = "$", t }: { totalBala
             <h1 className="text-4xl"><span className="font-extrabold">{currency}</span><span className="text-black/85">{totalBalance / 100}</span></h1>
         </div>
         <div>
-            <div className="flex flex-col items-center  cursor-pointer" onClick={() => router.push(`/${locale}/dashboard/transfer/deposit`)}>
+            <div className="flex flex-col items-center  cursor-pointer" onClick={() => router.push(`/${locale}/dashboard/transfer/withdraw`)}>
                 <Deposit />
                 <Button className="text-[#7F00FF] font-medium text-[18px]" >{t("deposit")}</Button>
             </div>
@@ -144,16 +142,15 @@ const OnRamp = ({ onRamps, children, onRampConfig }: { onRamps: onramptransactio
                         tickLine={false}
                         axisLine={false}
                         tickMargin={8}
-                        className="font-bold"
+                        className="font-bold text-[10px]"
                         tickFormatter={(value) => {
                             const date = new Date(value)
                             return date.toLocaleDateString("en-US", {
                                 month: "short",
                                 day: "2-digit",
                                 year: "numeric",
-                                minute: "numeric",
                                 hour: "numeric",
-                                second: "numeric"
+                                minute: "numeric",
                             })
                         }}
                     />
@@ -205,7 +202,7 @@ const P2PTransfer = ({ p2pTransfers, children, p2pConfig }: { p2pTransfers: p2pt
                         axisLine={true}
                         tickMargin={8}
                         minTickGap={32}
-                        className="font-bold"
+                        className="font-bold text-[10px]"
                         tickFormatter={(value) => {
                             const date = new Date(value)
                             return date.toLocaleDateString("en-US", {
@@ -214,7 +211,6 @@ const P2PTransfer = ({ p2pTransfers, children, p2pConfig }: { p2pTransfers: p2pt
                                 year: "numeric",
                                 hour: "numeric",
                                 minute: "numeric",
-                                second: "numeric"
                             })
                         }}
                     />

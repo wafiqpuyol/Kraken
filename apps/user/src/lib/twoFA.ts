@@ -136,7 +136,7 @@ export const disable2fa = async (twoFAType: "signInTwoFA" | "withDrawTwoFA", uid
 
     if (twoFAType === "signInTwoFA") {
         if (!session?.user?.uid && !uid) {
-            return { message: "Unauthorized. Please login first", status: 401 }
+            return
         }
         const user = await prisma.user.findFirst({ where: { id: uid || session?.user?.uid } })
         if (!user) return
