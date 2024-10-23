@@ -4,7 +4,7 @@ import { SendMoneySchema } from "@repo/forms/sendMoneySchema"
 import { authOptions } from "@repo/network"
 import { getServerSession } from "next-auth"
 import { prisma } from "@repo/db/client"
-import { p2ptransfer, user, $Enums, preference, wallet, account } from "@repo/db/type"
+import { p2ptransfer, user, $Enums, preference, account } from "@repo/db/type"
 import { generateTransactionId } from "./utils"
 import { verify } from "jsonwebtoken"
 import { ITransactionDetail } from "@repo/ui/types"
@@ -14,7 +14,7 @@ import { guessCountryByPartialPhoneNumber } from 'react-international-phone';
 import { generateOTP } from "./utils"
 import { sendOTP } from "./mail"
 import { WRONG_PINCODE_ATTEMPTS } from "@repo/ui/constants"
-import { updateLockStatus } from "./account"
+
 
 class SendMoney {
     static instance: Promise<{
@@ -95,7 +95,6 @@ class SendMoney {
             if (!isUserExist) {
                 throw new Error("User not found")
             }
-            console.log("SEnder--------->", this.sender);
             this.sender = isUserExist
             if (!isUserExist.isVerified) {
                 throw new Error("Please verify your account first to send money")
@@ -119,7 +118,6 @@ class SendMoney {
                 throw new Error("Pincode not found. Pincode is required to send money")
             }
 
-
             const decodedPincode = verify(wallet.pincode, isUserExist.password)
             const isPincodeValid = decodedPincode === transactionDetail.formData.pincode
             if (!isPincodeValid) {
@@ -136,7 +134,6 @@ class SendMoney {
                 throw new Error("Recipient number not found. Please enter a valid recipient number")
             }
             this.receiver = isRecipientExist;
-            console.log("Receiver--------->", this.receiver);
 
             /* ------------------- Check their number is not same -------------------*/
             if (this.sender.number === this.receiver.number) {
@@ -173,7 +170,6 @@ class SendMoney {
                 selectedCurrency: transactionDetail.additionalData?.international_trxn_currency
             }
             const senderTotalAmount = senderAmountWithFee(senderAmountWithFeeArg) as number
-            console.log("final ------>", senderTotalAmount);
 
             if (senderBalance?.amount < senderTotalAmount) {
                 throw new Error("You're wallet does not have sufficient balance to make this transfer.")
@@ -221,7 +217,7 @@ class SendMoney {
             return { message: "Sending money successful", status: 200, transaction: this.p2pTransfer }
 
         } catch (error: any) {
-            console.log("--------------->", error.message);
+            console.log("SendMoney --------------->", error);
             if (error.message === "Your account is locked.") {
                 return { message: error.message, status: 403 }
             }
@@ -362,7 +358,6 @@ export const verifyOTP = async (otp: string): Promise<{
     message: string;
     status: number;
 }> => {
-    console.log(otp);
     try {
         const session = await getServerSession(authOptions)
         if (!session?.user?.uid) {
@@ -399,7 +394,6 @@ export const verifyOTP = async (otp: string): Promise<{
             return { message: "OTP has expired. Please try again", status: 400 }
         }
 
-        console.log(isWalletExist);
         await prisma.wallet.update({ where: { userId: session.user.uid }, data: { otpVerified: true, otp: null, otp_expiresAt: null } })
         return { message: "OTP has verified", status: 200 }
     } catch (error: any) {
