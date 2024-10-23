@@ -3,7 +3,7 @@ import { authOptions } from "@repo/network"
 import { WITHDRAW_LIMIT } from "@repo/ui/constants"
 import React from 'react'
 import { useRedirectToLogin } from "../../../../hooks/useRedirect"
-
+import { SUPPORTED_CURRENCY_ENUM } from "@repo/ui/types"
 
 export default async function TransactionLimitTable({ params: { locale } }: { params: { locale: string } }) {
     await useRedirectToLogin(locale, "/login")
@@ -48,10 +48,10 @@ export default async function TransactionLimitTable({ params: { locale } }: { pa
                             <td className="py-2 px-4 border-b border-r">Add money from Bank</td>
                             <td className="py-2 px-4 text-center border-b border-r">{WITHDRAW_LIMIT.dayLimit}</td>
                             <td className="py-2 px-4 text-center border-b border-r">{WITHDRAW_LIMIT.monthLimit}</td>
-                            <td className="py-2 px-4 text-center border-b border-r">{WITHDRAW_LIMIT[userCurrency].perTransactionLimit.min}</td>
-                            <td className="py-2 px-4 text-center border-b border-r">{WITHDRAW_LIMIT[userCurrency].perTransactionLimit.max}</td>
-                            <td className="py-2 px-4 text-center border-b border-r">{WITHDRAW_LIMIT[userCurrency].totalTransactionLimit.day}</td>
-                            <td className="py-2 px-4 text-center border-b">{WITHDRAW_LIMIT[userCurrency].totalTransactionLimit.month}</td>
+                            <td className="py-2 px-4 text-center border-b border-r">{WITHDRAW_LIMIT[userCurrency as keyof typeof SUPPORTED_CURRENCY_ENUM].perTransactionLimit.min}</td>
+                            <td className="py-2 px-4 text-center border-b border-r">{WITHDRAW_LIMIT[userCurrency as keyof typeof SUPPORTED_CURRENCY_ENUM].perTransactionLimit.max}</td>
+                            <td className="py-2 px-4 text-center border-b border-r">{WITHDRAW_LIMIT[userCurrency as keyof typeof SUPPORTED_CURRENCY_ENUM].totalTransactionLimit.day}</td>
+                            <td className="py-2 px-4 text-center border-b">{WITHDRAW_LIMIT[userCurrency as keyof typeof SUPPORTED_CURRENCY_ENUM].totalTransactionLimit.month}</td>
                         </tr>
                     </tbody>
                 </table>
