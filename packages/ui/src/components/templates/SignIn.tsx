@@ -60,15 +60,16 @@ export const SignInForm: React.FC<LoginProps> = ({ isTwoFAEnabledFunc, activate2
                         variant: "destructive"
                     })
                 }
-                const twoFA = await isTwoFAEnabledFunc()
                 toast({
                     title: `Login Successful`,
                     variant: "default"
                 })
+                const twoFA = await isTwoFAEnabledFunc()
 
-                if (!twoFA.isTwoFAEnabled) {
-                    router.push(`/${locale}/dashboard/portfolio`);
+                if ((twoFA.isTwoFAEnabled && twoFA.isOTPVerified) || !twoFA.isTwoFAEnabled) {
+                    return router.push(`/${locale}/dashboard/portfolio`);
                 }
+
                 setIsTwoFAFormShow(twoFA.isTwoFAEnabled!)
                 setIsOTPVerified(twoFA.isOTPVerified!)
             })
