@@ -13,68 +13,67 @@ import { InputOTP, InputOTPGroup, InputOTPSeparator, InputOTPSlot } from "../ato
 import { useToast } from "./Toaster/use-toast"
 import { useSession } from "next-auth/react"
 import { Session } from "next-auth"
+import { useTranslations } from "next-intl"
+import { responseHandler } from "../../lib/utils"
 
-interface TwoFADialogProps {
+export interface TwoFADialogProps {
     children: ReactNode
     code: string
-    activate2fa: (otp: string) => Promise<{
+    activate2fa: (otp: string, twoFAType: "signInTwoFA" | "withDrawTwoFA") => Promise<{
         message: string;
         status: number;
     }>
-    setTwoFA: Dispatch<SetStateAction<boolean>>
+    twoFAType: "signInTwoFA" | "withDrawTwoFA"
+    setTwoFAEnabled?: Dispatch<SetStateAction<boolean>>
+    setWithDrawTwoFAEnabled?: Dispatch<SetStateAction<boolean>>
 }
-export const TwoFAEnableDialog: React.FC<TwoFADialogProps> = ({ children, code, activate2fa, setTwoFA }) => {
+export const TwoFAEnableDialog: React.FC<TwoFADialogProps> = ({ children, code, activate2fa, setTwoFAEnabled, twoFAType, setWithDrawTwoFAEnabled }) => {
     const [otp, setOtp] = useState("");
+    const [isLoading, setIsLoading] = useState(false);
     const { toast } = useToast()
     const session = useSession()
+    const t = useTranslations("TwoFAEnableDialog")
 
     const handleOTPSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
         try {
-            const res = await activate2fa(otp);
+            setIsLoading(true)
+            const res = await activate2fa(otp, twoFAType);
             switch (res.status) {
                 case 200:
                     toast({
                         title: `${res.message}`,
                         variant: "default"
                     })
-                    setTwoFA(true)
+                    let updatedSessionData: any
+                    if (twoFAType === "signInTwoFA") {
+                        setTwoFAEnabled!(true)
+                        updatedSessionData = { isOtpVerified: true, isTwoFAActive: true }
+                    } else {
+                        setWithDrawTwoFAEnabled!(true)
+                        updatedSessionData = { isWithDrawTwoFAActivated: true, isWithDrawOTPVerified: true }
+                    }
+                    setOtp("")
+                    setIsLoading(false)
                     session.update((data: Session) => {
                         return {
                             ...data,
                             user: {
                                 ...data.user,
-                                isOtpVerified: true,
-                                isTwoFAActive: true
+                                ...updatedSessionData
                             }
                         }
                     })
                     break;
-                case 400:
-                    toast({
-                        title: `${res.message}`,
-                        variant: "destructive"
-                    })
-                    break;
-                case 401:
-                    toast({
-                        title: `${res.message}`,
-                        variant: "destructive"
-                    })
-                    break;
-                case 500:
-                    toast({
-                        title: `${res.message}`,
-                        variant: "destructive"
-                    })
             }
-
+            responseHandler(res)
         } catch (error: any) {
             toast({
                 title: `${error.message}`,
                 variant: "destructive"
             })
         }
+        setIsLoading(false)
     };
 
 
@@ -83,25 +82,27 @@ export const TwoFAEnableDialog: React.FC<TwoFADialogProps> = ({ children, code, 
             <DialogTrigger asChild>
                 {children}
             </DialogTrigger>
-            <DialogContent className="sm:max-w-[425px] bg-white">
+            <DialogContent className="sm:max-w-[425px] bg-white" onInteractOutside={(e) => {
+                e.preventDefault();
+            }}>
                 <DialogHeader>
-                    <DialogTitle>Add Authenticator app</DialogTitle>
+                    <DialogTitle>{t("header")}</DialogTitle>
                 </DialogHeader>
                 <div className="py-4">
 
                     <div className="flex flex-col items-center p-5 gap-y-2">
                         <QRCodeSVG value={code} />
                         <ol className="text-xs text-slate-600 py-2 px-4"> <ol />
-                            <li>1. Download and install a 2FA app on your device. We recommend Google Authenticator.</li>
-                            <li>2. Scan the QR code.</li>
-                            <li>3. Enter the authentication code from the app.</li>
+                            <li>{t("instruction_1")}</li>
+                            <li>{t("instruction_2")}</li>
+                            <li>{t("instruction_3")}</li>
                         </ol>
                     </div>
 
                     <div className="flex flex-col items-center">
                         <form onSubmit={handleOTPSubmit} className="flex flex-col gap-2">
                             <p className="text-sm font-medium text-slate-500">
-                                Enter code from 2FA app
+                                {t("title")}
                             </p>
                             <InputOTP maxLength={6} value={otp} onChange={setOtp} className="border-purple-500">
                                 <InputOTPGroup>
@@ -116,12 +117,11 @@ export const TwoFAEnableDialog: React.FC<TwoFADialogProps> = ({ children, code, 
                                     <InputOTPSlot index={5} />
                                 </InputOTPGroup>
                             </InputOTP>
-                            <Button disabled={otp.length !== 6} type="submit" className="bg-purple-500 text-white mt-2">
-                                Continue
+                            <Button disabled={otp.length !== 6 || isLoading} type="submit" className="bg-purple-500 text-white mt-2">
+                                {t("continue")}
                             </Button>
                         </form>
                     </div>
-
                 </div>
             </DialogContent>
         </Dialog>

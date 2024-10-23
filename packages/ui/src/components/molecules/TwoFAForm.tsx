@@ -6,59 +6,87 @@ import { Button } from "../atoms/Button"
 import { useToast } from "../molecules/Toaster/use-toast"
 import { useRouter } from "next/navigation"
 import { useTranslations, useLocale } from 'next-intl';
+import { PublicKeyCredentialRequestOptionsJSON } from "@simplewebauthn/types"
+import { startAuthentication } from "@simplewebauthn/browser"
+import { useSession } from "next-auth/react"
+import { Session } from "next-auth"
+import { responseHandler } from "../../lib/utils"
 
 interface TwoFAFormProps {
-    activate2fa: (otp: string) => Promise<{
+    activate2fa: (otp: string, twoFAType: "signInTwoFA" | "withDrawTwoFA") => Promise<{
         message: string;
         status: number;
     }>
+    verifyPasskey: (step: "generateAuthentication" | "verifyAuthentication", regCred?: any) => Promise<{
+        message: string;
+        status: number;
+        challenge?: PublicKeyCredentialRequestOptionsJSON;
+    }>
 }
-export const TwoFAForm: React.FC<TwoFAFormProps> = ({ activate2fa }) => {
+export const TwoFAForm: React.FC<TwoFAFormProps> = ({ activate2fa, verifyPasskey }) => {
     const [otp, setOtp] = useState("");
+    const [isLoading, setIsLoading] = useState(false);
     const { toast } = useToast()
     const router = useRouter()
     const t = useTranslations("TwoFAForm")
     const local = useLocale()
+    const session = useSession()
 
     const handleOTPSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
         try {
-            const res = await activate2fa(otp);
+            setIsLoading(true)
+            const res = await activate2fa(otp, "signInTwoFA");
             switch (res.status) {
                 case 200:
                     toast({
                         title: "OTP verified successfully",
                         variant: "default"
                     })
-                    router.push(`/${local}/dashboard/home`)
-                    break;
-                case 400:
-                    toast({
-                        title: `${res.message}`,
-                        variant: "destructive"
+                    setOtp("")
+                    setIsLoading(false)
+                    session.update((data: Session) => {
+                        return {
+                            ...data,
+                            user: {
+                                ...data.user,
+                                isOtpVerified: true
+                            }
+                        }
                     })
+                    router.push(`/${local}/dashboard/portfolio`)
                     break;
-                case 401:
-                    toast({
-                        title: `${res.message}`,
-                        variant: "destructive"
-                    })
-                    break;
-                case 500:
-                    toast({
-                        title: `${res.message}`,
-                        variant: "destructive"
-                    })
             }
-
+            responseHandler(res)
         } catch (error: any) {
             toast({
                 title: `${error.message}`,
                 variant: "destructive"
             })
         }
+        setIsLoading(false)
     };
 
+    const handlePasskey = async () => {
+        try {
+            let res: {
+                message: string;
+                status: number;
+                challenge?: PublicKeyCredentialRequestOptionsJSON;
+            }
+            res = await verifyPasskey("generateAuthentication")
+            if (res.status === 200) {
+                const authResponse = await startAuthentication(res.challenge)
+                res = await verifyPasskey("verifyAuthentication", { challenge: res.challenge, authResponseJSON: authResponse })
+                if (res.status === 200) {
+                    router.push(`/${local}/dashboard/portfolio`)
+                }
+            }
+            responseHandler(res)
+        } catch (error) {
+            console.log("handlePasskey ===>", error);
+        }
+    }
     return (
         <div>
             <div>
@@ -89,10 +117,11 @@ export const TwoFAForm: React.FC<TwoFAFormProps> = ({ activate2fa }) => {
                             <InputOTPSlot index={5} />
                         </InputOTPGroup>
                     </InputOTP>
-                    <Button disabled={otp.length !== 6} type="submit" className="bg-purple-500 text-white mt-2">
+                    <Button disabled={otp.length !== 6 || isLoading} type="submit" className="bg-purple-500 text-white mt-2">
                         {t("continue_button")}
                     </Button>
                 </form>
+                <p className="mt-5 text-sm font-medium text-slate-500 cursor-pointer" onClick={handlePasskey}>Forgot your 2FA? <span className="text-purple-500 font-bold">Enter your Passkey</span></p>
             </div>
         </div>
     )
