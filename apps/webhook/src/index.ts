@@ -3,6 +3,7 @@ import cors from "cors";
 import { prisma } from "@repo/db/client"
 import { IWebhookPayload } from "./type"
 import { PORT } from "./config"
+import { redisManager } from "@repo/cache/redisManager"
 
 const app = express()
 
@@ -13,7 +14,7 @@ app.use(cors({ origin: ["http://localhost:3001"] }))
 app.post("/api/v1/webhook", async (req, res) => {
     try {
         const payload: IWebhookPayload = req.body;
-        await prisma.$transaction([
+        const result = await prisma.$transaction([
             prisma.balance.update({
                 where: {
                     userId: payload.userId
@@ -36,7 +37,7 @@ app.post("/api/v1/webhook", async (req, res) => {
                 }
             })
         ]);
-
+        redisManager().setCache("getAllOnRampTransactions", result[1])
         res.json({
             message: "Successful"
         })

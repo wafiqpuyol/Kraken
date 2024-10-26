@@ -14,7 +14,7 @@ import { guessCountryByPartialPhoneNumber } from 'react-international-phone';
 import { generateOTP } from "./utils"
 import { sendOTP } from "./mail"
 import { WRONG_PINCODE_ATTEMPTS } from "@repo/ui/constants"
-
+import { redisManager } from "@repo/cache/redisManager"
 
 class SendMoney {
     static instance: Promise<{
@@ -30,7 +30,6 @@ class SendMoney {
     private fee_currency: string | null = null
 
     private constructor(transactionDetail: ITransactionDetail) {
-
         return this.start(transactionDetail)
     }
 
@@ -212,6 +211,7 @@ class SendMoney {
                 }
                 this.currency = (await prisma.preference.findFirst({ where: { userId: this.sender.id } }) as preference)?.currency
                 this.p2pTransfer = await this.createP2PTransfer(transactionDetail, this.currency as string, "Success")
+                await redisManager().setCache("getAllP2PTransactions", this.p2pTransfer)
                 await prisma.wallet.update({ where: { userId: this.sender?.id }, data: { wrongPincodeAttempts: 0 } })
             })
             return { message: "Sending money successful", status: 200, transaction: this.p2pTransfer }
@@ -242,16 +242,14 @@ class SendMoney {
                 return { message: error.message, status: 401 }
             }
             this.p2pTransfer = await this.createP2PTransfer(transactionDetail, this.currency as string, "Failed")
+            await redisManager().setCache("getAllP2PTransactions", this.p2pTransfer)
             await prisma.wallet.update({ where: { userId: this.sender?.id }, data: { wrongPincodeAttempts: 0 } })
             return { message: error.message || "Something went wrong on the bank server", status: 500 }
-
         }
     }
 
     static getInstance(transactionDetail: ITransactionDetail) {
-
         this.instance = new SendMoney(transactionDetail);
-
         return this.instance;
     }
 }
