@@ -1,7 +1,7 @@
 import { AddMoney } from '../molecules/Addmoney'
 import { Balance } from '../molecules/Balance'
 import { WithDrawLimits } from '../molecules/WithdrawLimit'
-import { balance as UserBalance, account, onramptransaction } from "@repo/db/type"
+import { balance as UserBalance } from "@repo/db/type"
 import { addMoneyPayload } from "@repo/forms/addMoneySchema"
 import { preference } from "@repo/db/type"
 

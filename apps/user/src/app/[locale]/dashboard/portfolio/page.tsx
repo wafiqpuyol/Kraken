@@ -4,6 +4,7 @@ import { prisma } from "@repo/db/client";
 import { p2ptransfer } from "@repo/db/type";
 import { authOptions } from "@repo/network";
 import { getServerSession } from "next-auth"
+import { redisManager } from "@repo/cache/redisManager";
 
 type Accumulator = {
     internationalAmount: number
@@ -13,26 +14,35 @@ type Accumulator = {
 
 const Home = async ({ params: { locale } }: { params: { locale: string } }) => {
     await useRedirectToLogin(locale, "/login")
+    let onRamps
+    let p2pTransfers
     const session = await getServerSession(authOptions)
-    const onRamps = await prisma.onramptransaction.findMany({ where: { userId: session?.user?.uid } })
-    const p2pTransfers = await (await prisma.p2ptransfer.findMany({
-        where: { fromUserId: session?.user?.uid },
-        select: {
-            amount: true,
-            currency: true,
-            transactionCategory: true,
-            status: true,
-            transactionID: true,
-            domestic_trxn_fee: true,
-            international_trxn_fee: true,
-            fee_currency: true,
-            receiver_name: true,
-            sender_name: true,
-            timestamp: true,
-        }
-    }))
+    onRamps = await redisManager().getCache("getAllOnRampTransactions")
+    p2pTransfers = await redisManager().getCache("getAllP2PTransactions")
+    if (!p2pTransfers || !onRamps) {
+        onRamps = await prisma.onramptransaction.findMany({ where: { userId: session?.user?.uid } })
+        p2pTransfers = await (await prisma.p2ptransfer.findMany({
+            where: { fromUserId: session?.user?.uid },
+            select: {
+                amount: true,
+                currency: true,
+                transactionCategory: true,
+                status: true,
+                transactionID: true,
+                domestic_trxn_fee: true,
+                international_trxn_fee: true,
+                fee_currency: true,
+                receiver_name: true,
+                sender_name: true,
+                timestamp: true,
+            }
+        }))
+        await redisManager().setCache("getAllOnRampTransactions", onRamps)
+        await redisManager().setCache("getAllP2PTransactions", p2pTransfers)
+    };
+    p2pTransfers = p2pTransfers.
         // @ts-ignore
-        .reduce((acc: Accumulator, init: p2ptransfer) => {
+        reduce((acc: Accumulator, init: p2ptransfer) => {
             if (init.transactionCategory === "International") {
                 acc.push({ internationalAmount: init.amount / 100, domesticAmount: 0, date: init.timestamp, ...init })
             } else {
@@ -40,7 +50,6 @@ const Home = async ({ params: { locale } }: { params: { locale: string } }) => {
             }
             return acc;
         }, [])
-
     return (
         <div><Portfolio onRamps={onRamps} p2pTransfers={p2pTransfers} /></div>
     )

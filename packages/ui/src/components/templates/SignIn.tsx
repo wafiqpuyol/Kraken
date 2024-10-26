@@ -39,6 +39,7 @@ interface LoginProps {
 export const SignInForm: React.FC<LoginProps> = ({ isTwoFAEnabledFunc, activate2fa, verifyPasskey }) => {
     const [isTwoFAFormShow, setIsTwoFAFormShow] = useState(false)
     const [isOTPVerified, setIsOTPVerified] = useState(false)
+    const [isLoading, setIsLoading] = useState(false)
     const locale = useLocale();
     const router = useRouter()
     const { toast } = useToast()
@@ -53,8 +54,10 @@ export const SignInForm: React.FC<LoginProps> = ({ isTwoFAEnabledFunc, activate2
 
     const submit = async (payload: loginPayload) => {
         try {
+            setIsLoading(true)
             signIn("credentials", { ...payload, redirect: false }).then(async (response) => {
                 if (!response?.ok || response.error) {
+                    setIsLoading(false)
                     return toast({
                         title: response?.error || "Email or Password is incorrect",
                         variant: "destructive"
@@ -64,6 +67,7 @@ export const SignInForm: React.FC<LoginProps> = ({ isTwoFAEnabledFunc, activate2
                     title: `Login Successful`,
                     variant: "default"
                 })
+                setIsLoading(false)
                 const twoFA = await isTwoFAEnabledFunc()
 
                 if ((twoFA.isTwoFAEnabled && twoFA.isOTPVerified) || !twoFA.isTwoFAEnabled) {
@@ -74,6 +78,7 @@ export const SignInForm: React.FC<LoginProps> = ({ isTwoFAEnabledFunc, activate2
                 setIsOTPVerified(twoFA.isOTPVerified!)
             })
         } catch (err: any) {
+            setIsLoading(false)
             toast({
                 title: `${err.message}`,
                 variant: "destructive"
@@ -146,7 +151,8 @@ export const SignInForm: React.FC<LoginProps> = ({ isTwoFAEnabledFunc, activate2
                                     )}
                                 />
 
-                                <Button type="submit" className="bg-purple-600 w-full text-white text-lg hover:bg-purple-700">{t("continue_button")}</Button>
+                                <Button type="submit" disabled={isLoading}
+                                    className="bg-purple-600 w-full text-white text-lg hover:bg-purple-700">{t("continue_button")}</Button>
                             </form>
                         </ Form>
 
