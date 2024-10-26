@@ -4,7 +4,7 @@ import { RedisClientType, createClient } from "redis";
 class RedisManager {
     private static redisInstance: RedisManager
     private client: RedisClientType
-    constructor() {
+    private constructor() {
         this.client = createClient()
         this.client
             .on("error", err => console.warn("Redis Client Error, ", err))
@@ -24,7 +24,13 @@ class RedisManager {
             data.push(value)
             await this.client.set(key, JSON.stringify(data))
         } else {
-            await this.client.set(key, JSON.stringify(value))
+            data = data === null ? [] : data
+            if (Array.isArray(value)) {
+                data = [...value]
+            } else {
+                data.push(value)
+            }
+            await this.client.set(key, JSON.stringify(data))
         }
     }
 

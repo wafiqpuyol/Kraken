@@ -8,6 +8,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "@repo/cache": "^1.0.0",
     "@repo/db": "^0.0.0",
     "cors": "^2.8.5",
     "webhook": "file:"
