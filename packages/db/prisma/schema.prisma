@@ -124,20 +124,22 @@ model account {
 }
 
 model wallet {
-  id                       Int       @id @default(autoincrement())
-  userId                   Int       @unique(map: "Wallet_userId_key")
-  pincode                  String?
-  emergency_code           String?
-  emergency_code_expiresAt DateTime?
-  otp                      String?
-  otp_expiresAt            DateTime?
-  otpIssuer                String?
-  otpVerified              Boolean   @default(false)
-  withDrawTwoFASecret      String?
-  withDrawTwoFAActivated   Boolean   @default(false)
-  withDrawOTPVerified      Boolean   @default(false)
-  wrongPincodeAttempts     Int       @default(0)
-  user                     user      @relation(fields: [userId], references: [id], map: "Wallet_userId_fkey")
+  id                                   Int       @id @default(autoincrement())
+  userId                               Int       @unique(map: "Wallet_userId_key")
+  pincode                              String?
+  pincodeResetLimit                    Int       @default(0)
+  pincodeResetLimitDailyLimitExpiresAt DateTime?
+  emergency_code                       String?
+  emergency_code_expiresAt             DateTime?
+  otp                                  String?
+  otp_expiresAt                        DateTime?
+  otpIssuer                            String?
+  otpVerified                          Boolean   @default(false)
+  withDrawTwoFASecret                  String?
+  withDrawTwoFAActivated               Boolean   @default(false)
+  withDrawOTPVerified                  Boolean   @default(false)
+  wrongPincodeAttempts                 Int       @default(0)
+  user                                 user      @relation(fields: [userId], references: [id], map: "Wallet_userId_fkey")
 
   @@index([userId], map: "Wallet_userId_fkey")
 }
