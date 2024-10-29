@@ -1,0 +1,3 @@
+export const WINDOW_SIZE = 600 * 1000
+export const ACCOUNT_LOCK_EXPIRY_TIME = 1200
+export const WALLET_LOCK_EXPIRY_TIME = 1500

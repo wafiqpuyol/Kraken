@@ -14,6 +14,7 @@
     "redis": "^4.7.0"
   },
   "exports": {
-    "./redisManager": "./index.ts"
+    "./redisManager": "./index.ts",
+    "./constant": "./constant.ts"
   }
 }
