@@ -14,3 +14,32 @@ export const generateOTP = () => {
     const otp = Math.floor(Math.random() * 1000000);
     return otp.toString().padStart(6, '0');
 }
+
+export const getNextDayDate = () => {
+    const today = new Date();
+    today.setDate(today.getDate() + 1);
+    const options = { year: 'numeric', month: '2-digit', day: '2-digit' };
+    const formattedDate = today.toLocaleDateString('en-US', options);
+    console.log(formattedDate)
+    return formattedDate
+}
+
+export const hoursLeft = () => {
+    const countdown = (deadline: number) => {
+
+        const now = new Date().getTime();
+        const distance = deadline - now;
+
+        const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+
+        if (distance < 0) {
+            return 'Countdown finished!';
+        } else {
+            return `${hours} hours`;
+        }
+    }
+
+    const deadline = new Date(getNextDayDate()).getTime();
+
+    return countdown(deadline);
+}

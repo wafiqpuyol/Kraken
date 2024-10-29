@@ -7,7 +7,8 @@ import { getServerSession } from "next-auth"
 import { sign } from 'jsonwebtoken';
 import { randomBytes } from "crypto";
 import { sendEmergencyCodeMail } from "./mail"
-
+import { PINCODE_RESET_LIMIT } from "@repo/ui/constants"
+import { getNextDayDate, hoursLeft } from "./utils"
 
 export const generatePincode = async (pincode: string) => {
     try {
@@ -67,6 +68,13 @@ export const sendEmergencyCode = async (email: string) => {
         if (!wallet?.pincode) {
             return { message: "You haven't created any pincode yet", status: 401 }
         }
+        if (wallet && wallet.pincodeResetLimitDailyLimitExpiresAt) {
+            if (new Date(wallet.pincodeResetLimitDailyLimitExpiresAt).getTime() > Date.now()) {
+                return { message: `You have exceeded your daily pincode reset limit. Please try after ${hoursLeft()}`, status: 429 }
+            } else {
+                await prisma.wallet.update({ where: { userId: isUserExist.id }, data: { pincodeResetLimitDailyLimitExpiresAt: null, pincodeResetLimit: 0 } })
+            }
+        }
         const emergencyCode = randomBytes(25).toString("hex");
         await prisma.wallet.update({
             where: { userId: isUserExist.id }, data: {
@@ -99,19 +107,25 @@ export const resetPin = async (emergency_code: string) => {
 
         const wallet = await prisma.wallet.findFirst({ where: { userId: isUserExist.id } }) as wallet
         if (wallet.emergency_code !== emergency_code) {
-            return { message: "Invalid emergency code. Please restart the process", status: 400 }
+            return { message: "Invalid emergency code. Please try again", status: 400 }
         }
         if (wallet.emergency_code_expiresAt! < new Date()) {
             await prisma.wallet.update({ where: { userId: isUserExist.id }, data: { emergency_code: null, emergency_code_expiresAt: null } })
             return { message: "Emergency code has expired", status: 400 }
         }
-
+        if (wallet.pincodeResetLimit === PINCODE_RESET_LIMIT) {
+            await prisma.wallet.update({ where: { userId: isUserExist.id }, data: { pincodeResetLimitDailyLimitExpiresAt: new Date(getNextDayDate()).toISOString() } })
+            return { message: `Maximum PIN reset attempts reached.Try after 24 hours`, status: 429 }
+        }
         await prisma.wallet.update({
             where: { userId: isUserExist.id },
             data: {
                 emergency_code: null,
                 emergency_code_expiresAt: null,
                 pincode: null,
+                pincodeResetLimit: {
+                    increment: 1
+                }
             }
         })
         return { message: "Pincode has been reset successfully. Now you can create a new pincode.", status: 200 }
