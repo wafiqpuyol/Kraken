@@ -9,6 +9,7 @@ import { useEffect, useState } from "react"
 import { useSearchParams, useRouter } from 'next/navigation'
 import { SUPPORTED_LOCALES } from "../lib/constants"
 import { useToast } from "@repo/ui/useToast"
+import { cn } from "@repo/ui/utils"
 
 export default function Component() {
   const [userId, setUserId] = useState<string | null>(null)
@@ -55,53 +56,51 @@ export default function Component() {
       statusCode: number;
       language?: string;
     };
-
     if (userId != null) {
       if (parseInt(userId)) {
         res = await transactionAction(parseInt(userId), params.get("token"))
         const locale = SUPPORTED_LOCALES.find((l) => l.language === res.language)?.code || "/en"
-
+        const withDrawHistoryRoute = `${process.env.NEXT_PUBLIC_FRONTEND_URL}${locale}/dashboard/transactions/withdraw-history`
+        const loginRoute = `${process.env.NEXT_PUBLIC_FRONTEND_URL}${locale}/login`
+        setIsLoading(false)
+        res.statusCode === 200 ? setIsDisable(true) : setIsDisable(false)
         if (res.statusCode === 400) {
-          setIsLoading(false)
-          toast({ title: res.message, variant: "destructive" })
+          generateToast(toast, res)
           return setInputError("Invalid User Id")
         }
 
         if (res.statusCode === 401) {
-          setIsLoading(false)
-          toast({ title: res.message, variant: "destructive" })
-          setTimeout(() => router.push(`${process.env.NEXT_PUBLIC_FRONTEND_URL}${locale}/dashboard/transactions/withdraw-history`), 3500)
+          generateToast(toast, res)
+          setTimeout(() => router.push(withDrawHistoryRoute), 3500)
         }
 
         if (res.statusCode === 403) {
-          setIsLoading(false)
-          toast({ title: res.message, variant: "destructive" })
-          setTimeout(() => router.push(`${process.env.NEXT_PUBLIC_FRONTEND_URL}${locale}/login`), 3500)
+          generateToast(toast, res)
+          setTimeout(() => router.push(loginRoute), 3500)
         }
 
         if (res.statusCode === 498) {
-          toast({ title: res.message, variant: "destructive" })
-          setTimeout(() => router.push(`${process.env.NEXT_PUBLIC_FRONTEND_URL}${locale}/dashboard/transactions/withdraw-history`), 3500)
+          generateToast(toast, res)
+          setTimeout(() => router.push(withDrawHistoryRoute), 3500)
         }
 
         if (res.statusCode === 200) {
           setInputError(false)
           setUserId(null)
-          setIsLoading(false)
-          setIsDisable(true)
-          toast({ title: res.message, variant: "destructive" })
-          setTimeout(() => router.push(`${process.env.NEXT_PUBLIC_FRONTEND_URL}${locale}/dashboard/transactions/withdraw-history`), 3500)
+          generateToast(toast, res)
+          setTimeout(() => router.push(withDrawHistoryRoute), 3500)
         }
 
         if (res.statusCode === 500) {
-          setIsLoading(false)
-          toast({ title: res.message, variant: "destructive" })
+          generateToast(toast, res)
         }
       }
     } else {
+      setIsLoading(false)
       setInputError("Please Enter your User Id")
       return;
     }
+
   }
 
 
@@ -119,7 +118,7 @@ export default function Component() {
                 <div id="parent" className='self-center text-sm font-medium text-gray-500'>expires at:- <span id="childSpan" className='text-red-500'></span> </div>
               </div>
             </div>
-            <Input id="userId" value={userId} className="w-full" onChange={(e) => setUserId(e.target.value)} />
+            <Input id="userId" value={userId!} className="w-full" onChange={(e) => setUserId(e.target.value)} />
             {inputError && <span className="text-red-500"> {inputError} </span>}
             <Link href="#" className="text-sm text-blue-600 hover:underline">
               Forgot Customer ID
@@ -142,8 +141,8 @@ export default function Component() {
           </Card>
         </div>
         <div>
-          <div className="flex justify-end mb-4">
-            <Image src="/placeholder.svg?height=50&width=100" alt="Norton Secured" width={100} height={50} />
+          <div className="flex justify-start ml-11 mb-4 fill-none">
+            <Image src="/bank.webp" alt="Norton Secured" width={100} height={50} />
           </div>
           <p className="text-sm text-gray-800 mb-2">
             Your security is of utmost importance.
@@ -162,4 +161,18 @@ export default function Component() {
       </div>
     </div>
   )
+}
+
+const generateToast = (toast: any, res: {
+  message: string,
+  statusCode: number,
+  language?: string
+}) => {
+
+  return toast({
+    title: res.message,
+    variant: res.statusCode === 200 ? "default" : "destructive",
+    className: cn("text-white rounded-xl", res.statusCode === 200 ? "bg-green-500" : "bg-red-500"),
+    duration: 3000
+  })
 }

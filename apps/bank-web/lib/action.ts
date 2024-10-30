@@ -18,18 +18,10 @@ const webHookCall = async (payload: IWebhookPayload) => {
 
 
 class TransactionAction {
-    static instance: Promise<{
-        message: string;
-        statusCode: number;
-        language: string | undefined;
-    }>
-
+    static instance: TransactionAction
     private onRamp: onramptransaction | null = null
     private user: user | null = null
-    private constructor(userId: number, token: string | null) {
-
-        return this.start(userId, token)
-    }
+    private constructor() { }
 
     async validateOnRampExist(userId: number, token: string) {
         return prisma.onramptransaction.findFirst({
@@ -66,9 +58,7 @@ class TransactionAction {
                 throw new Error("Invalid Token",)
             }
             const isUserExist = await this.validateUser(userId)
-            console.log(isUserExist);
             if (!isUserExist) {
-                console.log("indie --->", isUserExist);
                 throw new Error("Invalid User Id")
             }
             this.user = isUserExist
@@ -95,7 +85,7 @@ class TransactionAction {
                 return { message: error.message, statusCode: 400 }
             }
 
-            await webHookCall({ amount: this.onRamp?.amount || 0, lockedAmount: this.onRamp?.lockedAmount || 0, userId, token, tokenValidation: "Failed" })
+            await webHookCall({ amount: this.onRamp?.amount || 0, lockedAmount: this.onRamp?.lockedAmount || 0, userId, token: token === null ? "" : token, tokenValidation: "Failed" })
 
             switch (error.message) {
                 case "Token has expired. Please go back to your wallet and try again":
@@ -110,16 +100,12 @@ class TransactionAction {
         }
     }
 
-    static getInstance(userId: number, token: string | null) {
-
-        this.instance = new TransactionAction(userId, token);
-
+    static getInstance() {
+        this.instance = new TransactionAction();
         return this.instance;
     }
 }
 
 export const transactionAction = (userId: number, token: string | null) => {
-    const a = TransactionAction.getInstance(userId, token)
-    // console.log("===>", a);
-    return a;
+    return TransactionAction.getInstance().start(userId, token)
 }
