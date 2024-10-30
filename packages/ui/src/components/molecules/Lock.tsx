@@ -3,12 +3,11 @@ import { useTranslations } from "next-intl"
 import { Dispatch, SetStateAction, useEffect, useState } from 'react'
 
 
-
 interface LockProps {
-    lockExpiry?: Date
-    updateLockStatus: () => Promise<void>
+    lockedAccountExpiresAt?: Date | null
+    updateLockStatus?: () => Promise<void>
     setAccountLock: Dispatch<SetStateAction<boolean>>
-    checkAccountLockStatus(): Promise<{
+    checkAccountLockStatus?: () => Promise<{
         message: string;
         status: number;
         isLock?: boolean;
@@ -16,16 +15,16 @@ interface LockProps {
     }>
 }
 
-export const AccountLock: React.FC<LockProps> = ({ updateLockStatus, setAccountLock, checkAccountLockStatus }) => {
+export const AccountLock: React.FC<LockProps> = ({ updateLockStatus, setAccountLock, checkAccountLockStatus, lockedAccountExpiresAt }) => {
     const t = useTranslations("AccountLock")
-    const [lockExpiry, setLockExpiry] = useState<Date | null>(null)
+    const [lockExpiry, setLockExpiry] = useState<Date | null>(lockedAccountExpiresAt ?? null)
 
     useEffect(() => {
         async function func() {
             const timer = (await checkAccountLockStatus()).lockExpiry ?? null
             setLockExpiry(timer)
         }
-        func()
+        if (checkAccountLockStatus) func()
     }, [])
 
     useEffect(() => {
@@ -44,8 +43,9 @@ export const AccountLock: React.FC<LockProps> = ({ updateLockStatus, setAccountL
                         + minutes + "m " + seconds + "s ";
 
                 } else {
-                    updateLockStatus()
+                    if (updateLockStatus) updateLockStatus()
                     setAccountLock(false)
+                    setLockExpiry(null)
                     hours = 0; minutes = 0; seconds = 0
                 }
                 if (distance < 0) {

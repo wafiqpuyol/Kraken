@@ -19,8 +19,8 @@ export const getNextDayDate = () => {
     const today = new Date();
     today.setDate(today.getDate() + 1);
     const options = { year: 'numeric', month: '2-digit', day: '2-digit' };
+    // @ts-ignore
     const formattedDate = today.toLocaleDateString('en-US', options);
-    console.log(formattedDate)
     return formattedDate
 }
 

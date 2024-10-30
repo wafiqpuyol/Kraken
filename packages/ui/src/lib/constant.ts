@@ -340,3 +340,5 @@ export const LOCK_AMOUNT = {
 }
 
 export const WRONG_PINCODE_ATTEMPTS = 3
+export const WRONG_PASSWORD_ATTEMPTS = 3
+export const PINCODE_RESET_LIMIT = 3
