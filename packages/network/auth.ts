@@ -2,12 +2,15 @@ import type { DefaultSession } from 'next-auth'
 import { NextAuthOptions, getServerSession } from 'next-auth'
 import GoogleProvider from 'next-auth/providers/google'
 import CredentialsProvider from 'next-auth/providers/credentials'
-import { MAX_AGE } from "./constants"
+import { MAX_AGE, DEFAULT_AUTH_ERROR_MESSAGE, DEFAULT_AUTH_ERROR_STATUS_CODE } from "./constants"
 import { sign } from 'jsonwebtoken'
 import { loginPayload, LoginSchema } from "@repo/forms/loginSchema"
 import { prisma } from "@repo/db/client"
 import { user } from "@repo/db/type"
 import bcrypt from "bcryptjs";
+import { redisManager } from "@repo/cache/redisManager"
+import { ACCOUNT_LOCK_EXPIRY_TIME } from "@repo/cache/constant"
+import { WRONG_PASSWORD_ATTEMPTS } from "@repo/ui/constants"
 
 declare module 'next-auth' {
     interface Session {
@@ -39,6 +42,23 @@ export const authOptions: NextAuthOptions = {
             },
             // @ts-ignore
             async authorize(credentials: loginPayload) {
+                let errObj = {
+                    message: DEFAULT_AUTH_ERROR_MESSAGE,
+                    status: DEFAULT_AUTH_ERROR_STATUS_CODE,
+                    ok: false,
+                }
+
+                const accountStatus = await redisManager().getCache("accountLocked")
+                if (accountStatus) {
+                    if (accountStatus.failedPasswordAttempt === WRONG_PASSWORD_ATTEMPTS) {
+                        errObj = {
+                            ...errObj,
+                            message: `Your account has been locked for ${ACCOUNT_LOCK_EXPIRY_TIME / 60} minutes. Please try again after 30 minutes`,
+                            status: 403
+                        }
+                        throw new Error(JSON.stringify(errObj))
+                    }
+                }
                 const validatedFields = LoginSchema.safeParse(credentials);
                 if (!validatedFields.success) {
                     throw new Error('Invalid credentials')
@@ -50,12 +70,19 @@ export const authOptions: NextAuthOptions = {
                 }
                 const isPasswordMatch = await bcrypt.compare(password, isUserExist.password);
                 if (!isPasswordMatch) {
-                    throw new Error('Email or Password is incorrect')
+                    errObj = {
+                        ...errObj,
+                        ...(await redisManager().accountLocked("accountLocked"))
+                    }
+                    throw new Error(JSON.stringify(errObj))
                 }
                 const jwtToken = sign(
                     { uid: isUserExist.id, email: isUserExist.email, number: isUserExist.number },
                     process.env.NEXTAUTH_SECRET || 'wafiqsuperSecret',
                 )
+                if (await redisManager().getCache("accountLocked")) {
+                    await redisManager().deleteCache("accountLocked")
+                }
                 return {
                     ...isUserExist,
                     jwtToken,
@@ -70,25 +97,6 @@ export const authOptions: NextAuthOptions = {
         maxAge: MAX_AGE,
     },
     callbacks: {
-        // async signIn({ user, account, }) {
-        //     console.log("ggggggggggggggggggg", user);
-        //     if (account?.provider === 'google') {
-        //         const { id, name, image } = user
-        //         const existingUser = await trpc.auth.user.query({
-        //             uid: id,
-        //         })
-
-        //         if (!existingUser) {
-        //             const user = await trpc.auth.registerWithProvider.mutate({
-        //                 type: AuthProviderType.GOOGLE,
-        //                 uid: id,
-        //                 image: image || '',
-        //                 name: name || '',
-        //             })
-        //         }
-        //     }
-        //     return true
-        // },
         async session({ token, session }) {
             let existUser: user | null = null;
             if (token.email) {
