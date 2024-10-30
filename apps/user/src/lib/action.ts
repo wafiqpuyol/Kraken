@@ -34,11 +34,9 @@ export const getAllOnRampTransactions = async (userId: number) => {
         const res = await prisma.onramptransaction.findMany({ where: { userId: userId } })
         return res.reduce((acc: { perDayTotal: number, perMonthTotal: number }, init: onramptransaction) => {
             if (new Date(init.startTime).getMonth() === new Date(Date.now()).getMonth() && init.status === "Success") {
-                console.log(init)
                 acc.perMonthTotal += (init.amount + init.lockedAmount)
             }
             if (new Date(init.startTime).getDate() === new Date(Date.now()).getDate() && init.status === "Success") {
-                console.log(init)
                 acc.perDayTotal += (init.amount + init.lockedAmount)
             }
             return acc

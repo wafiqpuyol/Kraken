@@ -8,6 +8,7 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@repo/cache": "^1.0.0",
     "@repo/network": "*",
     "@repo/ui": "*",
     "@simplewebauthn/browser": "^9.0.1",
@@ -35,5 +36,8 @@
     "postcss": "^8.4.45",
     "tailwindcss": "^3.4.10",
     "typescript": "^5"
+  },
+  "exports": {
+    "./redis": "./src/app/lib/redis.ts"
   }
 }

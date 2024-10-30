@@ -38,18 +38,18 @@ export const DownloadIcon = (props: any) => {
 }
 
 export const ProfileIcon = () => {
-    return (<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" stroke-linecap="round" stroke-linejoin="round" className="lucide lucide-circle-user"><circle cx="12" cy="12" r="10" /><circle cx="12" cy="10" r="3" /><path d="M7 20.662V19a2 2 0 0 1 2-2h6a2 2 0 0 1 2 2v1.662" /></svg>)
+    return (<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-circle-user"><circle cx="12" cy="12" r="10" /><circle cx="12" cy="10" r="3" /><path d="M7 20.662V19a2 2 0 0 1 2-2h6a2 2 0 0 1 2 2v1.662" /></svg>)
 }
 
 export const Send = () => {
     return (
-        <svg xmlns="http://www.w3.org/2000/svg" width="19" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" stroke-linecap="round" stroke-linejoin="round" className="lucide lucide-send"><path d="M14.536 21.686a.5.5 0 0 0 .937-.024l6.5-19a.496.496 0 0 0-.635-.635l-19 6.5a.5.5 0 0 0-.024.937l7.93 3.18a2 2 0 0 1 1.112 1.11z" /><path d="m21.854 2.147-10.94 10.939" />
+        <svg xmlns="http://www.w3.org/2000/svg" width="19" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-send"><path d="M14.536 21.686a.5.5 0 0 0 .937-.024l6.5-19a.496.496 0 0 0-.635-.635l-19 6.5a.5.5 0 0 0-.024.937l7.93 3.18a2 2 0 0 1 1.112 1.11z" /><path d="m21.854 2.147-10.94 10.939" />
         </svg>
     )
 }
 
 export const Tick = () => (
-    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" stroke-linecap="round" stroke-linejoin="round" className="lucide lucide-check text-purple-700"><path d="M20 6 9 17l-5-5" /></svg>
+    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-check text-purple-700"><path d="M20 6 9 17l-5-5" /></svg>
 )
 
 export const USD = () => (
@@ -69,13 +69,13 @@ export const AUD = () => (
 )
 
 export const Eye = () => (
-    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round" className="lucide lucide-eye"><path d="M2.062 12.348a1 1 0 0 1 0-.696 10.75 10.75 0 0 1 19.876 0 1 1 0 0 1 0 .696 10.75 10.75 0 0 1-19.876 0" />
+    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-eye"><path d="M2.062 12.348a1 1 0 0 1 0-.696 10.75 10.75 0 0 1 19.876 0 1 1 0 0 1 0 .696 10.75 10.75 0 0 1-19.876 0" />
         <circle cx="12" cy="12" r="3" />
     </svg>
 )
 
 export const ClosedEye = () => (
-    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round" className="lucide lucide-eye-off"><path d="M10.733 5.076a10.744 10.744 0 0 1 11.205 6.575 1 1 0 0 1 0 .696 10.747 10.747 0 0 1-1.444 2.49" /><path d="M14.084 14.158a3 3 0 0 1-4.242-4.242" /><path d="M17.479 17.499a10.75 10.75 0 0 1-15.417-5.151 1 1 0 0 1 0-.696 10.75 10.75 0 0 1 4.446-5.143" /><path d="m2 2 20 20" /></svg>
+    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-eye-off"><path d="M10.733 5.076a10.744 10.744 0 0 1 11.205 6.575 1 1 0 0 1 0 .696 10.747 10.747 0 0 1-1.444 2.49" /><path d="M14.084 14.158a3 3 0 0 1-4.242-4.242" /><path d="M17.479 17.499a10.75 10.75 0 0 1-15.417-5.151 1 1 0 0 1 0-.696 10.75 10.75 0 0 1 4.446-5.143" /><path d="m2 2 20 20" /></svg>
 )
 
 export const USDLogo = ({ width, height }: { height?: string, width?: string }) => {
@@ -96,11 +96,11 @@ export const EUROLogo = ({ width, height }: { height?: string, width?: string })
 )
 
 export const INRLogo = ({ width, height }: { height?: string, width?: string }) => (
-    <svg viewBox="0 0 256 256" xmlns="http://www.w3.org/2000/svg" width={width || 30} height={height || 30} className="bg-violet-300 rounded-full p-1"><rect fill="none" height="256" width="256" /><line fill="none" stroke="#000" stroke-linecap="round" stroke-linejoin="round" stroke-width="24" x1="72" x2="200" y1="80" y2="80" /><line fill="none" stroke="#000" stroke-linecap="round" stroke-linejoin="round" stroke-width="24" x1="72" x2="200" y1="40" y2="40" /><path d="M108,40a52,52,0,0,1,0,104H72l88,80" fill="none" stroke="#000" stroke-linecap="round" stroke-linejoin="round" stroke-width="24" /></svg>
+    <svg viewBox="0 0 256 256" xmlns="http://www.w3.org/2000/svg" width={width || 30} height={height || 30} className="bg-violet-300 rounded-full p-1"><rect fill="none" height="256" width="256" /><line fill="none" stroke="#000" strokeLinecap="round" strokeLinejoin="round" strokeWidth="24" x1="72" x2="200" y1="80" y2="80" /><line fill="none" stroke="#000" strokeLinecap="round" strokeLinejoin="round" strokeWidth="24" x1="72" x2="200" y1="40" y2="40" /><path d="M108,40a52,52,0,0,1,0,104H72l88,80" fill="none" stroke="#000" strokeLinecap="round" strokeLinejoin="round" strokeWidth="24" /></svg>
 )
 
 export const BDTLogo = ({ width, height }: { height?: string, width?: string }) => (
-    <svg width={width || 30} height={height || 30} className="icon icon-tabler icon-tabler-currency-taka" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+    <svg width={width || 30} height={height || 30} className="icon icon-tabler icon-tabler-currency-taka" fill="none" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
         <path d="M0 0h24v24H0z" fill="none" stroke="none" />
         <circle cx="16.5" cy="15.5" r="1" /><path d="M7 7a2 2 0 1 1 4 0v9a3 3 0 0 0 6 0v-.5" /><path d="M8 11h6" />
     </svg>
@@ -109,8 +109,8 @@ export const BDTLogo = ({ width, height }: { height?: string, width?: string }) 
 export const Deposit = () => (
     <div className="p-5 bg-purple-200 rounded-full hover:bg-purple-300 transform ease in-out duration-200">
         <svg width="30" height="30" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" className="ms-ds-0 me-ds-0 mt-ds-0 mb-ds-0 stroke-ds-icon w-ds-icon-md h-ds-icon-md text-[#7F00FF]">
-            <path d="M5 20H19" stroke-linecap="round" stroke-linejoin="round" className="fill-transparent stroke-current"></path>
-            <path d="M16.2524 12.5846L13.0023 15.8348C12.4487 16.3884 11.5512 16.3884 10.9976 15.8348L7.74744 12.5846M11.9999 15.5968L11.9999 4.25" stroke-linecap="round" stroke-linejoin="round" className="fill-transparent stroke-current">
+            <path d="M5 20H19" strokeLinecap="round" strokeLinejoin="round" className="fill-transparent stroke-current"></path>
+            <path d="M16.2524 12.5846L13.0023 15.8348C12.4487 16.3884 11.5512 16.3884 10.9976 15.8348L7.74744 12.5846M11.9999 15.5968L11.9999 4.25" strokeLinecap="round" strokeLinejoin="round" className="fill-transparent stroke-current">
             </path></svg>
     </div>
 )
