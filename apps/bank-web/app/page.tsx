@@ -11,7 +11,7 @@ import { SUPPORTED_LOCALES } from "../lib/constants"
 import { useToast } from "@repo/ui/useToast"
 import { cn } from "@repo/ui/utils"
 
-export default function Component() {
+export default function Bank() {
   const [userId, setUserId] = useState<string | null>(null)
   const [isLoading, setIsLoading] = useState<boolean>(false)
   const [isDisable, setIsDisable] = useState<boolean>(false)

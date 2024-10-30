@@ -34,7 +34,6 @@
     "@react-pdf/renderer": "^3.4.4",
     "@repo/forms": "*",
     "@repo/network": "*",
-    "@repo/ui": "file:",
     "@simplewebauthn/browser": "^9.0.1",
     "class-variance-authority": "^0.7.0",
     "clsx": "^2.1.1",

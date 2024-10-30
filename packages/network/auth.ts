@@ -10,7 +10,7 @@ import { user } from "@repo/db/type"
 import bcrypt from "bcryptjs";
 import { redisManager } from "@repo/cache/redisManager"
 import { ACCOUNT_LOCK_EXPIRY_TIME } from "@repo/cache/constant"
-import { WRONG_PASSWORD_ATTEMPTS } from "@repo/ui/constants"
+import { WRONG_PASSWORD_ATTEMPTS } from "./constants"
 
 declare module 'next-auth' {
     interface Session {
@@ -21,7 +21,7 @@ declare module 'next-auth' {
             wallet_currency: string
             preference: any
             country: string
-            total_balance: string
+            total_balance: number
             isWithDrawTwoFAActivated: boolean
             isWithDrawOTPVerified: boolean
         }
@@ -30,10 +30,6 @@ declare module 'next-auth' {
 
 export const authOptions: NextAuthOptions = {
     providers: [
-        GoogleProvider({
-            clientId: process.env.GOOGLE_CLIENT_ID!,
-            clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
-        }),
         CredentialsProvider({
             name: 'Credentials',
             credentials: {
@@ -98,11 +94,11 @@ export const authOptions: NextAuthOptions = {
     },
     callbacks: {
         async session({ token, session }) {
-            let existUser: user | null = null;
+            let existUser: any = null;
             if (token.email) {
                 existUser = await prisma.user.findUnique({
                     where: {
-                        email: token.email
+                        email: token.email!
                     },
                     include: {
                         preference: true,
@@ -132,8 +128,8 @@ export const authOptions: NextAuthOptions = {
                 isTwoFAActive: existUser?.twoFactorActivated,
                 isOtpVerified: existUser?.otpVerified,
                 isVerified: existUser?.isVerified,
-                wallet_currency: existUser?.balance?.currency,
-                total_balance: existUser?.balance.amount,
+                wallet_currency: existUser?.balance?.currency!,
+                total_balance: existUser?.balance?.amount!,
                 isWithDrawTwoFAActivated: existUser.wallet.withDrawTwoFAActivated || false,
                 isWithDrawOTPVerified: existUser.wallet.withDrawOTPVerified || false,
                 preference: {
