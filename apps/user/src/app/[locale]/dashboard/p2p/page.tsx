@@ -5,10 +5,6 @@ import { useRedirectToLogin } from "../../../../hooks/useRedirect"
 import { sendVerificationEmailAction } from "../../../../lib/auth"
 import { generatePincode, sendEmergencyCode, resetPin } from "../../../../lib/wallet"
 import { checkAccountLockStatus, updateLockStatus } from "../../../../lib/account"
-import { getServerSession } from "next-auth"
-import { prisma } from "@repo/db/client"
-import { preference } from "@repo/db/type"
-import { authOptions } from "@repo/network"
 
 
 interface PageProps {
@@ -16,8 +12,6 @@ interface PageProps {
 }
 async function page({ params }: PageProps) {
     await useRedirectToLogin(params.locale, "/login")
-    const session = await getServerSession(authOptions)
-    const getUserPreference = await prisma.preference.findFirst({ where: { userId: session?.user?.uid } }) as preference
     const p2pTransactionHistories = await getAllP2PTransactionHistories()
     const account = await checkAccountLockStatus()
     const isAccountLock = account.isLock ?? false

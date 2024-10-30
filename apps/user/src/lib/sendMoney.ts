@@ -13,7 +13,6 @@ import { ZodError } from "@repo/forms/types"
 import { guessCountryByPartialPhoneNumber } from 'react-international-phone';
 import { generateOTP } from "./utils"
 import { sendOTP } from "./mail"
-import { WRONG_PINCODE_ATTEMPTS } from "@repo/ui/constants"
 import { redisManager } from "@repo/cache/redisManager"
 
 class SendMoney {
@@ -120,9 +119,11 @@ class SendMoney {
             const decodedPincode = verify(wallet.pincode, isUserExist.password)
             const isPincodeValid = decodedPincode === transactionDetail.formData.pincode
             if (!isPincodeValid) {
-                const numberOfAttempts = (await prisma.wallet.update({ where: { userId: isUserExist.id }, data: { wrongPincodeAttempts: { increment: 1 } } })).wrongPincodeAttempts
-                if (numberOfAttempts >= WRONG_PINCODE_ATTEMPTS) {
-                    await prisma.account.update({ where: { userId: isUserExist.id }, data: { isLock: true, lock_expiresAt: new Date(Date.now() + 1000 * 43200) } })
+                const cachedData = await redisManager().accountLocked("walletLock")
+                await prisma.wallet.update({ where: { userId: isUserExist.id }, data: { wrongPincodeAttempts: cachedData.failedAttempt } })
+                if (cachedData.lockExpiresAt) {
+                    await prisma.account.update({ where: { userId: isUserExist.id }, data: { isLock: true, lock_expiresAt: cachedData.lockExpiresAt } })
+                    throw new Error("Your account is locked.")
                 }
                 throw new Error("Wrong pincode. Please enter the correct pincode")
             }
@@ -136,11 +137,10 @@ class SendMoney {
 
             /* ------------------- Check their number is not same -------------------*/
             if (this.sender.number === this.receiver.number) {
-                throw new Error("Cannot send money to yourself. Invalid recipient number")
+                throw new Error("Both receiver & sender can not be same. Invalid recipient number")
             }
 
             /* ------------------- Validate Numbers ------------------- */
-            console.log(transactionDetail.additionalData);
             if (transactionDetail.additionalData.trxn_type === "Domestic") {
                 const recipientCountry = guessCountryByPartialPhoneNumber({ phone: transactionDetail.additionalData.receiver_number }).country?.name
                 if (isUserExist.country !== recipientCountry) {
@@ -149,7 +149,6 @@ class SendMoney {
             }
             if (transactionDetail.additionalData.trxn_type === "International") {
                 const recipientCountry = guessCountryByPartialPhoneNumber({ phone: transactionDetail.additionalData.receiver_number }).country?.name
-                console.log(isRecipientExist.country === recipientCountry);
                 if (isUserExist.country === recipientCountry) {
                     return { message: "Invalid recipient number", status: 400 }
                 }
@@ -175,8 +174,6 @@ class SendMoney {
             }
 
             const deductedAmount = (senderBalance?.amount - senderTotalAmount)
-            console.log(senderBalance?.amount + "----" + senderTotalAmount);
-            console.log("minus ---->", senderBalance?.amount - senderTotalAmount);
 
             if (senderBalance.locked !== 0 && deductedAmount <= senderBalance.locked) {
                 throw new Error("The amount you're trying to send exceeds your locked amount. Please reduce the amount & try again")
@@ -184,6 +181,7 @@ class SendMoney {
             if (deductedAmount < 0) {
                 throw new Error("You're wallet does not have sufficient balance to make this transfer.")
             }
+
             /* ------------------- Create P2P Transfer -------------------*/
             await prisma.$transaction(async (tx) => {
                 await tx.$queryRaw`SELECT * FROM Balance WHERE userId=${isUserExist.id} FOR UPDATE`;
@@ -207,12 +205,15 @@ class SendMoney {
                     }
                 })
                 if (transactionDetail.additionalData.trxn_type === "International") {
-                    await prisma.preference.update({ where: { userId: this.sender.id }, data: { currency: transactionDetail.additionalData.international_trxn_currency } })
+                    await prisma.preference.update({ where: { userId: this?.sender?.id }, data: { currency: transactionDetail.additionalData.international_trxn_currency } })
                 }
-                this.currency = (await prisma.preference.findFirst({ where: { userId: this.sender.id } }) as preference)?.currency
+                this.currency = (await prisma.preference.findFirst({ where: { userId: this?.sender?.id } }) as preference)?.currency
                 this.p2pTransfer = await this.createP2PTransfer(transactionDetail, this.currency as string, "Success")
                 await redisManager().setCache("getAllP2PTransactions", this.p2pTransfer)
                 await prisma.wallet.update({ where: { userId: this.sender?.id }, data: { wrongPincodeAttempts: 0 } })
+                if (await redisManager().getCache("walletLock")) {
+                    await redisManager().deleteCache("walletLock")
+                }
             })
             return { message: "Sending money successful", status: 200, transaction: this.p2pTransfer }
 
@@ -310,7 +311,6 @@ export const sendOTPAction = async (email: string): Promise<{
     message: string;
     status: number;
 }> => {
-    console.log(email);
     try {
         const session = await getServerSession(authOptions)
         if (!session?.user?.uid) {
