@@ -84,6 +84,7 @@ model user {
   resetpassword                            resetpassword[]
   wallet                                   wallet?
   masterkey                                masterkey?
+  notification                             notification[]
 }
 
 model resetpassword {
@@ -156,6 +157,18 @@ model masterkey {
   transports       Json?
 
   @@index([userId], map: "MasterKey_userId_fkey")
+}
+
+model notification {
+  id        Int      @id @default(autoincrement())
+  userId    Int
+  message   Json?
+  read      Boolean  @default(false)
+  opt_in    Boolean  @default(false)
+  createdAt DateTime @default(now())
+  user      user     @relation(fields: [userId], references: [id], map: "Notification_userId_fkey")
+
+  @@index([userId], map: "Notification_userId_fkey")
 }
 
 enum onramptransaction_status {

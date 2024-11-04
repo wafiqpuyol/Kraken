@@ -14,13 +14,11 @@ import { guessCountryByPartialPhoneNumber } from 'react-international-phone';
 import { generateOTP } from "./utils"
 import { sendOTP } from "./mail"
 import { redisManager } from "@repo/cache/redisManager"
+import { SignalingManager } from "@repo/web-socket/signalingManager"
+import axios from "axios"
 
 class SendMoney {
-    static instance: Promise<{
-        message: string;
-        status: number;
-        transaction?: p2ptransfer | {}
-    }>
+    static instance: SendMoney
 
     private p2pTransfer: p2ptransfer | [] = []
     private sender: user | null = null
@@ -28,10 +26,12 @@ class SendMoney {
     private currency: string | null = null
     private fee_currency: string | null = null
 
-    private constructor(transactionDetail: ITransactionDetail) {
-        return this.start(transactionDetail)
-    }
+    private constructor() { }
 
+    static getInstance() {
+        this.instance = new SendMoney();
+        return this.instance;
+    }
 
     private async createP2PTransfer(transactionDetail: ITransactionDetail, currency: string, status: $Enums.p2p_transaction_status) {
         return prisma.p2ptransfer.create({
@@ -214,6 +214,25 @@ class SendMoney {
                 if (await redisManager().getCache("walletLock")) {
                     await redisManager().deleteCache("walletLock")
                 }
+
+                // SignalingManager.emit(JSON.stringify(this.p2pTransfer), `${this.receiver?.id}`, "publish")
+                if (this.p2pTransfer.status === "Success") {
+                    const notificationTemplate = {
+                        transactionID: this.p2pTransfer.transactionID,
+                        amount: this.p2pTransfer.amount,
+                        currency: this.p2pTransfer.currency,
+                        sender_number: this.p2pTransfer.sender_number,
+                        sender_name: this.p2pTransfer.sender_name,
+                        timestamp: this.p2pTransfer.timestamp,
+                    }
+                    await prisma.notification.create({
+                        data: {
+                            userId: this.receiver?.id!,
+                            message: JSON.stringify(notificationTemplate),
+                        }
+                    })
+                    await axios.post(`${process.env.NEXT_PUBLIC_PRODUCER_API_URL}/notifications`, { ...notificationTemplate, receiver_id: this.receiver?.id! })
+                }
             })
             return { message: "Sending money successful", status: 200, transaction: this.p2pTransfer }
 
@@ -249,13 +268,9 @@ class SendMoney {
         }
     }
 
-    static getInstance(transactionDetail: ITransactionDetail) {
-        this.instance = new SendMoney(transactionDetail);
-        return this.instance;
-    }
 }
 
-export const sendMoneyAction = async (transactionDetail: ITransactionDetail) => SendMoney.getInstance(transactionDetail)
+export const sendMoneyAction = async (transactionDetail: ITransactionDetail) => SendMoney.getInstance().start(transactionDetail)
 
 export const getAllP2PTransactionHistories = async (): Promise<p2ptransfer[] | []> => {
     try {
