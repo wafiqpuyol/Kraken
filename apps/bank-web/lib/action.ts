@@ -12,8 +12,8 @@ interface IWebhookPayload {
     lockedAmount: number
 }
 
-const webHookCall = async (payload: IWebhookPayload) => {
-    await axios.post(`${process.env.NEXT_PUBLIC_WEEBHOOK_API_URL}/webhook`, payload)
+const moveToQueue = async (payload: IWebhookPayload) => {
+    await axios.post(`${process.env.NEXT_PUBLIC_PRODUCER_API_URL}/deposits`, payload)
 }
 
 
@@ -74,7 +74,7 @@ class TransactionAction {
                 throw new Error("Onramp doesn't exist. You are not authorized. Please login to your wallet account or create one.")
             }
             this.onRamp = isOnRampExist
-            await webHookCall({ amount: isOnRampExist.amount, lockedAmount: isOnRampExist.lockedAmount, userId, token, tokenValidation: "Success", })
+            await moveToQueue({ amount: isOnRampExist.amount, lockedAmount: isOnRampExist.lockedAmount, userId, token, tokenValidation: "Success", })
             return { message: "Onramp Successful", statusCode: 200, language: isUserExist.preference?.language! }
         } catch (error: any) {
             if (error instanceof AxiosError) {
@@ -85,9 +85,11 @@ class TransactionAction {
                 return { message: error.message, statusCode: 400 }
             }
 
-            await webHookCall({ amount: this.onRamp?.amount || 0, lockedAmount: this.onRamp?.lockedAmount || 0, userId, token: token === null ? "" : token, tokenValidation: "Failed" })
+            await moveToQueue({ amount: this.onRamp?.amount || 0, lockedAmount: this.onRamp?.lockedAmount || 0, userId, token: token === null ? "" : token, tokenValidation: "Failed" })
 
             switch (error.message) {
+                case "Token is missing":
+                    return { message: error.message, statusCode: 401 }
                 case "Token has expired. Please go back to your wallet and try again":
                     return { message: error.message, statusCode: 401 }
                 case "Invalid Token":

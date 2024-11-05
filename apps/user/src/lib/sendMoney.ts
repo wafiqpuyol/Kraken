@@ -14,7 +14,6 @@ import { guessCountryByPartialPhoneNumber } from 'react-international-phone';
 import { generateOTP } from "./utils"
 import { sendOTP } from "./mail"
 import { redisManager } from "@repo/cache/redisManager"
-import { SignalingManager } from "@repo/web-socket/signalingManager"
 import axios from "axios"
 
 class SendMoney {
@@ -215,7 +214,6 @@ class SendMoney {
                     await redisManager().deleteCache("walletLock")
                 }
 
-                // SignalingManager.emit(JSON.stringify(this.p2pTransfer), `${this.receiver?.id}`, "publish")
                 if (this.p2pTransfer.status === "Success") {
                     const notificationTemplate = {
                         transactionID: this.p2pTransfer.transactionID,
