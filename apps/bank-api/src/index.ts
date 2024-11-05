@@ -1,39 +1,18 @@
 import express from "express"
 import cors from "cors"
-import type { Request, Response } from "express"
+import 'dotenv/config'
+import apiRoutes from "./routes"
 import { PORT } from "./config"
-import { generateToken, decoode } from "./routes/token"
-const app = express()
-app.use(express.json())
-app.use(cors({
-    origin: ["http://localhost:3000", "http://localhost:3001"],
-}))
+const main = () => {
 
-app.get("/api/v1/health", (req: Request, res: Response) => res.send("Server is running"))
-
-app.post("/api/v1/token", (req: Request, res: Response) => {
-    const uId = req.body.uid;
-    const transactionToken = generateToken(uId)
-    return res.status(200).json({ token: transactionToken })
-})
-
-app.post("/api/v1/verify", (req: Request, res: Response) => {
-    //@ts-ignore
-    try {
-        const result = decoode(req.body.token)
-        return res.json({ token: result })
-
-    } catch (error) {
-        if (error === "jwt expired") {
-            return res.status(401).json({ message: "Token has expired. Please go back to your wallet and try again" });
-        }
-        if (error === "jwt malformed") {
-            return res.status(400).json({ message: error });
-        } else {
-            return res.status(500).json({ message: "Something went wrong while verifying your token" });
-        }
-    }
-})
-app.listen(PORT, () => {
-    console.log(`Listening on port ${PORT}`)
-})
+    const app = express()
+    app.use(cors({
+        origin: [process.env.PRIMARY_APP_URL!, process.env.BANK_WEB_URL!],
+    }))
+    app.use(express.json())
+    app.use("/api", apiRoutes)
+    app.listen(PORT, () => {
+        console.log(`Listening on port ${PORT}`)
+    })
+}
+main()
