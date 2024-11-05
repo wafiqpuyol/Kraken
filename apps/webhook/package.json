@@ -12,7 +12,9 @@
   "dependencies": {
     "@repo/cache": "^1.0.0",
     "@repo/db": "^0.0.0",
-    "cors": "^2.8.5"
+    "cors": "^2.8.5",
+    "kafkajs": "^2.2.4",
+    "webhook": "file:"
   },
   "devDependencies": {
     "@types/cors": "^2.8.17",
