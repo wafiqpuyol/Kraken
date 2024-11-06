@@ -162,7 +162,7 @@ model masterkey {
 
 model notification {
   id        Int      @id @default(autoincrement())
-  userId    Int
+  userId    Int      @unique(map: "Notification_userId_key")
   message   Json?
   read      Boolean  @default(false)
   opt_in    Boolean  @default(false)

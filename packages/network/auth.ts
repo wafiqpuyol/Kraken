@@ -62,7 +62,12 @@ export const authOptions: NextAuthOptions = {
                 const { phone_number, password } = validatedFields.data
                 const isUserExist = await prisma.user.findUnique({ where: { number: phone_number } })
                 if (!isUserExist) {
-                    throw new Error('user not found. Please signup first')
+                    errObj = {
+                        ...errObj,
+                        message: 'User not found. Please signup first',
+                        status: 404
+                    }
+                    throw new Error(JSON.stringify(errObj))
                 }
                 const isPasswordMatch = await bcrypt.compare(password, isUserExist.password);
                 if (!isPasswordMatch) {
@@ -130,8 +135,8 @@ export const authOptions: NextAuthOptions = {
                 isVerified: existUser?.isVerified,
                 wallet_currency: existUser?.balance?.currency!,
                 total_balance: existUser?.balance?.amount!,
-                isWithDrawTwoFAActivated: existUser.wallet.withDrawTwoFAActivated || false,
-                isWithDrawOTPVerified: existUser.wallet.withDrawOTPVerified || false,
+                isWithDrawTwoFAActivated: existUser?.wallet?.withDrawTwoFAActivated || false,
+                isWithDrawOTPVerified: existUser?.wallet?.withDrawOTPVerified || false,
                 preference: {
                     language: existUser?.preference?.language,
                     timezone: existUser?.preference?.timezone,

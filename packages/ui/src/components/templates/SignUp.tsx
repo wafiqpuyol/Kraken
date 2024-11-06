@@ -14,6 +14,7 @@ import 'react-international-phone/style.css';
 import { useTranslations } from 'next-intl';
 import { useLocale } from 'next-intl';
 import { Eye, ClosedEye } from "../../icons"
+import { responseHandler } from "../../lib/utils"
 
 interface SignUpFormProps {
     signUpAction: (arg: signUpPayload, countryName: string) => Promise<{
@@ -43,39 +44,20 @@ export const SignUpForm: React.FC<SignUpFormProps> = ({ signUpAction }) => {
                 case 201:
                     toast({
                         title: res.message,
-                        variant: "default"
+                        variant: "default",
+                        className: "bg-green-500 text-white rounded-xl",
+                        duration: 3000
                     })
                     router.push(`/${locale}/login`);
                     break;
-
-                case 409:
-                    toast({
-                        title: res.message,
-                        variant: "destructive"
-                    })
-                    break;
-
-                case 500:
-                    toast({
-                        title: res.message,
-                        variant: "destructive"
-                    })
-                    break;
-
-                default:
-                    toast({
-                        title: res.message,
-                        variant: "destructive"
-                    })
-                    break;
             }
+            responseHandler(res)
         } catch (err: any) {
             toast({
                 title: `${err.message}`,
                 variant: "destructive"
             })
         }
-
     }
 
     return (

@@ -15,7 +15,6 @@ export const useModal = () => {
 };
 export const ModalProvider = ({ children }: { children: React.ReactNode }) => {
     const [open, setOpen] = useState(false);
-    console.log("form provider ====>", open);
     return (
         <ModalContext.Provider value={{ open, setOpen }}>
             {children}

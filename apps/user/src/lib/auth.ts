@@ -32,10 +32,11 @@ export const signUpAction = async (payload: signUpPayload, countryName: string):
             }
         }
 
-        const isUser = await prisma.user.findUnique({ where: { email: payload.email } })
-        if (isUser) {
-            return { message: "User already exist with this email", status: 409 }
-        }
+        const isUserWithSameEmailExist = await prisma.user.findUnique({ where: { email: payload.email } })
+        if (isUserWithSameEmailExist) return { message: "User already exist with this email", status: 409 }
+        const isUserWithSameNumberExist = await prisma.user.findUnique({ where: { number: payload.phone_number } })
+        if (isUserWithSameNumberExist) return { message: "User already exist with phone number already exist", status: 409 }
+
 
         payload.password = await generateHash(payload.password);
         await prisma.$transaction(async () => {
