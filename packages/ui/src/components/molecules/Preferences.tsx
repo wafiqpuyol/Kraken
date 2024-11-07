@@ -9,6 +9,9 @@ import { useState } from "react"
 import { useTranslations } from 'next-intl';
 import { responseHandler } from "../../lib/utils"
 import { useToast } from "./Toaster/use-toast"
+import { SignallingManager } from "../../lib/utils"
+import { useSession } from "next-auth/react"
+import { Session } from "next-auth"
 
 interface PreferencesProps {
     userDetails: user
@@ -27,6 +30,7 @@ export const Preferences: React.FC<PreferencesProps> = ({ userDetails, userPrefe
         ...userPreference
     })
     const language = preference.language === "U.S. English" ? "US English" : preference.language
+
     return (
         <div className="bg-white p-6 rounded-lg shadow">
             <h2 className="text-2xl font-semibold mb-4">{t("title")}</h2>
@@ -68,23 +72,6 @@ export const Preferences: React.FC<PreferencesProps> = ({ userDetails, userPrefe
                     </SupportedTimezoneDialog>
                 </div>
                 <NotificationToggle updatePreference={updatePreference} notificationStatus={notificationStatus} />
-                {/* Auto log-out
-                <div className="flex justify-between items-center">
-                    <div className="flex space-x-[100px]">
-                        <Label htmlFor="autoLogout" className="mt-2 text-slate-500 w-44">{t("auto_log_out")}</Label>
-                        <Select defaultValue="8">
-                            <SelectTrigger id="autoLogout">
-                                <SelectValue placeholder="Select auto log-out time" />
-                            </SelectTrigger>
-                            <SelectContent className='bg-white text-black'>
-                                <SelectItem className="cursor-pointer" value="8">Default (8 hours)</SelectItem>
-                                <SelectItem className="cursor-pointer" value="4">4 hours</SelectItem>
-                                <SelectItem className="cursor-pointer" value="2">2 hours</SelectItem>
-                            </SelectContent>
-                        </Select>
-                    </div>
-                    <Button variant="link" className="text-purple-600">{t("edit")}</Button>
-                </div> */}
             </div>
         </div >
     )
@@ -98,13 +85,36 @@ const NotificationToggle = ({ notificationStatus, updatePreference }: {
 }) => {
     const [toggleNotification, setToggleNotification] = useState<boolean>(notificationStatus)
     const { toast } = useToast()
+    const session = useSession()
 
     const handleClick = async () => {
         try {
             const res = await updatePreference({ notification_status: !toggleNotification });
             switch (res.statusCode) {
                 case 200:
+                    let updatedSessionData: any
                     (() => setToggleNotification(!toggleNotification))()
+                    if (toggleNotification) {
+                        SignallingManager.getInstance().closeConnection()
+                        updatedSessionData = { notification_status: !toggleNotification }
+                    } else {
+                        SignallingManager.getInstance().sendMessage()
+                        updatedSessionData = { notification_status: toggleNotification }
+                    }
+
+                    session.update((data: Session) => {
+                        return {
+                            ...data,
+                            user: {
+                                ...data.user,
+                                preference: {
+                                    ...data.user?.preference,
+                                    ...updatedSessionData
+                                }
+                            }
+                        }
+                    })
+
                     return toast({
                         title: "Notification status updated successfully",
                         variant: "default",

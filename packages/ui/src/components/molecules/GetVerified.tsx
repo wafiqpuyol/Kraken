@@ -4,6 +4,7 @@ import { useToast } from "../molecules/Toaster/use-toast"
 import { useLocale } from 'next-intl';
 import { useRouter } from 'next/navigation'
 import { useSession } from "next-auth/react"
+import { responseHandler } from "../../lib/utils"
 
 interface GetVerifiedProps {
     sendVerificationEmailAction: (locale: string) => Promise<{
@@ -27,17 +28,12 @@ export const GetVerified: React.FC<GetVerifiedProps> = ({ sendVerificationEmailA
             }
             const res = await sendVerificationEmailAction(locale)
             switch (res.status) {
-                case 200:
-                    toast({
-                        title: res.message,
-                        variant: "default"
-                    })
-                    break;
-
                 case 401:
                     toast({
                         title: res.message,
-                        variant: "default"
+                        variant: "default",
+                        className: "bg-green-500 text-white rounded-xl",
+                        duration: 3000
                     })
                     router.push(`/${locale}/login`);
                     break;
@@ -45,25 +41,14 @@ export const GetVerified: React.FC<GetVerifiedProps> = ({ sendVerificationEmailA
                 case 404:
                     toast({
                         title: res.message,
-                        variant: "default"
+                        variant: "default",
+                        className: "bg-green-500 text-white rounded-xl",
+                        duration: 3000
                     })
                     router.push(`/${locale}/login`);
                     break;
-
-                case 500:
-                    toast({
-                        title: res.message,
-                        variant: "destructive"
-                    })
-                    break;
-
-                default:
-                    toast({
-                        title: res.message,
-                        variant: "destructive"
-                    })
-                    break;
             }
+            responseHandler(res)
         } catch (error: any) {
             toast({
                 title: error.message || "Something went wrong",

@@ -5,7 +5,6 @@ import { Card, CardContent } from "../../atoms/Card"
 import { useSession } from "next-auth/react"
 import { TwoFAEnableDialog } from "../../molecules/TwoFAEnableModal"
 import { TwoFADisableDialog } from "../../molecules/TwoFADisableDialog"
-import { useToast } from "../../molecules/Toaster/use-toast"
 import React, { useState } from "react"
 import { useTranslations } from "next-intl"
 import { ChangePasswordDialog } from "../../molecules/ChangePasswordDialog"
@@ -14,6 +13,7 @@ import { Dialog, DialogContent, DialogTrigger } from "../../molecules/Dialog"
 import { MasterKeyDialog } from "../../molecules/MasterKeyDialog"
 import { PublicKeyCredentialCreationOptionsJSON, PublicKeyCredentialRequestOptionsJSON } from "@simplewebauthn/types"
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "../../atoms/ToolTip"
+import { responseHandler } from "../../../lib/utils"
 
 interface SecurityTabProps {
     isTwoFaEnabled: boolean
@@ -56,30 +56,20 @@ interface SecurityTabProps {
 export const SecurityTab: React.FC<SecurityTabProps> = ({ getTwoFASecret, isTwoFaEnabled, activate2fa, changePasswordAction,
     getWithDrawTwoFASecret, isWithDrawTwoFaEnabled, verifyMasterKeyOTP, isMasterKeyOTPVerified, createMasterKey, verifyPasskey, isMasterKeyActivated, remove2fa }) => {
     const session = useSession()
-    const { toast } = useToast()
     const [code, setCode] = useState("");
     const [twoFAEnabled, setTwoFAEnabled] = useState(isTwoFaEnabled);
     const [withDrawTwoFAEnabled, setWithDrawTwoFAEnabled] = useState(isWithDrawTwoFaEnabled);
     const t = useTranslations("SecurityTab")
 
     const handleSignInTwoFABtn = async () => {
-        const res = await getTwoFASecret()
-        switch (res.status) {
-            case 200:
-                setCode(res.twoFactorSecret as string)
-                break
-            case 401:
-                toast({
-                    title: res.message,
-                    variant: "destructive"
-                })
-                break
-            case 500:
-                toast({
-                    title: res.message,
-                    variant: "destructive"
-                })
-                break
+        if (session.data?.user?.isVerified) {
+            const res = await getTwoFASecret()
+            switch (res.status) {
+                case 200:
+                    setCode(res.twoFactorSecret as string)
+                    break
+            }
+            responseHandler(res)
         }
     }
     const handleWithDrawTwoFABtn = async () => {
@@ -88,19 +78,8 @@ export const SecurityTab: React.FC<SecurityTabProps> = ({ getTwoFASecret, isTwoF
             case 200:
                 setCode(res.withDrawTwoFASecret as string)
                 break
-            case 401:
-                toast({
-                    title: res.message,
-                    variant: "destructive"
-                })
-                break
-            case 500:
-                toast({
-                    title: res.message,
-                    variant: "destructive"
-                })
-                break
         }
+        responseHandler(res)
     }
 
     return (

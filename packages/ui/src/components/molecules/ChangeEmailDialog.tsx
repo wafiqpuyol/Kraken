@@ -14,6 +14,7 @@ import { useEffect, useState } from "react"
 import { signOut } from "next-auth/react"
 import { RedirectingLoader } from "../organisms/RedirectingLoader"
 import { useTranslations } from "next-intl";
+import { responseHandler } from "../../lib/utils"
 
 interface ChangeEmailDialogProps {
     children: React.ReactNode
@@ -44,7 +45,6 @@ export const ChangeEmailDialog: React.FC<ChangeEmailDialogProps> = ({ children, 
         account.email_update ? JSON.parse(account.email_update?.toLocaleString()).email_address : ""
     )
 
-
     useEffect(() => {
         if (isRedirectedToLogin) {
             setTimeout(() => router.push(`/${locale}/login`), 5000)
@@ -59,7 +59,9 @@ export const ChangeEmailDialog: React.FC<ChangeEmailDialogProps> = ({ children, 
                 case 200:
                     toast({
                         title: `${res.message}`,
-                        variant: "destructive"
+                        variant: "default",
+                        className: "bg-green-500 text-white rounded-xl",
+                        duration: 3000
                     })
                     setNewEmail(payload.email)
                     setToggleDialog(true)
@@ -67,7 +69,9 @@ export const ChangeEmailDialog: React.FC<ChangeEmailDialogProps> = ({ children, 
                 case 400:
                     toast({
                         title: `${res.message}`,
-                        variant: "destructive"
+                        variant: "destructive",
+                        className: "bg-red-500 text-white rounded-xl",
+                        duration: 3000
                     })
                     setTimeout(() => router.push(`/${locale}/login`), 4000)
                     break;
@@ -75,26 +79,20 @@ export const ChangeEmailDialog: React.FC<ChangeEmailDialogProps> = ({ children, 
                 case 401:
                     toast({
                         title: `${res.message}`,
-                        variant: "destructive"
+                        variant: "destructive",
+                        className: "bg-red-500 text-white rounded-xl",
+                        duration: 3000
                     })
                     setTimeout(() => router.push(`/${locale}/login`), 4000)
                     break;
-                case 409:
-                    toast({
-                        title: `${res.message}`,
-                        variant: "destructive"
-                    })
-                    break;
-                case 500:
-                    toast({
-                        title: `${res.message}`,
-                        variant: "destructive"
-                    })
             }
+            responseHandler(res)
         } catch (err: any) {
             toast({
                 title: `${err.message}`,
-                variant: "destructive"
+                variant: "destructive",
+                className: "bg-red-500 text-white rounded-xl",
+                duration: 3000
             })
         }
         formEmail.reset()
@@ -107,14 +105,18 @@ export const ChangeEmailDialog: React.FC<ChangeEmailDialogProps> = ({ children, 
                 case 200:
                     toast({
                         title: `${res.message}`,
-                        variant: "destructive"
+                        variant: "default",
+                        className: "bg-green-500 text-white rounded-xl",
+                        duration: 3000
                     })
                     setIsRedirectedToLogin(true)
                     break;
                 case 400:
                     toast({
                         title: `${res.message}`,
-                        variant: "destructive"
+                        variant: "destructive",
+                        className: "bg-red-500 text-white rounded-xl",
+                        duration: 3000
                     })
                     setTimeout(() => router.push(`/${locale}/login`), 4000)
                     break;
@@ -122,20 +124,20 @@ export const ChangeEmailDialog: React.FC<ChangeEmailDialogProps> = ({ children, 
                 case 401:
                     toast({
                         title: `${res.message}`,
-                        variant: "destructive"
+                        variant: "destructive",
+                        className: "bg-red-500 text-white rounded-xl",
+                        duration: 3000
                     })
                     setTimeout(() => router.push(`/${locale}/login`), 4000)
                     break;
-                case 500:
-                    toast({
-                        title: `${res.message}`,
-                        variant: "destructive"
-                    })
             }
+            responseHandler(res)
         } catch (error: any) {
             toast({
                 title: `${error.message}`,
-                variant: "destructive"
+                variant: "destructive",
+                className: "bg-red-500 text-white rounded-xl",
+                duration: 3000
             })
         }
         formConfirmMail.reset()
@@ -148,7 +150,9 @@ export const ChangeEmailDialog: React.FC<ChangeEmailDialogProps> = ({ children, 
                 case 200:
                     toast({
                         title: `${res.message}`,
-                        variant: "destructive"
+                        variant: "default",
+                        className: "bg-green-500 text-white rounded-xl",
+                        duration: 3000
                     })
                     window.location.reload()
                     formConfirmMail.reset()
@@ -156,21 +160,21 @@ export const ChangeEmailDialog: React.FC<ChangeEmailDialogProps> = ({ children, 
                 case 401:
                     toast({
                         title: `${res.message}`,
-                        variant: "destructive"
+                        variant: "destructive",
+                        className: "bg-red-500 text-white rounded-xl",
+                        duration: 3000
                     })
                     setTimeout(() => router.push(`/${locale}/login`), 4000)
                     break;
-                case 500:
-                    toast({
-                        title: `${res.message}`,
-                        variant: "destructive"
-                    })
             }
+            responseHandler(res)
         } catch (error: any) {
             console.log(error);
             toast({
                 title: `${error.message}`,
-                variant: "destructive"
+                variant: "destructive",
+                className: "bg-red-500 text-white rounded-xl",
+                duration: 3000
             })
         }
         formConfirmMail.reset()
