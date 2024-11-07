@@ -57,7 +57,7 @@ interface Enable2FADialogProps {
     enable2FAPrompt?: boolean
     setEnable2FAPrompt?: Dispatch<SetStateAction<boolean>>
     isWithDraw2FAActive?: boolean
-    seIsWithDraw2FAActive?: Dispatch<SetStateAction<boolean>>
+    setIsWithDraw2FAActive?: Dispatch<SetStateAction<boolean>>
 }
 
 interface WithDrawOTPDialogProps {
@@ -86,7 +86,7 @@ export const AddMoney: React.FC<AddMoneyProps> = ({ disable2fa, addMoneyAction, 
     const [isBtnDisable, setIsBtnDisable] = useState(false)
     const [isLockInputDisable, setIsLockInputDisable] = useState(true)
     const [enable2FAPrompt, setEnable2FAPrompt] = useState(false)
-    const [isWithDraw2FAActive, seIsWithDraw2FAActive] = useState(false)
+    const [isWithDraw2FAActive, setIsWithDraw2FAActive] = useState(false)
     const [enableWithDraw2FAOTP, setEnableWithDraw2FAOTP] = useState(false)
     const [payloadData, setPayloadData] = useState<addMoneyPayload | null>(null)
 
@@ -175,7 +175,7 @@ export const AddMoney: React.FC<AddMoneyProps> = ({ disable2fa, addMoneyAction, 
         }
 
         if (!session.data.user.isWithDrawTwoFAActivated) {
-            seIsWithDraw2FAActive(true)
+            setIsWithDraw2FAActive(true)
             return
         }
 
@@ -325,7 +325,7 @@ export const AddMoney: React.FC<AddMoneyProps> = ({ disable2fa, addMoneyAction, 
                                         {
                                             isWithDraw2FAActive
                                             &&
-                                            <Enable2FADialog isWithDraw2FAActive={isWithDraw2FAActive} seIsWithDraw2FAActive={seIsWithDraw2FAActive}
+                                            <Enable2FADialog isWithDraw2FAActive={isWithDraw2FAActive} setIsWithDraw2FAActive={setIsWithDraw2FAActive}
                                                 title={t("title2")} twoFaType="WithDraw">
                                             </Enable2FADialog>
                                         }
@@ -366,17 +366,17 @@ export const AddMoney: React.FC<AddMoneyProps> = ({ disable2fa, addMoneyAction, 
     )
 }
 
-const Enable2FADialog: React.FC<Enable2FADialogProps> = ({ isWithDraw2FAActive, title, twoFaType, setEnable2FAPrompt, enable2FAPrompt, seIsWithDraw2FAActive }) => {
+const Enable2FADialog: React.FC<Enable2FADialogProps> = ({ isWithDraw2FAActive, title, twoFaType, setEnable2FAPrompt, enable2FAPrompt, setIsWithDraw2FAActive }) => {
     const t = useTranslations("Enable2FADialog")
     return (
         <Dialog open={twoFaType === "WithDraw" ? isWithDraw2FAActive : enable2FAPrompt}
-            onOpenChange={() => twoFaType === "WithDraw" ? seIsWithDraw2FAActive!(false) : setEnable2FAPrompt!(false)}>
+            onOpenChange={() => twoFaType === "WithDraw" ? setIsWithDraw2FAActive!(false) : setEnable2FAPrompt!(false)}>
             <DialogContent className="sm:max-w-[440px] bg-white p-8" onInteractOutside={(e) => {
                 e.preventDefault();
             }}>
                 <p className="my-4 font-semibold text-lg">{title}</p>
                 <span className="px-2 text-sm font-medium text-slate-500 leading-[1.8rem]">{t("desc1")} &gt; {t("select")} <span className="font-bold py-[2px] border-black/40 px-[5px] rounded-lg border-[1px] mr-2">{t("security")}</span>{t("desc2")} &gt; {t("click_on")} {" "}
-                    <span className="font-bold py-[2px] border-black/40 px-[5px] rounded-lg border-[1px] mr-2">{twoFaType === "SignIn" ? t("authenticator_app") : t("security")}</span>
+                    <span className="font-bold py-[2px] border-black/40 px-[5px] rounded-lg border-[1px] mr-2">{twoFaType === "SignIn" ? t("authenticator_app") : t("withDraw_2FA")}</span>
                     {t("desc3")}.</span>
             </DialogContent>
         </Dialog>

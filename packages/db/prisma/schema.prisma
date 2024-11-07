@@ -30,8 +30,8 @@ model onramptransaction {
   provider     String
   amount       Int
   startTime    DateTime
-  lockedAmount Int
   userId       Int
+  lockedAmount Int
   user         user                     @relation(fields: [userId], references: [id], map: "OnRampTransaction_userId_fkey")
 
   @@index([userId], map: "OnRampTransaction_userId_fkey")
@@ -39,22 +39,22 @@ model onramptransaction {
 
 model p2ptransfer {
   id                                Int                    @id @default(autoincrement())
-  transactionID                     String
-  currency                          String
-  fee_currency                      String
   amount                            Int
   timestamp                         DateTime
   fromUserId                        Int
   toUserId                          Int
+  transactionType                   transaction_type
+  transactionID                     String
+  currency                          String
+  transactionCategory               transaction_category
   domestic_trxn_fee                 String?
   international_trxn_fee            String?
-  sender_number                     String
-  receiver_number                   String
-  sender_name                       String
-  receiver_name                     String
-  transactionType                   transaction_type
-  transactionCategory               transaction_category
   status                            p2p_transaction_status
+  receiver_number                   String
+  sender_number                     String
+  receiver_name                     String
+  sender_name                       String
+  fee_currency                      String
   user_p2ptransfer_fromUserIdTouser user                   @relation("p2ptransfer_fromUserIdTouser", fields: [fromUserId], references: [id], map: "P2pTransfer_fromUserId_fkey")
   user_p2ptransfer_toUserIdTouser   user                   @relation("p2ptransfer_toUserIdTouser", fields: [toUserId], references: [id], map: "P2pTransfer_toUserId_fkey")
 
@@ -75,16 +75,16 @@ model user {
   isVerified                               Boolean             @default(false)
   verificationToken                        String              @default("")
   verificationTokenExpiresAt               DateTime?
+  account                                  account?
   balance                                  balance?
+  masterkey                                masterkey?
+  notification                             notification[]
   onramptransaction                        onramptransaction[]
   p2ptransfer_p2ptransfer_fromUserIdTouser p2ptransfer[]       @relation("p2ptransfer_fromUserIdTouser")
   p2ptransfer_p2ptransfer_toUserIdTouser   p2ptransfer[]       @relation("p2ptransfer_toUserIdTouser")
   preference                               preference?
-  account                                  account?
   resetpassword                            resetpassword[]
   wallet                                   wallet?
-  masterkey                                masterkey?
-  notification                             notification[]
 }
 
 model resetpassword {
@@ -112,13 +112,13 @@ model preference {
 model account {
   id                   Int       @id @default(autoincrement())
   userId               Int       @unique(map: "Account_userId_key")
-  current_email        String
-  isLock               Boolean   @default(false)
-  lock_expiresAt       DateTime?
   email_update_pending Boolean   @default(false)
   email_update         Json
   authorization_code   String?
   confirmation_code    String?
+  current_email        String
+  isLock               Boolean   @default(false)
+  lock_expiresAt       DateTime?
   dailyLimitExceed     Boolean   @default(false)
   user                 user      @relation(fields: [userId], references: [id], map: "Account_userId_fkey")
 
@@ -129,18 +129,18 @@ model wallet {
   id                                   Int       @id @default(autoincrement())
   userId                               Int       @unique(map: "Wallet_userId_key")
   pincode                              String?
-  pincodeResetLimit                    Int       @default(0)
-  pincodeResetLimitDailyLimitExpiresAt DateTime?
   emergency_code                       String?
   emergency_code_expiresAt             DateTime?
   otp                                  String?
-  otp_expiresAt                        DateTime?
   otpIssuer                            String?
   otpVerified                          Boolean   @default(false)
-  withDrawTwoFASecret                  String?
-  withDrawTwoFAActivated               Boolean   @default(false)
+  otp_expiresAt                        DateTime?
   withDrawOTPVerified                  Boolean   @default(false)
+  withDrawTwoFAActivated               Boolean   @default(false)
+  withDrawTwoFASecret                  String?
   wrongPincodeAttempts                 Int       @default(0)
+  pincodeResetLimit                    Int       @default(0)
+  pincodeResetLimitDailyLimitExpiresAt DateTime?
   user                                 user      @relation(fields: [userId], references: [id], map: "Wallet_userId_fkey")
 
   @@index([userId], map: "Wallet_userId_fkey")
@@ -149,20 +149,20 @@ model wallet {
 model masterkey {
   id               Int     @id @default(autoincrement())
   userId           Int     @unique(map: "MasterKey_userId_key")
-  otpVerified      Boolean @default(false)
-  user             user    @relation(fields: [userId], references: [id], map: "MasterKey_userId_fkey")
-  passKeyActivated Boolean @default(false)
   passkeys         Json?
+  transports       Json?
+  otpVerified      Boolean @default(false)
+  passKeyActivated Boolean @default(false)
   passKeyID        Json?
   passkeyVerified  Boolean @default(false)
-  transports       Json?
+  user             user    @relation(fields: [userId], references: [id], map: "MasterKey_userId_fkey")
 
   @@index([userId], map: "MasterKey_userId_fkey")
 }
 
 model notification {
   id        Int      @id @default(autoincrement())
-  userId    Int      @unique(map: "Notification_userId_key")
+  userId    Int
   message   Json?
   read      Boolean  @default(false)
   opt_in    Boolean  @default(false)

@@ -122,7 +122,7 @@ export const MasterKeyDialog: React.FC<MasterKeyDialogProps> = ({ children, veri
                         </div>
                         :
                         <div>
-                            <div>
+                            <div className='flex flex-col items-center'>
                                 <Image src="/authenticator-app.light.png" alt="authenticator app" width={250} height={250} className="ml-11" />
                             </div>
                             <div className="flex flex-col items-center">
@@ -133,7 +133,7 @@ export const MasterKeyDialog: React.FC<MasterKeyDialogProps> = ({ children, veri
                                             {t("authenticator_app_text")}
                                         </p>
 
-                                    </div>505997
+                                    </div>
                                     <p className="text-sm font-medium text-slate-500">
                                         {t("enter_2fa_code")}
                                     </p>

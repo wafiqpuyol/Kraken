@@ -15,6 +15,7 @@ import { useSession } from "next-auth/react"
 import { Session } from "next-auth"
 import { useTranslations } from "next-intl"
 import { responseHandler } from "../../lib/utils"
+import { MdEmail } from "react-icons/md";
 
 export interface TwoFADialogProps {
     children: ReactNode
@@ -88,40 +89,50 @@ export const TwoFAEnableDialog: React.FC<TwoFADialogProps> = ({ children, code, 
                 <DialogHeader>
                     <DialogTitle>{t("header")}</DialogTitle>
                 </DialogHeader>
+
                 <div className="py-4">
+                    {session.data && session.data.user?.isVerified
+                        ?
+                        <>
+                            <div className="flex flex-col items-center p-5 gap-y-2">
+                                <QRCodeSVG value={code} />
+                                <ol className="text-xs text-slate-600 py-2 px-4"> <ol />
+                                    <li>{t("instruction_1")}</li>
+                                    <li>{t("instruction_2")}</li>
+                                    <li>{t("instruction_3")}</li>
+                                </ol>
+                            </div>
 
-                    <div className="flex flex-col items-center p-5 gap-y-2">
-                        <QRCodeSVG value={code} />
-                        <ol className="text-xs text-slate-600 py-2 px-4"> <ol />
-                            <li>{t("instruction_1")}</li>
-                            <li>{t("instruction_2")}</li>
-                            <li>{t("instruction_3")}</li>
-                        </ol>
-                    </div>
-
-                    <div className="flex flex-col items-center">
-                        <form onSubmit={handleOTPSubmit} className="flex flex-col gap-2">
-                            <p className="text-sm font-medium text-slate-500">
-                                {t("title")}
-                            </p>
-                            <InputOTP maxLength={6} value={otp} onChange={setOtp} className="border-purple-500">
-                                <InputOTPGroup>
-                                    <InputOTPSlot index={0} />
-                                    <InputOTPSlot index={1} />
-                                    <InputOTPSlot index={2} />
-                                </InputOTPGroup>
-                                <InputOTPSeparator />
-                                <InputOTPGroup>
-                                    <InputOTPSlot index={3} />
-                                    <InputOTPSlot index={4} />
-                                    <InputOTPSlot index={5} />
-                                </InputOTPGroup>
-                            </InputOTP>
-                            <Button disabled={otp.length !== 6 || isLoading} type="submit" className="bg-purple-500 text-white mt-2">
-                                {t("continue")}
-                            </Button>
-                        </form>
-                    </div>
+                            <div className="flex flex-col items-center">
+                                <form onSubmit={handleOTPSubmit} className="flex flex-col gap-2">
+                                    <p className="text-sm font-medium text-slate-500">
+                                        {t("title")}
+                                    </p>
+                                    <InputOTP maxLength={6} value={otp} onChange={setOtp} className="border-purple-500">
+                                        <InputOTPGroup>
+                                            <InputOTPSlot index={0} />
+                                            <InputOTPSlot index={1} />
+                                            <InputOTPSlot index={2} />
+                                        </InputOTPGroup>
+                                        <InputOTPSeparator />
+                                        <InputOTPGroup>
+                                            <InputOTPSlot index={3} />
+                                            <InputOTPSlot index={4} />
+                                            <InputOTPSlot index={5} />
+                                        </InputOTPGroup>
+                                    </InputOTP>
+                                    <Button disabled={otp.length !== 6 || isLoading} type="submit" className="bg-purple-500 text-white mt-2">
+                                        {t("continue")}
+                                    </Button>
+                                </form>
+                            </div>
+                        </>
+                        :
+                        <div className="text-center font-medium text-slate-800 flex flex-col items-center gap-y-1">
+                            <div><MdEmail size={50} /></div>
+                            <p>Please verify your email first to enable 2FA.</p>
+                        </div>
+                    }
                 </div>
             </DialogContent>
         </Dialog>
