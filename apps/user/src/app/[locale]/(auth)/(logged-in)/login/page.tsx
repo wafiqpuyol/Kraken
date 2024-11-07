@@ -5,11 +5,14 @@ import { useRedirect } from '../../../../../hooks/useRedirect'
 import { verifyPasskey } from "../../../../../lib/masterkey"
 import { redisManager } from "@repo/cache/redisManager"
 import { WRONG_PASSWORD_ATTEMPTS } from "@repo/ui/constants"
+import { cookies } from 'next/headers'
 
 const page = async ({ params: { locale } }: { params: { locale: string } }) => {
     await useRedirect(locale, "/dashboard/portfolio");
 
-    const totalPasswordFailedAttempts = (await redisManager().getCache("accountLocked"));
+    const cookieStore = await cookies()
+    const csrfToken = cookieStore.get('next-auth.csrf-token')?.value
+    const totalPasswordFailedAttempts = (await redisManager().getCache(`${csrfToken}_accountLocked`));
     const isAccountLocked = totalPasswordFailedAttempts?.failedAttempt ? Number(totalPasswordFailedAttempts.failedAttempt) === WRONG_PASSWORD_ATTEMPTS : false
     const lockedAccountExpiresAt = totalPasswordFailedAttempts?.lockExpiresAt ?? null
 

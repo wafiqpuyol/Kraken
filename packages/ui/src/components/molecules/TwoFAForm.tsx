@@ -68,6 +68,15 @@ export const TwoFAForm: React.FC<TwoFAFormProps> = ({ activate2fa, verifyPasskey
     };
 
     const handlePasskey = async () => {
+        if (session.data && !session.data.user?.isMasterKeyActivated) {
+            toast({
+                title: "Passkey is not activated. Please activate your master key first",
+                variant: "destructive",
+                className: "bg-red-500 text-white rounded-xl",
+                duration: 3000
+            })
+            return
+        }
         try {
             let res: {
                 message: string;
@@ -79,6 +88,15 @@ export const TwoFAForm: React.FC<TwoFAFormProps> = ({ activate2fa, verifyPasskey
                 const authResponse = await startAuthentication(res.challenge)
                 res = await verifyPasskey("verifyAuthentication", { challenge: res.challenge, authResponseJSON: authResponse })
                 if (res.status === 200) {
+                    session.update((data: Session) => {
+                        return {
+                            ...data,
+                            user: {
+                                ...data.user,
+                                isMasterKeyVerified: true
+                            }
+                        }
+                    })
                     router.push(`/${local}/dashboard/portfolio`)
                 }
             }

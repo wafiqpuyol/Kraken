@@ -11,6 +11,7 @@ import bcrypt from "bcryptjs";
 import { redisManager } from "@repo/cache/redisManager"
 import { ACCOUNT_LOCK_EXPIRY_TIME } from "@repo/cache/constant"
 import { WRONG_PASSWORD_ATTEMPTS } from "./constants"
+import { cookies } from 'next/headers'
 
 declare module 'next-auth' {
     interface Session {
@@ -24,6 +25,8 @@ declare module 'next-auth' {
             total_balance: number
             isWithDrawTwoFAActivated: boolean
             isWithDrawOTPVerified: boolean
+            isMasterKeyActivated: boolean
+            isMasterKeyVerified: boolean
         }
     }
 }
@@ -43,8 +46,10 @@ export const authOptions: NextAuthOptions = {
                     status: DEFAULT_AUTH_ERROR_STATUS_CODE,
                     ok: false,
                 }
+                const cookieStore = await cookies()
+                const csrfToken = cookieStore.get('next-auth.csrf-token')?.value
 
-                const accountStatus = await redisManager().getCache("accountLocked")
+                const accountStatus = await redisManager().getCache(`${csrfToken}_accountLocked`)
                 if (accountStatus) {
                     if (accountStatus.failedPasswordAttempt === WRONG_PASSWORD_ATTEMPTS) {
                         errObj = {
@@ -73,7 +78,7 @@ export const authOptions: NextAuthOptions = {
                 if (!isPasswordMatch) {
                     errObj = {
                         ...errObj,
-                        ...(await redisManager().accountLocked("accountLocked"))
+                        ...(await redisManager().accountLocked(`${csrfToken}_accountLocked`))
                     }
                     throw new Error(JSON.stringify(errObj))
                 }
@@ -81,8 +86,8 @@ export const authOptions: NextAuthOptions = {
                     { uid: isUserExist.id, email: isUserExist.email, number: isUserExist.number },
                     process.env.NEXTAUTH_SECRET || 'wafiqsuperSecret',
                 )
-                if (await redisManager().getCache("accountLocked")) {
-                    await redisManager().deleteCache("accountLocked")
+                if (await redisManager().getCache(`${csrfToken}_accountLocked`)) {
+                    await redisManager().deleteCache(`${csrfToken}_accountLocked`)
                 }
                 return {
                     ...isUserExist,
@@ -118,6 +123,12 @@ export const authOptions: NextAuthOptions = {
                                 withDrawOTPVerified: true,
                                 withDrawTwoFAActivated: true
                             }
+                        },
+                        masterkey: {
+                            select: {
+                                passKeyActivated: true,
+                                passkeyVerified: true
+                            }
                         }
                     }
                 })
@@ -137,6 +148,8 @@ export const authOptions: NextAuthOptions = {
                 total_balance: existUser?.balance?.amount!,
                 isWithDrawTwoFAActivated: existUser?.wallet?.withDrawTwoFAActivated || false,
                 isWithDrawOTPVerified: existUser?.wallet?.withDrawOTPVerified || false,
+                isMasterKeyActivated: existUser?.masterkey?.passKeyActivated || false,
+                isMasterKeyVerified: existUser?.masterkey?.passkeyVerified || false,
                 preference: {
                     notification_status: existUser?.preference.notification_status,
                     language: existUser?.preference?.language,
