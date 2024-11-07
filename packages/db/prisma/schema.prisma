@@ -165,7 +165,6 @@ model notification {
   userId    Int
   message   Json?
   read      Boolean  @default(false)
-  opt_in    Boolean  @default(false)
   createdAt DateTime @default(now())
   user      user     @relation(fields: [userId], references: [id], map: "Notification_userId_fkey")
 

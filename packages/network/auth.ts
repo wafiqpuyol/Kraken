@@ -138,9 +138,10 @@ export const authOptions: NextAuthOptions = {
                 isWithDrawTwoFAActivated: existUser?.wallet?.withDrawTwoFAActivated || false,
                 isWithDrawOTPVerified: existUser?.wallet?.withDrawOTPVerified || false,
                 preference: {
+                    notification_status: existUser?.preference.notification_status,
                     language: existUser?.preference?.language,
                     timezone: existUser?.preference?.timezone,
-                    selected_currency: existUser?.preference?.currency
+                    selected_currency: existUser?.preference?.currency,
                 }
             }
             return session

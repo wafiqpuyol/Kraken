@@ -38,6 +38,7 @@ import { Session } from "next-auth"
 import { InputOTP, InputOTPGroup, InputOTPSeparator, InputOTPSlot } from "../atoms/InputOTP"
 import { AccountLock } from "../molecules/Lock"
 import { responseHandler } from "../../lib/utils"
+import { useAppState } from "../molecules/StateProvider"
 
 export interface SendMoneyProps {
     sendMoneyAction: (arg: ITransactionDetail) => Promise<{
@@ -315,7 +316,6 @@ const FinalCard: React.FC<FinalProps> = ({ sendMoneyAction, children, transactio
     const { toast } = useToast()
     const router = useRouter()
 
-
     const handleClick = async () => {
         if (!session?.user) {
             router.push(`/${locale}/login`)
@@ -458,6 +458,7 @@ export const SendMoneyPage: React.FC<SendMoneyProps> = ({ sendMoneyAction, p2pTr
     const [currency, setCurrency] = useState<null | string>(null)
     const [accountLock, setAccountLock] = useState<boolean>(isAccountLock)
     const CurrencyLogo = CURRENCY_LOGO[currency]?.Logo
+    const { userTotalBalance } = useAppState()
 
     const submit = async (payload: sendMoneyPayload) => {
         const recipientCountry = guessCountryByPartialPhoneNumber({ phone: payload.phone_number })?.country?.name
@@ -531,7 +532,7 @@ export const SendMoneyPage: React.FC<SendMoneyProps> = ({ sendMoneyAction, p2pTr
                                 <>
                                     <div className="flex justify-end items-center">
                                         <p className="text-right rounded-lg px-[5px] py-[1px] font-bold bg-purple-600 text-white text-[0.74rem]">
-                                            {t("current_balance")}: <span className="font-bold">{session.data?.user?.total_balance / 100}</span>
+                                            {t("current_balance")}: <span className="font-bold">{userTotalBalance / 100}</span>
                                             <span className="text-[12px] font-extrabold">{CHARGE[walletCurrency].symbol}
                                             </span>
                                         </p>
@@ -619,7 +620,7 @@ export const SendMoneyPage: React.FC<SendMoneyProps> = ({ sendMoneyAction, p2pTr
                                                                                 setAmountError("Amount must be positive & greater then zero")
                                                                             }
                                                                             if (currentCurrency === walletCurrency) {
-                                                                                if (parseFloat(value) > (session.data.user?.total_balance / 100)) {
+                                                                                if (parseFloat(value) > (userTotalBalance / 100)) {
                                                                                     setAmountError("Amount cannot be greater than current balance")
                                                                                 }
                                                                             }

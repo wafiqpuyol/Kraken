@@ -24,12 +24,13 @@ interface SettingsTabProps {
         message: string;
         status: number;
     }>
+    notificationStatus: boolean
 }
-export const SettingsTab: React.FC<SettingsTabProps> = ({ userDetails, userPreference, updatePreference, account, changeEmailAction, updateEmail, cancelConfirmMail }) => {
+export const SettingsTab: React.FC<SettingsTabProps> = ({ userDetails, userPreference, updatePreference, account, changeEmailAction, updateEmail, cancelConfirmMail, notificationStatus }) => {
     return (
         <div className="space-y-6">
             <PersonalInfo userDetails={userDetails} account={account} changeEmailAction={changeEmailAction} updateEmail={updateEmail} cancelConfirmMail={cancelConfirmMail} />
-            <Preferences userDetails={userDetails} userPreference={userPreference} updatePreference={updatePreference} />
+            <Preferences userDetails={userDetails} userPreference={userPreference} updatePreference={updatePreference} notificationStatus={notificationStatus} />
         </div>
     )
 }

@@ -1,5 +1,4 @@
 "use client"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../atoms/Select"
 import { Button } from "../atoms/Button"
 import { Label } from "../atoms/Label"
 import { user, preference } from "@repo/db/type"
@@ -8,6 +7,8 @@ import { SupportedCurrencyDialog } from "./SupportedCurrencyDialog"
 import { SupportedTimezoneDialog } from "./SupportedTimezone"
 import { useState } from "react"
 import { useTranslations } from 'next-intl';
+import { responseHandler } from "../../lib/utils"
+import { useToast } from "./Toaster/use-toast"
 
 interface PreferencesProps {
     userDetails: user
@@ -16,10 +17,11 @@ interface PreferencesProps {
         message: string;
         statusCode: number;
     }>
+    notificationStatus: boolean
 }
 
 
-export const Preferences: React.FC<PreferencesProps> = ({ userDetails, userPreference, updatePreference }) => {
+export const Preferences: React.FC<PreferencesProps> = ({ userDetails, userPreference, updatePreference, notificationStatus }) => {
     const t = useTranslations("Preferences")
     const [preference, setPreference] = useState<Omit<preference, "id" | "userId">>({
         ...userPreference
@@ -65,7 +67,8 @@ export const Preferences: React.FC<PreferencesProps> = ({ userDetails, userPrefe
                         <Button variant="link" className="text-purple-600">{t("edit")}</Button>
                     </SupportedTimezoneDialog>
                 </div>
-                {/* Auto log-out */}
+                <NotificationToggle updatePreference={updatePreference} notificationStatus={notificationStatus} />
+                {/* Auto log-out
                 <div className="flex justify-between items-center">
                     <div className="flex space-x-[100px]">
                         <Label htmlFor="autoLogout" className="mt-2 text-slate-500 w-44">{t("auto_log_out")}</Label>
@@ -81,8 +84,54 @@ export const Preferences: React.FC<PreferencesProps> = ({ userDetails, userPrefe
                         </Select>
                     </div>
                     <Button variant="link" className="text-purple-600">{t("edit")}</Button>
-                </div>
+                </div> */}
             </div>
         </div >
+    )
+}
+
+const NotificationToggle = ({ notificationStatus, updatePreference }: {
+    notificationStatus: boolean, updatePreference: (payload: Partial<preference>) => Promise<{
+        message: string;
+        statusCode: number;
+    }>
+}) => {
+    const [toggleNotification, setToggleNotification] = useState<boolean>(notificationStatus)
+    const { toast } = useToast()
+
+    const handleClick = async () => {
+        try {
+            const res = await updatePreference({ notification_status: !toggleNotification });
+            switch (res.statusCode) {
+                case 200:
+                    (() => setToggleNotification(!toggleNotification))()
+                    return toast({
+                        title: "Notification status updated successfully",
+                        variant: "default",
+                        className: "bg-green-500 text-white rounded-xl",
+                        duration: 3000
+                    })
+            }
+            responseHandler(res)
+        } catch (error: any) {
+            toast({
+                title: `${error.message}`,
+                variant: "destructive",
+                className: "bg-red-500 text-white rounded-xl",
+                duration: 3000
+            })
+        }
+    }
+
+    return (
+        <div className="flex justify-between items-start">
+            <div className="flex items-center justify-between space-x-[120px]">
+                <h3 className="text-sm font-medium text-slate-500">Notification</h3>
+                <p className="mt-1 text-sm">Customize your notification preference</p>
+            </div>
+
+            <Button variant="outline" className="text-purple-600 bg-purple-200" onClick={() => handleClick()}>{
+                toggleNotification ? "Disable" : "Enable"}</Button>
+        </div>
     )
 }
