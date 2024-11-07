@@ -118,7 +118,7 @@ class SendMoney {
             const decodedPincode = verify(wallet.pincode, isUserExist.password)
             const isPincodeValid = decodedPincode === transactionDetail.formData.pincode
             if (!isPincodeValid) {
-                const cachedData = await redisManager().accountLocked("walletLock")
+                const cachedData = await redisManager().accountLocked(`${session.user.uid}_walletLock`)
                 await prisma.wallet.update({ where: { userId: isUserExist.id }, data: { wrongPincodeAttempts: cachedData.failedAttempt } })
                 if (cachedData.lockExpiresAt) {
                     await prisma.account.update({ where: { userId: isUserExist.id }, data: { isLock: true, lock_expiresAt: cachedData.lockExpiresAt } })
@@ -210,23 +210,22 @@ class SendMoney {
                 this.p2pTransfer = await this.createP2PTransfer(transactionDetail, this.currency as string, "Success")
                 await redisManager().setCache("getAllP2PTransactions", this.p2pTransfer)
                 await prisma.wallet.update({ where: { userId: this.sender?.id }, data: { wrongPincodeAttempts: 0 } })
-                if (await redisManager().getCache("walletLock")) {
-                    await redisManager().deleteCache("walletLock")
+                if (await redisManager().getCache(`${this.sender?.id}_walletLock`)) {
+                    await redisManager().deleteCache(`${this.sender?.id}_walletLock`)
                 }
 
                 if (this.p2pTransfer.status === "Success") {
-                    const notificationTemplate = {
-                        transactionID: this.p2pTransfer.transactionID,
-                        amount: this.p2pTransfer.amount,
-                        currency: this.p2pTransfer.currency,
-                        sender_number: this.p2pTransfer.sender_number,
-                        sender_name: this.p2pTransfer.sender_name,
-                        timestamp: this.p2pTransfer.timestamp,
-                    }
-                    await prisma.notification.create({
+                    const notificationTemplate = await prisma.notification.create({
                         data: {
                             userId: this.receiver?.id!,
-                            message: JSON.stringify(notificationTemplate),
+                            message: JSON.stringify({
+                                transactionID: this.p2pTransfer.transactionID,
+                                amount: this.p2pTransfer.amount,
+                                currency: this.p2pTransfer.currency,
+                                sender_number: this.p2pTransfer.sender_number,
+                                sender_name: this.p2pTransfer.sender_name,
+                                timestamp: this.p2pTransfer.timestamp,
+                            }),
                         }
                     })
                     await axios.post(`${process.env.NEXT_PUBLIC_PRODUCER_API_URL}/notifications`, { ...notificationTemplate, receiver_id: this.receiver?.id! })
@@ -262,7 +261,7 @@ class SendMoney {
             this.p2pTransfer = await this.createP2PTransfer(transactionDetail, this.currency as string, "Failed")
             await redisManager().setCache("getAllP2PTransactions", this.p2pTransfer)
             await prisma.wallet.update({ where: { userId: this.sender?.id }, data: { wrongPincodeAttempts: 0 } })
-            return { message: error.message || "Something went wrong on the bank server", status: 500 }
+            return { message: error.message || "fuck yoyu Something went wrong on the bank server", status: 500 }
         }
     }
 

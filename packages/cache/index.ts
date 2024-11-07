@@ -40,7 +40,7 @@ class RedisManager {
         return data ? JSON.parse(data) : null
     }
 
-    async accountLocked(key: "accountLocked" | "walletLock") {
+    async accountLocked(key: string) {
         const data: IAccountLock | null = await this.getCache(key)
         if (data) {
             const now = Date.now();
@@ -50,9 +50,9 @@ class RedisManager {
                     if (data.lockExpiresAt === null) {
                         await this.client.set(key, JSON.stringify({
                             ...data, failedAttempt: failedAttemptIncrement,
-                            lockExpiresAt: new Date(Date.now() + 1000 * (key === "accountLocked" ? ACCOUNT_LOCK_EXPIRY_TIME : WALLET_LOCK_EXPIRY_TIME))
+                            lockExpiresAt: new Date(Date.now() + 1000 * (key.includes("accountLocked") ? ACCOUNT_LOCK_EXPIRY_TIME : WALLET_LOCK_EXPIRY_TIME))
                         }))
-                        await this.client.expire(key, (key === "accountLocked" ? ACCOUNT_LOCK_EXPIRY_TIME : WALLET_LOCK_EXPIRY_TIME))
+                        await this.client.expire(key, (key.includes("accountLocked") ? ACCOUNT_LOCK_EXPIRY_TIME : WALLET_LOCK_EXPIRY_TIME))
                     }
                     return this.getCache(key)
                 }

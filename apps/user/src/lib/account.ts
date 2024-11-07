@@ -9,10 +9,6 @@ import { WRONG_PINCODE_ATTEMPTS } from "@repo/ui/constants"
 
 export const checkAccountLockStatus = async (): Promise<{ message: string, status: number, isLock?: boolean, lockExpiry?: Date | null }> => {
     try {
-        const cachedData = await redisManager().getCache("walletLock")
-        if (cachedData) {
-            return { message: "ok", status: 200, isLock: cachedData.failedAttempt === WRONG_PINCODE_ATTEMPTS, lockExpiry: cachedData.lockExpiresAt }
-        }
         const session = await getServerSession(authOptions)
         if (!session?.user?.uid) {
             return { message: "Unauthorized. Please login first", status: 401 }
@@ -20,6 +16,11 @@ export const checkAccountLockStatus = async (): Promise<{ message: string, statu
         const isUserExist = await prisma.user.findFirst({ where: { id: session.user.uid } })
         if (!isUserExist) return { message: "User not found. Please login", status: 401 }
         if (!isUserExist.isVerified) return { message: "Please verify your account.", status: 401 }
+
+        const cachedData = await redisManager().getCache(`${session.user.uid}_walletLock`)
+        if (cachedData) {
+            return { message: "ok", status: 200, isLock: cachedData.failedAttempt === WRONG_PINCODE_ATTEMPTS, lockExpiry: cachedData.lockExpiresAt }
+        }
 
         const account = await prisma.account.findFirst({ where: { userId: session.user.uid } }) as account
         return { message: "ok", status: 200, isLock: account.isLock, lockExpiry: account.lock_expiresAt }
@@ -35,8 +36,8 @@ export const updateLockStatus = async () => {
         if (!session?.user?.uid) {
             return
         }
-        if (await redisManager().getCache("walletLock")) {
-            await redisManager().deleteCache("walletLock")
+        if (await redisManager().getCache(`${session.user.uid}_walletLock`)) {
+            await redisManager().deleteCache(`${session.user.uid}_walletLock`)
         }
         await prisma.account.update({ where: { userId: session.user.uid }, data: { isLock: false, lock_expiresAt: null } })
         await prisma.wallet.update({ where: { userId: session.user.uid }, data: { wrongPincodeAttempts: 0 } })
