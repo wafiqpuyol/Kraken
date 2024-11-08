@@ -17,8 +17,9 @@ const Home = async ({ params: { locale } }: { params: { locale: string } }) => {
     let onRamps
     let p2pTransfers
     const session = await getServerSession(authOptions)
-    onRamps = await redisManager().getCache("getAllOnRampTransactions")
-    p2pTransfers = await redisManager().getCache("getAllP2PTransactions")
+
+    onRamps = await redisManager().getCache(`${session?.user?.uid}getAllOnRampTransactions`)
+    p2pTransfers = await redisManager().getCache(`${session?.user?.uid}_getAllP2PTransactions`)
     if (!p2pTransfers || !onRamps) {
         onRamps = await prisma.onramptransaction.findMany({ where: { userId: session?.user?.uid } })
         p2pTransfers = await (await prisma.p2ptransfer.findMany({
@@ -37,8 +38,8 @@ const Home = async ({ params: { locale } }: { params: { locale: string } }) => {
                 timestamp: true,
             }
         }))
-        await redisManager().setCache("getAllOnRampTransactions", onRamps)
-        await redisManager().setCache("getAllP2PTransactions", p2pTransfers)
+        await redisManager().setCache(`${session?.user?.uid}_getAllOnRampTransactions`, onRamps)
+        await redisManager().setCache(`${session?.user?.uid}_getAllP2PTransactions`, p2pTransfers)
     };
     p2pTransfers = p2pTransfers.
         // @ts-ignore

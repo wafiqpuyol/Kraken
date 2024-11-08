@@ -208,7 +208,7 @@ class SendMoney {
                 }
                 this.currency = (await prisma.preference.findFirst({ where: { userId: this?.sender?.id } }) as preference)?.currency
                 this.p2pTransfer = await this.createP2PTransfer(transactionDetail, this.currency as string, "Success")
-                await redisManager().setCache("getAllP2PTransactions", this.p2pTransfer)
+                await redisManager().setCache(`${this.sender?.id}_getAllP2PTransactions`, this.p2pTransfer)
                 await prisma.wallet.update({ where: { userId: this.sender?.id }, data: { wrongPincodeAttempts: 0 } })
                 if (await redisManager().getCache(`${this.sender?.id}_walletLock`)) {
                     await redisManager().deleteCache(`${this.sender?.id}_walletLock`)
@@ -259,9 +259,9 @@ class SendMoney {
                 return { message: error.message, status: 401 }
             }
             this.p2pTransfer = await this.createP2PTransfer(transactionDetail, this.currency as string, "Failed")
-            await redisManager().setCache("getAllP2PTransactions", this.p2pTransfer)
+            await redisManager().setCache(`${this.sender?.id}_getAllP2PTransactions`, this.p2pTransfer)
             await prisma.wallet.update({ where: { userId: this.sender?.id }, data: { wrongPincodeAttempts: 0 } })
-            return { message: error.message || "fuck yoyu Something went wrong on the bank server", status: 500 }
+            return { message: error.message || "Something went wrong on the bank server", status: 500 }
         }
     }
 
@@ -298,7 +298,7 @@ export const getAllP2PTransactionHistories = async (): Promise<p2ptransfer[] | [
             take: 12,
             orderBy: { timestamp: "desc" }
         })
-        return p2pTransactionHistories
+        return p2pTransactionHistories.filter(t => !(t.toUserId === isUserExist.id && t.status === "Failed"))
     } catch (error) {
         console.log("getAllP2PTransactions =========>", error);
         return []

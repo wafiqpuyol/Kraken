@@ -25,7 +25,7 @@ class RedisManager {
             data.push(value)
             await this.client.set(key, JSON.stringify(data))
         } else {
-            data = data === null ? [] : data
+            data = (data === null) ? [] : data
             if (Array.isArray(value)) {
                 data = [...value]
             } else {
