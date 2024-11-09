@@ -67,7 +67,18 @@ class SendMoney {
         })
     }
     private async validateSender(userId: number, sender_number: string) {
-        return prisma.user.findFirst({ where: { AND: [{ id: userId }, { number: sender_number }] } })
+        return prisma.user.findFirst({
+            where: {
+                AND: [{ id: userId }, { number: sender_number }]
+            },
+            include: {
+                preference: {
+                    select: {
+                        currency: true
+                    }
+                }
+            }
+        })
     }
 
     private async validateReceiver(receiver_number: string) {
@@ -83,7 +94,6 @@ class SendMoney {
 
             const validatedPayload = SendMoneySchema.safeParse(transactionDetail.formData)
             if (!validatedPayload.success) {
-                console.log(validatedPayload.error.format().phone_number?._errors);
                 throw new Error(validatedPayload.error.format().phone_number?._errors[0] || validatedPayload.error.format().amount?._errors[0] || validatedPayload.error.format().pincode?._errors[0])
             }
 
@@ -203,7 +213,11 @@ class SendMoney {
                         }
                     }
                 })
-                if (transactionDetail.additionalData.trxn_type === "International") {
+                if (
+                    transactionDetail.additionalData.trxn_type === "International"
+                    &&
+                    isUserExist.preference?.currency !== transactionDetail.additionalData.international_trxn_currency
+                ) {
                     await prisma.preference.update({ where: { userId: this?.sender?.id }, data: { currency: transactionDetail.additionalData.international_trxn_currency } })
                 }
                 this.currency = (await prisma.preference.findFirst({ where: { userId: this?.sender?.id } }) as preference)?.currency

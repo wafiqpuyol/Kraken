@@ -19,6 +19,26 @@ class RedisManager {
         return this.redisInstance
     }
 
+    async notification(key: string, value: string) {
+        const data = await this.getCache(key)
+        if (data) {
+            value = JSON.parse(value);
+            if (Array.isArray(value)) {
+                data.push(value)
+            } else {
+                data.unshift(value)
+            }
+            return await this.client.set(key, JSON.stringify(data))
+        } else {
+            value = JSON.parse(value);
+            if (Array.isArray(value)) {
+                return await this.client.set(key, JSON.stringify(value));
+            } else {
+                return await this.client.set(key, JSON.stringify([value]));
+            }
+        }
+    }
+
     async setCache(key: string, value: any) {
         let data = await this.getCache(key)
         if (data) {
