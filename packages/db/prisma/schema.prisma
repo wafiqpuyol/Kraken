@@ -103,7 +103,7 @@ model preference {
   language            String  @default("U.S. English")
   currency            String  @default("USD")
   timezone            String  @default("[-04:00 EDT] New York, N. America")
-  notification_status Boolean @default(true)
+  notification_status Boolean @default(false)
   user                user    @relation(fields: [userId], references: [id], map: "Preference_userId_fkey")
 
   @@index([userId], map: "Preference_userId_fkey")

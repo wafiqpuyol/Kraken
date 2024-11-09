@@ -26,11 +26,7 @@ import { Session } from "next-auth"
 import { responseHandler } from "../../lib/utils"
 
 interface AddMoneyProps {
-    onRampTransactionLimitDetail: {
-        perDayTotal: number;
-        perMonthTotal: number;
-    } | undefined
-    addMoneyAction: (arg: addMoneyPayload, token: string, withDrawLimit: AddMoneyProps["onRampTransactionLimitDetail"]) => Promise<{
+    addMoneyAction: (arg: addMoneyPayload, token: string) => Promise<{
         message: string;
         status: number;
     }>
@@ -68,11 +64,7 @@ interface WithDrawOTPDialogProps {
     enableWithDraw2FAOTP: boolean,
     isLoading: boolean,
     setIsLoading: Dispatch<SetStateAction<boolean>>,
-    activate2fa: AddMoneyProps["activate2fa"],
-    onRampTransactionLimitDetail: {
-        perDayTotal: number;
-        perMonthTotal: number;
-    } | undefined
+    activate2fa: AddMoneyProps["activate2fa"]
 }
 
 export const AddMoney: React.FC<AddMoneyProps> = ({ disable2fa, addMoneyAction, userBalance, sendVerificationEmailAction, activate2fa, onRampTransactionLimitDetail }) => {
@@ -234,7 +226,7 @@ export const AddMoney: React.FC<AddMoneyProps> = ({ disable2fa, addMoneyAction, 
                                                                 setInputError((prev) => ({ ...prev, phone_numberError: null }))
                                                             }
                                                             field.onChange(e.target.value)
-                                                            if (e.target.value !== session?.data?.user.number) {
+                                                            if (e.target.value !== session?.data?.user?.number) {
                                                                 setInputError((prev) => ({ ...prev, phone_numberError: "Phone number not matched" }))
                                                                 return;
                                                             }
@@ -335,7 +327,7 @@ export const AddMoney: React.FC<AddMoneyProps> = ({ disable2fa, addMoneyAction, 
                                             <WithDrawOTPDialog addMoneyAction={addMoneyAction} payload={payloadData} session={session.data}
                                                 isLoading={isLoading} setIsLoading={setIsLoading} setEnableWithDraw2FAOTP={setEnableWithDraw2FAOTP}
                                                 enableWithDraw2FAOTP={enableWithDraw2FAOTP} activate2fa={activate2fa}
-                                                onRampTransactionLimitDetail={onRampTransactionLimitDetail}>
+                                            >
                                             </WithDrawOTPDialog>
                                         }
 
@@ -384,7 +376,7 @@ const Enable2FADialog: React.FC<Enable2FADialogProps> = ({ isWithDraw2FAActive, 
 }
 
 const WithDrawOTPDialog: React.FC<WithDrawOTPDialogProps> = ({ activate2fa, session, addMoneyAction, payload, setIsLoading, isLoading,
-    enableWithDraw2FAOTP, setEnableWithDraw2FAOTP, onRampTransactionLimitDetail
+    enableWithDraw2FAOTP, setEnableWithDraw2FAOTP
 }) => {
     const [otp, setOtp] = useState("");
     const { toast } = useToast()
@@ -399,7 +391,7 @@ const WithDrawOTPDialog: React.FC<WithDrawOTPDialogProps> = ({ activate2fa, sess
                 await axios.get(`${process.env.NEXT_PUBLIC_BANK_API_URL}/health`);
                 setTimeout(async () => {
                     const token = await axios.post(`${process.env.NEXT_PUBLIC_BANK_API_URL}/token`, { uid: session?.user?.uid })
-                    res = await addMoneyAction(payload, token.data.token, onRampTransactionLimitDetail);
+                    res = await addMoneyAction(payload, token.data.token);
                     responseHandler(res)
                     if (res.status === 200) router.push(`${process.env.NEXT_PUBLIC_BANK_FRONTEND_URL}?token=${token.data.token}`)
                     setOtp("")

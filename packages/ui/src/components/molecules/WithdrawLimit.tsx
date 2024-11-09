@@ -10,7 +10,7 @@ interface WithdrawLimitsProps {
     onRampTransactionLimitDetail: {
         perDayTotal: number;
         perMonthTotal: number;
-    } | undefined;
+    };
 }
 
 export const WithDrawLimits: React.FC<WithdrawLimitsProps> = ({ onRampTransactionLimitDetail }) => {

@@ -9,8 +9,8 @@ interface DepositProps {
     onRampTransactionLimitDetail: {
         perDayTotal: number;
         perMonthTotal: number;
-    } | undefined
-    addMoneyAction: (args: addMoneyPayload, token: string, withDrawLimit: DepositProps["onRampTransactionLimitDetail"]) => Promise<{ message: string; status: number; }>
+    }
+    addMoneyAction: (args: addMoneyPayload, token: string) => Promise<{ message: string; status: number; }>
     userBalance: Omit<UserBalance, "id" | "userId">,
     userPreference: preference
     sendVerificationEmailAction: (locale: string) => Promise<{
@@ -30,7 +30,7 @@ export const Deposit: React.FC<DepositProps> = ({ onRampTransactionLimitDetail, 
         <>
             <div className='flex gap-10'>
                 <AddMoney disable2fa={disable2fa} activate2fa={activate2fa} userBalance={userBalance} addMoneyAction={addMoneyAction} sendVerificationEmailAction={sendVerificationEmailAction}
-                    onRampTransactionLimitDetail={onRampTransactionLimitDetail} />
+                />
                 <div className='flex flex-col gap-10'>
                     <Balance userBalance={userBalance} userPreference={userPreference} />
                     <WithDrawLimits onRampTransactionLimitDetail={onRampTransactionLimitDetail} />

@@ -5,6 +5,7 @@ import { useLocale } from 'next-intl';
 import { useRouter } from 'next/navigation'
 import { useSession } from "next-auth/react"
 import { responseHandler } from "../../lib/utils"
+import { useState } from 'react';
 
 interface GetVerifiedProps {
     sendVerificationEmailAction: (locale: string) => Promise<{
@@ -19,6 +20,8 @@ export const GetVerified: React.FC<GetVerifiedProps> = ({ sendVerificationEmailA
     const { toast } = useToast()
     const session = useSession()
     const router = useRouter()
+    const [isLoading, setIsLoading] = useState(false)
+    const [isBtnDisable, setIsBtnDisable] = useState(false)
 
 
     const handleVerificationBtn = async () => {
@@ -26,6 +29,7 @@ export const GetVerified: React.FC<GetVerifiedProps> = ({ sendVerificationEmailA
             if (session.status === "unauthenticated" || session.data === null || !session.data.user) {
                 return router.push(`/${locale}/login`);
             }
+            setIsLoading(true)
             const res = await sendVerificationEmailAction(locale)
             switch (res.status) {
                 case 401:
@@ -49,7 +53,10 @@ export const GetVerified: React.FC<GetVerifiedProps> = ({ sendVerificationEmailA
                     break;
             }
             responseHandler(res)
+            setIsLoading(false)
+            res.status === 200 ? setIsBtnDisable(true) : setIsBtnDisable(false)
         } catch (error: any) {
+            setIsLoading(false)
             toast({
                 title: error.message || "Something went wrong",
                 variant: "destructive"
@@ -68,7 +75,7 @@ export const GetVerified: React.FC<GetVerifiedProps> = ({ sendVerificationEmailA
                     <span className="text-slate-500/85 font-medium text-[0.8rem]">Submit a few personal details, and you'll be all set to fund your account.</span>
                 </div>
             </div>
-            <Button className="w-full bg-purple-600 text-white rounded-3xl" onClick={handleVerificationBtn}>Get Verified</Button>
+            <Button className="w-full bg-purple-600 text-white rounded-3xl" disabled={isLoading || isBtnDisable} onClick={handleVerificationBtn}>Get Verified</Button>
         </div>
     )
 }

@@ -88,6 +88,14 @@ const NotificationToggle = ({ notificationStatus, updatePreference }: {
     const session = useSession()
 
     const handleClick = async () => {
+        if (!(session.data?.user?.isVerified)) {
+            return toast({
+                title: "Please verify your email first.",
+                variant: "destructive",
+                className: "bg-red-500 text-white rounded-xl",
+                duration: 3000
+            })
+        }
         try {
             const res = await updatePreference({ notification_status: !toggleNotification });
             switch (res.statusCode) {

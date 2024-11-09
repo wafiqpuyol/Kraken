@@ -6,16 +6,13 @@ import { authOptions } from "@repo/network"
 import { addMoneyPayload, AddMoneySchema } from "@repo/forms/addMoneySchema"
 import { LOCK_AMOUNT, WITHDRAW_LIMIT } from "@repo/ui/constants"
 import { updateAccount } from "./account"
+import { getAllOnRampTransactions } from "./action"
 
 export const addMoneyAction = async (payload: addMoneyPayload, token: string,
-    withDrawLimit: {
-        perDayTotal: number;
-        perMonthTotal: number;
-    }): Promise<{ message: string, status: number }> => {
+): Promise<{ message: string, status: number }> => {
     try {
         const session = await getServerSession(authOptions)
         if (!session?.user) return { message: "Unauthorized. Please login first", status: 401 }
-        if (session?.user.number !== payload.phone_number) return { message: "User with this phone number doesn't exist", status: 404 }
 
         const validatedPayload = AddMoneySchema.safeParse(payload)
         if (!validatedPayload.success) {
@@ -32,7 +29,7 @@ export const addMoneyAction = async (payload: addMoneyPayload, token: string,
                 ]
             }
         })
-
+        if (isUserExist?.number !== payload.phone_number) return { message: "User with this phone number doesn't exist", status: 404 }
         if (!isUserExist) return { message: "User not found. Please login", status: 401 }
         if (!isUserExist.isVerified) return { message: "Please verify your account first to deposit money", status: 401 }
 
@@ -48,6 +45,8 @@ export const addMoneyAction = async (payload: addMoneyPayload, token: string,
         if (!userAccount) {
             return { message: "User account not found. Please login", status: 401 }
         }
+
+        const withDrawLimit = await getAllOnRampTransactions(session.user.uid)
         if (userAccount.dailyLimitExceed) {
             if ((withDrawLimit.perDayTotal / 100) === parseFloat(withDrawCurrency.totalTransactionLimit.day)) {
                 return { message: "You have exceeded your daily withdrawal limit", status: 422 }

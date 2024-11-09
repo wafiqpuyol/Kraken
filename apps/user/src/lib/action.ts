@@ -21,6 +21,9 @@ export const updatePreference = async (payload: Partial<preference>): Promise<{
             }
         })
         if (!isUserExist) return { message: "User not found. Please login", statusCode: 404 }
+        if (Object.keys(payload).includes("notification_status") && !isUserExist.isVerified) {
+            return { message: "Please verify your email first.", statusCode: 401 }
+        }
         const updatedPreference = await prisma.preference.update({ where: { id: isUserExist.preference?.id, userId: isUserExist.id }, data: payload })
         return { message: "success", statusCode: 200, updatedPreference }
     } catch (error) {
@@ -49,5 +52,6 @@ export const getAllOnRampTransactions = async (userId: number) => {
         }, { perDayTotal: 0, perMonthTotal: 0 })
     } catch (error) {
         console.log("getAllOnRampTransactions -->", error);
+        return { perDayTotal: 0, perMonthTotal: 0 }
     }
 }
