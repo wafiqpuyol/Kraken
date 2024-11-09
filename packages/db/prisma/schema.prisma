@@ -44,7 +44,7 @@ model p2ptransfer {
   fromUserId                        Int
   toUserId                          Int
   transactionType                   transaction_type
-  transactionID                     String
+  transactionID                     String                 @unique(map: "P2pTransfer_transactionID_key")
   currency                          String
   transactionCategory               transaction_category
   domestic_trxn_fee                 String?

@@ -46,7 +46,7 @@ const messageHandler = async (message: MessageType) => {
                 }
             })
         ]);
-        redisManager().setCache(`${result[1].userId}getAllOnRampTransactions`, result[1])
+        redisManager().setCache(`${result[1].userId}_getAllOnRampTransactions`, result[1])
     } catch (error) {
         console.log("messageHandler ---->", error);
     }

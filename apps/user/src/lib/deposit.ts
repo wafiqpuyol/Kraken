@@ -34,7 +34,7 @@ export const addMoneyAction = async (payload: addMoneyPayload, token: string,
         })
 
         if (!isUserExist) return { message: "User not found. Please login", status: 401 }
-        if (!isUserExist.isVerified) return { message: "Please verify your account first to send money", status: 401 }
+        if (!isUserExist.isVerified) return { message: "Please verify your account first to deposit money", status: 401 }
 
         /* -------------------- Check Account Status -------------------- */
         const userBalance = await prisma.balance.findFirst({

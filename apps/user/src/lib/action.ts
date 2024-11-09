@@ -1,9 +1,9 @@
 "use server"
 import { prisma } from "@repo/db/client"
 import { getServerSession } from "next-auth"
-import { onramptransaction } from "@repo/db/type"
+import { onramptransaction, preference } from "@repo/db/type"
 import { authOptions } from "@repo/network"
-import { preference } from "@repo/db/type"
+import { redisManager } from "@repo/cache/redisManager"
 
 export const updatePreference = async (payload: Partial<preference>): Promise<{
     message: string;
@@ -31,8 +31,14 @@ export const updatePreference = async (payload: Partial<preference>): Promise<{
 
 export const getAllOnRampTransactions = async (userId: number) => {
     try {
-        const res = await prisma.onramptransaction.findMany({ where: { userId: userId } })
-        return res.reduce((acc: { perDayTotal: number, perMonthTotal: number }, init: onramptransaction) => {
+        let onRampTransactions: [] | onramptransaction[] | null
+        onRampTransactions = await redisManager().getCache(`${userId}_getAllOnRampTransactions`)
+        if (!onRampTransactions) {
+            onRampTransactions = await prisma.onramptransaction.findMany({ where: { userId: userId } })
+            redisManager().setCache(`${userId}_getAllOnRampTransactions`, onRampTransactions)
+        }
+
+        return onRampTransactions.reduce((acc: { perDayTotal: number, perMonthTotal: number }, init: onramptransaction) => {
             if (new Date(init.startTime).getMonth() === new Date(Date.now()).getMonth() && init.status === "Success") {
                 acc.perMonthTotal += (init.amount + init.lockedAmount)
             }
