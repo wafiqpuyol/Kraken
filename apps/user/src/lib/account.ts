@@ -13,16 +13,23 @@ export const checkAccountLockStatus = async (): Promise<{ message: string, statu
         if (!session?.user?.uid) {
             return { message: "Unauthorized. Please login first", status: 401 }
         }
-        const isUserExist = await prisma.user.findFirst({ where: { id: session.user.uid } })
+        let isUserExist = await redisManager().getUserField(`${session.user.number}_userCred`, "user")
+        if (!isUserExist) {
+            isUserExist = await prisma.user.findFirst({ where: { id: session.user.uid } })
+            if (isUserExist) await redisManager().updateUserCred(session.user.number.toString(), "user", JSON.stringify(isUserExist))
+        }
         if (!isUserExist) return { message: "User not found. Please login", status: 401 }
         if (!isUserExist.isVerified) return { message: "Please verify your account.", status: 401 }
 
-        const cachedData = await redisManager().getCache(`${session.user.uid}_walletLock`)
-        if (cachedData) {
-            return { message: "ok", status: 200, isLock: cachedData.failedAttempt === WRONG_PINCODE_ATTEMPTS, lockExpiry: cachedData.lockExpiresAt }
+        const cachedWalletLockData = await redisManager().getCache(`${session.user.uid}_walletLock`)
+        if (cachedWalletLockData) {
+            return { message: "ok", status: 200, isLock: cachedWalletLockData.failedAttempt === WRONG_PINCODE_ATTEMPTS, lockExpiry: cachedWalletLockData.lockExpiresAt }
         }
-
-        const account = await prisma.account.findFirst({ where: { userId: session.user.uid } }) as account
+        let account = await redisManager().getUserField(`${session.user.number}_userCred`, "account")
+        if (!account) {
+            account = await prisma.account.findFirst({ where: { userId: session.user.uid } }) as account
+            await redisManager().updateUserCred(session.user.number.toString(), "account", JSON.stringify(account))
+        }
         return { message: "ok", status: 200, isLock: account.isLock, lockExpiry: account.lock_expiresAt }
     } catch (error) {
         console.log("isAccountLock ===>", error);
@@ -51,7 +58,9 @@ export const updateAccount = async (update: Partial<account>) => {
         if (!session?.user?.uid) {
             return
         }
-        await prisma.account.update({ where: { userId: session.user.uid }, data: { ...update } })
+        // @ts-ignore
+        const updatedAccountInfo = await prisma.account.update({ where: { userId: session.user.uid }, data: { ...update } })
+        await redisManager().updateUserCred(session.user.number.toString(), "account", JSON.stringify(updatedAccountInfo))
     } catch (error) {
         console.log("updateAccount ===>", error);
     }

@@ -2,7 +2,6 @@
 
 import { generateHash, generateRandomNumber, comparePassword } from "@repo/network"
 import { prisma } from "@repo/db/client"
-import { user } from "@repo/db/type"
 import { signUpPayload, SignUpSchema } from "@repo/forms/signupSchema"
 import { ChangePasswordSchema, changePasswordPayload } from "@repo/forms/changePasswordSchema"
 import { ForgotPasswordSchema, forgotPasswordPayload } from "@repo/forms/forgotPasswordSchema"
@@ -15,6 +14,9 @@ import { resetPasswordPayload } from "@repo/forms/resetPasswordSchema"
 import { PasswordMatchSchema } from "@repo/forms/changePasswordSchema"
 import { SUPPORTED_CURRENCY } from "@repo/ui/constants"
 import { verify, sign, JwtPayload } from "jsonwebtoken"
+import { generateToken } from "./utils"
+import { redisManager } from "@repo/cache/redisManager"
+import { user } from "@repo/db/type"
 
 export const signUpAction = async (payload: signUpPayload, countryName: string): Promise<{ message: string, status: number }> => {
     try {
@@ -32,9 +34,10 @@ export const signUpAction = async (payload: signUpPayload, countryName: string):
             }
         }
 
-        const isUserWithSameEmailExist = await prisma.user.findUnique({ where: { email: payload.email } })
+
+        let isUserWithSameEmailExist = (await redisManager().getUserField(`${payload.phone_number}_userCred`, "user"))?.email ?? null
         if (isUserWithSameEmailExist) return { message: "User already exist with this email", status: 409 }
-        const isUserWithSameNumberExist = await prisma.user.findUnique({ where: { number: payload.phone_number } })
+        let isUserWithSameNumberExist = (await redisManager().getUserField(`${payload.phone_number}_userCred`, "user"))?.number ?? null
         if (isUserWithSameNumberExist) return { message: "User already exist with phone number already exist", status: 409 }
 
 
@@ -50,9 +53,9 @@ export const signUpAction = async (payload: signUpPayload, countryName: string):
                     country: countryName
                 }
             });
-
+            await redisManager().addUser(user);
             const currency = SUPPORTED_CURRENCY.find((c) => (c.country === countryName))?.name || "USD"
-            await prisma.balance.create({
+            const userBalance = await prisma.balance.create({
                 data: {
                     amount: 0,
                     locked: 0,
@@ -60,19 +63,22 @@ export const signUpAction = async (payload: signUpPayload, countryName: string):
                     currency: currency
                 }
             })
-            await prisma.preference.create({
+            await redisManager().updateUserCred(user.number.toString(), "balance", JSON.stringify(userBalance))
+            const userPreference = await prisma.preference.create({
                 data: {
                     userId: user.id,
                     currency
                 }
             })
-            await prisma.account.create({
+            redisManager().updateUserCred(user.number.toString(), "preference", JSON.stringify(userPreference))
+            const userAccount = await prisma.account.create({
                 data: {
                     current_email: user.email!,
                     userId: user.id,
                     email_update: JSON.stringify({}),
                 }
             })
+            redisManager().updateUserCred(user.number.toString(), "account", JSON.stringify(userAccount))
         })
         return { message: "Signup Successful", status: 201 }
     } catch (error: any) {
@@ -96,7 +102,11 @@ export const changePasswordAction = async (payload: changePasswordPayload): Prom
             }
         }
 
-        const isUserExist = await prisma.user.findFirst({ where: { id: session.user.uid } })
+        let isUserExist = await redisManager().getUserField(`${session.user.number}_userCred`, "user")
+        if (!isUserExist) {
+            isUserExist = await prisma.user.findFirst({ where: { id: session.user.uid } })
+            redisManager().updateUserCred(session.user.number.toString(), "user", JSON.stringify(isUserExist))
+        }
         if (!isUserExist) {
             return { message: "Unauthorized. Please login first to change password", status: 401 }
         }
@@ -119,6 +129,7 @@ export const changePasswordAction = async (payload: changePasswordPayload): Prom
                 password: await generateHash(payload.newPassword)
             }
         })
+        await redisManager().updateUserCred(session.user.number.toString(), "user", JSON.stringify(updatedUserData))
 
         if (decodedPincode !== null) {
             const encryptedPin = sign(decodedPincode, updatedUserData.password)
@@ -145,14 +156,27 @@ export const forgotPasswordAction = async (payload: forgotPasswordPayload, local
             }
         }
 
-        const isUserExist = await prisma.user.findUnique({ where: { email: payload.email } })
+        let isUserExist = await redisManager().getUserField(`${session?.user?.number}_userCred`, "user")
         if (!isUserExist) {
-            return { message: "User with this email does not exist", status: 404 }
+            isUserExist = await prisma.user.findUnique({ where: { email: payload.email } })
+            redisManager().updateUserCred(isUserExist.number.toString(), "user", JSON.stringify(isUserExist))
         }
 
-        const passwordResetToken = randomBytes(32).toString("hex");
-        const tokenExpiry = new Date(Date.now() + 1000 * 60 * 60 * 24 * 1)
+        if (!isUserExist) {
+            return { message: "Password reset link has been sent to your email", status: 200 };
+        }
 
+        const passwordResetToken = await generateToken();
+        const tokenExpiry = new Date(Date.now() + 1000 * 60 * 10)
+        const existingResetPasswordEntry = await prisma.resetpassword.findFirst({
+            where: {
+                userId: isUserExist.id
+            }
+        })
+
+        if (existingResetPasswordEntry) {
+            await prisma.resetpassword.deleteMany({ where: { userId: isUserExist.id } })
+        }
         await prisma.resetpassword.create({
             data: {
                 userId: isUserExist.id,
@@ -189,17 +213,19 @@ export const resetPasswordAction = async (payload: resetPasswordPayload, token: 
             where: { token }
         })
         if (!resetPasswordTableData) {
-            return { message: "Invalid token. Please request a new one mail to reset", status: 401 }
+            return { message: "Invalid token. Please request a new mail to reset", status: 401 }
         }
         const now = new Date();
         if (resetPasswordTableData) {
             if (resetPasswordTableData.token !== token) {
-                return { message: "Invalid token. Please try again", status: 401 }
+                return { message: "Invalid token. Please request a new mail to reset", status: 401 }
             }
             if (now > resetPasswordTableData?.tokenExpiry!) {
-                return { message: "Token has expired. Please try again", status: 401 }
+                await prisma.resetpassword.delete({ where: { id: resetPasswordTableData.id } })
+                return { message: "Token has expired. Please request a new mail to reset", status: 401 }
             }
         }
+
         await prisma.$transaction(async () => {
             const user = await prisma.user.findFirst({ where: { id: resetPasswordTableData.userId } }) as user
             const isWalletExist = await prisma.wallet.findFirst({ where: { userId: user.id } })
@@ -215,6 +241,7 @@ export const resetPasswordAction = async (payload: resetPasswordPayload, token: 
                     password: await generateHash(payload.newPassword)
                 }
             })
+            await redisManager().updateUserCred(updatedUserData.number.toString(), "user", JSON.stringify(updatedUserData))
 
             if (decodedPincode !== null) {
                 const encryptedPin = sign(decodedPincode, updatedUserData.password)
@@ -242,17 +269,22 @@ export const sendVerificationEmailAction = async (locale: string): Promise<{ mes
             return { message: "Unauthorized. Please login first", status: 401 }
         }
 
-        const isUserExist = await prisma.user.findUnique({ where: { id: session.user.uid } })
+        let isUserExist = await redisManager().getUserField(`${session.user.number}_userCred`, "user")
+        if (!isUserExist) {
+            isUserExist = await prisma.user.findUnique({ where: { id: session.user.uid } })
+            if (isUserExist) await redisManager().updateUserCred(isUserExist.number.toString(), "user", JSON.stringify(isUserExist))
+        }
 
         if (!isUserExist) {
             return { message: "User with this email does not exist", status: 404 }
         }
 
         const payload = {
-            verificationToken: randomBytes(32).toString("hex"),
+            verificationToken: await generateToken(),
             verificationTokenExpiresAt: new Date(Date.now() + 1000 * 60 * 60 * 24 * 1),
         }
-        await prisma.user.update({ where: { id: isUserExist.id }, data: payload })
+        const updatedUserInfo = await prisma.user.update({ where: { id: isUserExist.id }, data: payload })
+        await redisManager().updateUserCred(isUserExist.number.toString(), "user", JSON.stringify(updatedUserInfo))
         return await sendVerificationEmail(isUserExist.email!, payload.verificationToken, locale)
     } catch (error) {
         console.log("sendVerificationEmailAction", error);
@@ -265,11 +297,19 @@ export const verifyEmail = async (token: string): Promise<{
     status: number;
 }> => {
     try {
+        const session = await getServerSession(authOptions)
+        if (!session?.user) {
+            return { message: "Unauthorized. Please login first", status: 401 }
+        }
         if (!token) {
             return { message: "Token is missing", status: 401 }
         }
-        const now = new Date();
-        const isUserExist = await prisma.user.findFirst({ where: { verificationToken: token } })
+
+        let isUserExist = await redisManager().getUserField(`${session.user.number}_userCred`, "user")
+        if (!isUserExist) {
+            isUserExist = await prisma.user.findFirst({ where: { verificationToken: token } })
+            if (isUserExist) await redisManager().updateUserCred(isUserExist.number.toString(), "user", JSON.stringify(isUserExist))
+        }
 
         if (!isUserExist) {
             return { message: "User with this email does not exist", status: 404 }
@@ -277,15 +317,20 @@ export const verifyEmail = async (token: string): Promise<{
         if (isUserExist.verificationToken !== token) {
             return { message: "Invalid token", status: 400 }
         }
+
+        const now = new Date();
         if (now > isUserExist.verificationTokenExpiresAt!) {
-            return { message: "Token has expired", status: 401 }
+            return { message: "Token has expired. Please request a new verification mail", status: 401 }
         }
+
         const payload = {
             isVerified: true,
             verificationToken: "",
             verificationTokenExpiresAt: null
         }
-        await prisma.user.update({ where: { id: isUserExist.id }, data: payload })
+        const updatedUserInfo = await prisma.user.update({ where: { id: isUserExist.id }, data: payload })
+        await redisManager().updateUserCred(session.user.number.toString(), "user", JSON.stringify(updatedUserInfo))
+
         return { message: "Email verification successful", status: 200 }
     } catch (error: any) {
         console.log("------> verifyEmail", error);
@@ -307,7 +352,12 @@ export const changeEmailAction = async (payload: forgotPasswordPayload): Promise
             }
         }
 
-        const isUserExist = await prisma.user.findFirst({ where: { id: session.user.uid } })
+        let isUserExist = await redisManager().getUserField(`${session.user.number}_userCred`, "user")
+        if (!isUserExist) {
+            isUserExist = await prisma.user.findFirst({ where: { id: session.user.uid } })
+            if (isUserExist) await redisManager().updateUserCred(isUserExist.number.toString(), "user", JSON.stringify(isUserExist))
+        }
+
         if (!isUserExist) {
             return { message: "Unauthorized. Please login first", status: 401 }
         }
@@ -328,7 +378,9 @@ export const changeEmailAction = async (payload: forgotPasswordPayload): Promise
             confirmation_code: randomBytes(16).toString("hex")
         }
 
-        await prisma.account.update({ where: { userId: session.user.uid }, data: updated })
+        const updatedAccountInfo = await prisma.account.update({ where: { userId: session.user.uid }, data: updated })
+        await redisManager().updateUserCred(session.user.number.toString(), "user", JSON.stringify(updatedAccountInfo))
+
         await sendChangeEmailVerification(isUserExist.email!, payload.email, updated.authorization_code, updated.confirmation_code)
         return { message: "Email change request sent successfully", status: 200 }
     } catch (error: any) {
@@ -350,8 +402,11 @@ export const updateEmail = async (payload: confirmMailPayload): Promise<{ messag
                 status: 400,
             }
         }
-
-        const isUserExist = await prisma.user.findFirst({ where: { id: session.user.uid } })
+        let isUserExist = await redisManager().getUserField(`${session.user.number}_userCred`, "user")
+        if (!isUserExist) {
+            isUserExist = await prisma.user.findFirst({ where: { id: session.user.uid } })
+            if (isUserExist) await redisManager().updateUserCred(isUserExist.number.toString(), "user", JSON.stringify(isUserExist))
+        }
         if (!isUserExist) {
             return { message: "Unauthorized. Please login first", status: 401 }
         }
@@ -370,10 +425,11 @@ export const updateEmail = async (payload: confirmMailPayload): Promise<{ messag
             return { message: "Invalid confirmation or authorization code", status: 400 }
         }
 
-        const newEmail = JSON.parse(isAccountExist.email_update.toLocaleString());
+        const newEmail = JSON.parse(isAccountExist.email_update!.toLocaleString());
 
-        await prisma.user.update({ where: { id: session.user.uid }, data: { email: newEmail.email_address } })
-        await prisma.account.update({
+        const updatedUserInfo = await prisma.user.update({ where: { id: session.user.uid }, data: { email: newEmail.email_address } })
+        await redisManager().updateUserCred(session.user.number.toString(), "user", JSON.stringify(updatedUserInfo))
+        const updatedAccountInfo = await prisma.account.update({
             where: { userId: isUserExist.id }, data: {
                 authorization_code: null,
                 confirmation_code: null,
@@ -382,6 +438,7 @@ export const updateEmail = async (payload: confirmMailPayload): Promise<{ messag
                 email_update: JSON.stringify({})
             }
         })
+        await redisManager().updateUserCred(session.user.number.toString(), "account", JSON.stringify(updatedAccountInfo))
 
         return { message: "Email changed successfully", status: 200 }
     } catch (error: any) {
@@ -399,8 +456,14 @@ export const cancelConfirmMail = async (): Promise<{
         if (!session?.user?.uid) {
             return { message: "Unauthorized. Please login first to change your email.", status: 401 }
         }
-        const isUserExist = await prisma.user.findFirst({ where: { id: session?.user.uid } }) as user
-        await prisma.account.update({
+
+        let isUserExist = await redisManager().getUserField(`${session.user.number}_userCred`, "user")
+        if (!isUserExist) {
+            isUserExist = await prisma.user.findFirst({ where: { id: session?.user.uid } }) as user
+            if (isUserExist) await redisManager().updateUserCred(isUserExist.number.toString(), "user", JSON.stringify(isUserExist))
+        }
+
+        const updatedUserInfo = await prisma.account.update({
             where: {
                 userId: isUserExist.id,
             },
@@ -411,6 +474,8 @@ export const cancelConfirmMail = async (): Promise<{
                 email_update: JSON.stringify({}),
             }
         })
+        await redisManager().updateUserCred(session.user.number.toString(), "user", JSON.stringify(updatedUserInfo))
+
         return { message: "Email change request canceled successfully", status: 200 }
     } catch (error) {
         console.log("cancelConfirmMail -->", error);

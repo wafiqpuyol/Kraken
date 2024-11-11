@@ -64,8 +64,28 @@ export const authOptions: NextAuthOptions = {
                 if (!validatedFields.success) {
                     throw new Error('Invalid credentials')
                 }
+
                 const { phone_number, password } = validatedFields.data
-                const isUserExist = await prisma.user.findUnique({ where: { number: phone_number } })
+                let isUserExist = await redisManager().getUserField(`${credentials.phone_number}_userCred`, "user")
+                if (!isUserExist) {
+                    isUserExist = (await prisma.user.findUnique({
+                        where: { number: phone_number },
+                        include: {
+                            account: true,
+                            preference: true,
+                            balance: true,
+                        }
+                    }))
+
+                    await redisManager().updateUserCred(phone_number.toString(), "preference", JSON.stringify(isUserExist.preference))
+                    await redisManager().updateUserCred(phone_number.toString(), "balance", JSON.stringify(isUserExist.balance))
+                    await redisManager().updateUserCred(phone_number.toString(), "account", JSON.stringify(isUserExist.account))
+                    delete isUserExist.account
+                    delete isUserExist.preference
+                    delete isUserExist.balance
+                    await redisManager().updateUserCred(phone_number.toString(), "user", JSON.stringify(isUserExist))
+                }
+
                 if (!isUserExist) {
                     errObj = {
                         ...errObj,
