@@ -604,7 +604,7 @@
     "continue": "続ける",
     "email_placeholder": "新しいメールを入力",
     "authCode_desc": "認証コードを現在のメールアドレスに送信しました。ここにそれを入力してください。",
-    "confirmCode_desc:": "確認コードを新しいメールアドレスにも送信しました - ",
+    "confirmCode_desc": "確認コードを新しいメールアドレスにも送信しました - ",
     "confirmCode_placeHolder": "確認コード",
     "authCode_desc_placeHolder": "認証コード",
     "footer": "これらのメールが届かない場合は、ジャンク/スパムフォルダを確認するか、メールを再送信できます。",
@@ -635,7 +635,7 @@
     "emergencyCode_placeholder": "緊急コードを入力してください"
   },
   "FinalCard": {
-    "Send": "送金",
+    "title": "送金",
     "receiver_number": "受信者番号",
     "sender_number": "送信者番号",
     "amount": "金額",

@@ -13,13 +13,19 @@ export const updatePreference = async (payload: Partial<preference>): Promise<{
     try {
         const session = await getServerSession(authOptions)
         if (!session?.user) return { message: "unauthenticated", statusCode: 401 }
-        const isUserExist = await prisma.user.findUnique({
-            where:
-                { number: session.user.number },
-            include: {
-                preference: true
-            }
-        })
+
+        let isUserExist = await redisManager().getUserField(`${session.user.number}_userCred`, "user")
+        if (!isUserExist) {
+            isUserExist = await prisma.user.findUnique({
+                where:
+                    { number: session.user.number },
+                include: {
+                    preference: true
+                }
+            })
+            if (isUserExist) await redisManager().updateUserCred(`${session.user.number}_userCred`, "user", JSON.stringify(isUserExist))
+        }
+
         if (!isUserExist) return { message: "User not found. Please login", statusCode: 404 }
         if (Object.keys(payload).includes("notification_status") && !isUserExist.isVerified) {
             return { message: "Please verify your email first.", statusCode: 401 }

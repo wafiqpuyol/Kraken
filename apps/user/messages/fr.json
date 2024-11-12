@@ -604,7 +604,7 @@
     "continue": "Continuer",
     "email_placeholder": "Saisissez le nouvel e-mail",
     "authCode_desc": "Nous avons envoyé un code d'autorisation à votre e-mail actuel. Saisissez-le ici.",
-    "confirmCode_desc:": "Nous avons également envoyé un code de confirmation à votre nouvel e-mail - ",
+    "confirmCode_desc": "Nous avons également envoyé un code de confirmation à votre nouvel e-mail - ",
     "confirmCode_placeHolder": "Code de confirmation",
     "authCode_desc_placeHolder": "Code d'autorisation",
     "footer": "Si vous n'avez pas reçu ces e-mails, vérifiez votre dossier de courrier indésirable ou vous pouvez renvoyer les e-mails.",
@@ -635,7 +635,7 @@
     "emergencyCode_placeholder": "Saisissez votre code d'urgence"
   },
   "FinalCard": {
-    "Send": "Envoyer de l'argent",
+    "title": "Envoyer de l'argent",
     "receiver_number": "Numéro du destinataire",
     "sender_number": "Numéro de l'expéditeur",
     "amount": "Montant",

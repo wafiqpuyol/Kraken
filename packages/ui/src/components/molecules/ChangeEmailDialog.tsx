@@ -39,11 +39,14 @@ export const ChangeEmailDialog: React.FC<ChangeEmailDialogProps> = ({ children, 
     const locale = useLocale();
     const router = useRouter()
     const [toggleDialog, setToggleDialog] = useState(account.email_update_pending)
+    const [isLoading, setIsLoading] = useState(false)
+    const [isBtnDisable, setIsBtnDisable] = useState(false)
     const [isRedirectedToLogin, setIsRedirectedToLogin] = useState(false)
     const t = useTranslations("ChangeEmailDialog")
     const [newEmail, setNewEmail] = useState<string>(() =>
         account.email_update ? JSON.parse(account.email_update?.toLocaleString()).email_address : ""
     )
+
 
     useEffect(() => {
         if (isRedirectedToLogin) {
@@ -54,6 +57,7 @@ export const ChangeEmailDialog: React.FC<ChangeEmailDialogProps> = ({ children, 
 
     const emailSubmit = async (payload: forgotPasswordPayload) => {
         try {
+            setIsLoading(true)
             const res = await changeEmailAction(payload)
             switch (res.status) {
                 case 200:
@@ -86,8 +90,11 @@ export const ChangeEmailDialog: React.FC<ChangeEmailDialogProps> = ({ children, 
                     setTimeout(() => router.push(`/${locale}/login`), 4000)
                     break;
             }
+            setIsLoading(false)
+            res.status === 200 ? setIsBtnDisable(true) : setIsBtnDisable(false)
             responseHandler(res)
         } catch (err: any) {
+            setIsLoading(false)
             toast({
                 title: `${err.message}`,
                 variant: "destructive",
@@ -192,7 +199,7 @@ export const ChangeEmailDialog: React.FC<ChangeEmailDialogProps> = ({ children, 
                 <DialogTrigger asChild>
                     {children}
                 </DialogTrigger>
-                <DialogContent className="sm:max-w-[400px] bg-white" onInteractOutside={(e) => {
+                <DialogContent className="sm:max-w-[500px] bg-white" onInteractOutside={(e) => {
                     e.preventDefault();
                 }}>
                     <DialogHeader>
@@ -223,7 +230,7 @@ export const ChangeEmailDialog: React.FC<ChangeEmailDialogProps> = ({ children, 
                                             </FormItem>
                                         )}
                                     />
-                                    <Button type="submit" className="bg-[#7132F5] w-full text-white text-lg">{t("continue")}</Button>
+                                    <Button type="submit" disabled={isLoading || isBtnDisable} className="bg-[#7132F5] w-full text-white text-lg">{t("continue")}</Button>
                                 </form>
                             </ Form>
                             :
@@ -240,7 +247,7 @@ export const ChangeEmailDialog: React.FC<ChangeEmailDialogProps> = ({ children, 
                                             <FormItem>
                                                 <p className="font-medium text-slate-600 mb-4">{t("authCode_desc")}</p>
                                                 <FormControl>
-                                                    <Input type="text" {...field} placeholder="authCode_desc_placeHolder" />
+                                                    <Input type="text" {...field} placeholder={t("authCode_desc_placeHolder")} />
                                                 </FormControl>
                                                 <FormMessage className='text-red-500' />
                                             </FormItem>
@@ -252,9 +259,9 @@ export const ChangeEmailDialog: React.FC<ChangeEmailDialogProps> = ({ children, 
                                         name="confirmation_code"
                                         render={({ field }) => (
                                             <FormItem>
-                                                <p className="font-medium text-slate-600 mb-4">{("confirmCode_desc")}<span className="font-bold text-slate-800">{newEmail}</span>.{t("enter")}</p>
+                                                <p className="font-medium text-slate-600 mb-4">{t("confirmCode_desc")}<span className="font-bold text-slate-800"> {newEmail}</span>. {t("enter")}</p>
                                                 <FormControl>
-                                                    <Input type="text" {...field} placeholder="confirmCode_placeHolder" />
+                                                    <Input type="text" {...field} placeholder={t("confirmCode_placeHolder")} />
                                                 </FormControl>
                                                 <FormMessage className='text-red-500' />
                                             </FormItem>
@@ -262,7 +269,7 @@ export const ChangeEmailDialog: React.FC<ChangeEmailDialogProps> = ({ children, 
                                     />
                                     <p className="text-slate-800 mb-4 font-medium">{t("footer")}</p>
                                     <div className="flex gap-x-4">
-                                        <Button type="button" onClick={() => handleCancelBtn()} name="cancel" className="rounded-2xl bg-[#7132F5] w-full text-white text-lg">{t("cancel")}</Button>
+                                        <Button type="button" onClick={() => handleCancelBtn()} name="cancel" className="rounded-2xl bg-[#7132F5] w-full text-white text-lg">{t("Cancel")}</Button>
                                         <Button type="submit" name="confirm" className="rounded-2xl bg-[#7132F5] w-full text-white text-lg">{t("confirm_new_email")}</Button>
                                     </div>
                                 </form>
