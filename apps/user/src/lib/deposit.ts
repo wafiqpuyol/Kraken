@@ -7,6 +7,7 @@ import { addMoneyPayload, AddMoneySchema } from "@repo/forms/addMoneySchema"
 import { LOCK_AMOUNT, WITHDRAW_LIMIT } from "@repo/ui/constants"
 import { updateAccount } from "./account"
 import { getAllOnRampTransactions } from "./action"
+import { redisManager } from "@repo/cache/redisManager"
 
 export const addMoneyAction = async (payload: addMoneyPayload, token: string,
 ): Promise<{ message: string, status: number }> => {
@@ -21,27 +22,40 @@ export const addMoneyAction = async (payload: addMoneyPayload, token: string,
                 status: 400
             }
         }
-        const isUserExist = await prisma.user.findFirst({
-            where: {
-                AND: [
-                    { id: session.user.uid },
-                    { number: session.user.number },
-                ]
-            }
-        })
+        let isUserExist = await redisManager().getUserField(`${session.user.number}_userCred`, "user")
+        if (!isUserExist) {
+            isUserExist = await prisma.user.findFirst({
+                where: {
+                    AND: [
+                        { id: session.user.uid },
+                        { number: session.user.number },
+                    ]
+                }
+            })
+            if (isUserExist) await redisManager().updateUserCred(session.user.number.toString(), "user", JSON.stringify(isUserExist))
+        }
+
         if (isUserExist?.number !== payload.phone_number) return { message: "User with this phone number doesn't exist", status: 404 }
         if (!isUserExist) return { message: "User not found. Please login", status: 401 }
         if (!isUserExist.isVerified) return { message: "Please verify your account first to deposit money", status: 401 }
 
         /* -------------------- Check Account Status -------------------- */
-        const userBalance = await prisma.balance.findFirst({
-            where: { userId: session.user.uid }
-        })
+        let userBalance = await redisManager().getUserField(`${session.user.number}_userCred`, "balance")
+        if (!userBalance) {
+            userBalance = await prisma.balance.findFirst({
+                where: { userId: session.user.uid }
+            })
+            if (userBalance) await redisManager().updateUserCred(session.user.number.toString(), "balance", JSON.stringify(userBalance))
+        }
         if (!userBalance) { return { message: "User balance not found. Please login", status: 401 } }
         // @ts-ignore
         const withDrawCurrency = WITHDRAW_LIMIT[userBalance.currency];
 
-        const userAccount = await prisma.account.findFirst({ where: { userId: session.user.uid } })
+        let userAccount = await redisManager().getUserField(`${session.user.number}_userCred`, "account")
+        if (!userAccount) {
+            userAccount = await prisma.account.findFirst({ where: { userId: session.user.uid } })
+            if (userAccount) await redisManager().updateUserCred(session.user.number.toString(), "account", JSON.stringify(userAccount))
+        }
         if (!userAccount) {
             return { message: "User account not found. Please login", status: 401 }
         }

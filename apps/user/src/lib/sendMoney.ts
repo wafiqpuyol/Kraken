@@ -4,7 +4,7 @@ import { SendMoneySchema } from "@repo/forms/sendMoneySchema"
 import { authOptions } from "@repo/network"
 import { getServerSession } from "next-auth"
 import { prisma } from "@repo/db/client"
-import { p2ptransfer, user, $Enums, preference, account } from "@repo/db/type"
+import { p2ptransfer, user, $Enums, preference, account, wallet } from "@repo/db/type"
 import { generateTransactionId } from "./utils"
 import { verify } from "jsonwebtoken"
 import { ITransactionDetail } from "@repo/ui/types"
@@ -22,6 +22,7 @@ class SendMoney {
     private p2pTransfer: p2ptransfer | [] = []
     private sender: user | null = null
     private receiver: user | null = null
+    private wallet: wallet | null = null
     private currency: string | null = null
     private fee_currency: string | null = null
 
@@ -102,34 +103,38 @@ class SendMoney {
             if (!isUserExist) {
                 throw new Error("User not found")
             }
-            this.sender = isUserExist
             if (!isUserExist.isVerified) {
                 throw new Error("Please verify your account first to send money")
             }
+            this.sender = isUserExist
 
             /* ------------------- Check Account Lock status -------------------*/
-            const account = await prisma.account.findFirst({ where: { userId: isUserExist.id } }) as account
+            let account = await redisManager().getUserField(`${isUserExist.number}_userCred`, "account")
+            if (!account) {
+                account = await prisma.account.findFirst({ where: { userId: isUserExist.id } }) as account
+                if (account) await redisManager().updateUserCred(isUserExist.number.toString(), "account", JSON.stringify(account))
+            }
             if (account.isLock) {
                 throw new Error("Your account is locked.")
             }
 
             /* ------------------- Validate wallet Pincode -------------------*/
-            const wallet = await prisma.wallet.findFirst({ where: { userId: isUserExist.id } })
-            if (!wallet) {
+            this.wallet = await prisma.wallet.findFirst({ where: { userId: isUserExist.id } })
+            if (!this.wallet) {
                 throw new Error("You're not verified to make a transaction.Please create a pincode or enter valid OTP sent to your mail")
             }
-            if (!wallet.otpVerified) {
+            if (!this.wallet.otpVerified) {
                 throw new Error("OTP verification falied. Enter valid OTP sent to your mail")
             }
-            if (!wallet.pincode) {
+            if (!this.wallet.pincode) {
                 throw new Error("Pincode not found. Pincode is required to send money")
             }
 
-            const decodedPincode = verify(wallet.pincode, isUserExist.password)
+            const decodedPincode = verify(this.wallet.pincode, isUserExist.password)
             const isPincodeValid = decodedPincode === transactionDetail.formData.pincode
             if (!isPincodeValid) {
                 const cachedData = await redisManager().accountLocked(`${session.user.uid}_walletLock`)
-                await prisma.wallet.update({ where: { userId: isUserExist.id }, data: { wrongPincodeAttempts: cachedData.failedAttempt } })
+                this.wallet = await prisma.wallet.update({ where: { userId: isUserExist.id }, data: { wrongPincodeAttempts: cachedData.failedAttempt } })
                 if (cachedData.lockExpiresAt) {
                     await prisma.account.update({ where: { userId: isUserExist.id }, data: { isLock: true, lock_expiresAt: cachedData.lockExpiresAt } })
                     throw new Error("Your account is locked.")
@@ -164,7 +169,12 @@ class SendMoney {
             }
 
             /* ------------------- Validate Sender Amount with his Balance -------------------*/
-            const senderBalance = await prisma.balance.findFirst({ where: { userId: this.sender.id } })
+            let senderBalance = await redisManager().getUserField(`${this.sender.number}_userCred`, "balance")
+            if (!senderBalance) {
+                senderBalance = await prisma.balance.findFirst({ where: { userId: this.sender.id } })
+                if (senderBalance) await redisManager().updateUserCred(this.sender.number.toString(), "balance", JSON.stringify(senderBalance))
+            }
+
             if (!senderBalance) {
                 throw new Error("Balance not found")
             }
@@ -223,7 +233,9 @@ class SendMoney {
                 this.currency = (await prisma.preference.findFirst({ where: { userId: this?.sender?.id } }) as preference)?.currency
                 this.p2pTransfer = await this.createP2PTransfer(transactionDetail, this.currency as string, "Success")
                 await redisManager().setCache(`${this.sender?.id}_getAllP2PTransactions`, this.p2pTransfer)
-                await prisma.wallet.update({ where: { userId: this.sender?.id }, data: { wrongPincodeAttempts: 0 } })
+                if (this.wallet && this.wallet.wrongPincodeAttempts > 0) {
+                    this.wallet = await prisma.wallet.update({ where: { userId: this.sender?.id }, data: { wrongPincodeAttempts: 0 } })
+                }
                 if (await redisManager().getCache(`${this.sender?.id}_walletLock`)) {
                     await redisManager().deleteCache(`${this.sender?.id}_walletLock`)
                 }
@@ -274,7 +286,9 @@ class SendMoney {
             }
             this.p2pTransfer = await this.createP2PTransfer(transactionDetail, this.currency as string, "Failed")
             await redisManager().setCache(`${this.sender?.id}_getAllP2PTransactions`, this.p2pTransfer)
-            await prisma.wallet.update({ where: { userId: this.sender?.id }, data: { wrongPincodeAttempts: 0 } })
+            if (this.wallet && this.wallet.wrongPincodeAttempts > 0) {
+                this.wallet = await prisma.wallet.update({ where: { userId: this.sender?.id }, data: { wrongPincodeAttempts: 0 } })
+            }
             return { message: error.message || "Something went wrong on the bank server", status: 500 }
         }
     }
@@ -289,7 +303,13 @@ export const getAllP2PTransactionHistories = async (): Promise<p2ptransfer[] | [
         if (!session?.user?.uid) {
             return []
         }
-        const isUserExist = await prisma.user.findFirst({ where: { id: session.user.uid } })
+
+        let isUserExist = await redisManager().getUserField(`${session.user.number}_userCred`, "user")
+        if (!isUserExist) {
+            isUserExist = await prisma.user.findFirst({ where: { id: session.user.uid } })
+            if (isUserExist) await redisManager().updateUserCred(session.user.number.toString(), "user", JSON.stringify(isUserExist))
+        }
+
         if (!isUserExist) {
             return []
         }
@@ -343,17 +363,21 @@ export const sendOTPAction = async (email: string): Promise<{
             return { message: "Unauthorized. Please login first", status: 401 }
         }
 
-        const isUserExist = await prisma.user.findFirst({
-            where:
-            {
-                AND: [
-                    { id: session?.user?.uid },
-                    { email }
-                ]
-            }
-        })
+        let isUserExist = await redisManager().getUserField(`${session.user.number}_userCred`, "user")
+        if (!isUserExist) {
+            isUserExist = await prisma.user.findFirst({
+                where:
+                {
+                    AND: [
+                        { id: session?.user?.uid },
+                        { email }
+                    ]
+                }
+            })
+            if (isUserExist) await redisManager().updateUserCred(session.user.number.toString(), "user", JSON.stringify(isUserExist))
+        }
 
-        if (!isUserExist) return { message: "User doesn't exist. Please login first.", status: 401 }
+        if (!isUserExist) return { message: "User doesn't exist with this email. Please login first.", status: 401 }
         if (!isUserExist.isVerified) return { message: "Please verify your account first to send money", status: 401 }
         if (!isUserExist.twoFactorActivated) return { message: "Please enable your 2FA", status: 401 }
         if (!isUserExist.otpVerified) return { message: "Please enable your 2FA", status: 401 }
@@ -388,14 +412,11 @@ export const verifyOTP = async (otp: string): Promise<{
             return { message: "Unauthorized. Please login first", status: 401 }
         }
 
-        const isUserExist = await prisma.user.findFirst({
-            where:
-            {
-                AND: [
-                    { id: session?.user?.uid },
-                ]
-            }
-        })
+        let isUserExist = await redisManager().getUserField(`${session.user.number}_userCred`, "user")
+        if (!isUserExist) {
+            isUserExist = await prisma.user.findFirst({ where: { id: session?.user?.uid } })
+            if (isUserExist) await redisManager().updateUserCred(session.user.number.toString(), "user", JSON.stringify(isUserExist))
+        }
 
         if (!isUserExist) return { message: "User doesn't exist. Please login first.", status: 401 }
         if (!isUserExist.isVerified) return { message: "Please verify your account first to send money", status: 401 }

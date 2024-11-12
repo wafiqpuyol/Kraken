@@ -5,7 +5,7 @@ import { prisma } from "@repo/db/client"
 import { getServerSession } from "next-auth"
 import { authOptions } from "@repo/network"
 import { user } from "@repo/db/type";
-
+import { redisManager } from "@repo/cache/redisManager"
 
 export const getTwoFASecret = async (): Promise<{
     message?: string;
@@ -18,20 +18,26 @@ export const getTwoFASecret = async (): Promise<{
             return { message: "Unauthorized. Please login first", status: 401, }
         }
 
-        let isUserExist = await prisma.user.findFirst({ where: { id: session.user.uid } })
+        let isUserExist = await redisManager().getUserField(`${session.user.number}_userCred`, "user")
+        if (!isUserExist) {
+            isUserExist = await prisma.user.findFirst({ where: { id: session.user.uid } })
+            if (isUserExist) await redisManager().updateUserCred(isUserExist.number.toString(), "user", JSON.stringify(isUserExist))
+        }
         if (!isUserExist) {
             return { message: "Unauthorized User Not Found", status: 401 }
         }
         if (!isUserExist.isVerified) {
             return { message: "Please verify your account first before enable signIn2FA.", status: 401 }
         }
+
         let secret = isUserExist.twoFactorSecret
         if (!secret) {
             secret = authenticator.generateSecret();
-            isUserExist = await prisma.user.update({
+            const updatedUserInfo = isUserExist = await prisma.user.update({
                 where: { id: session.user.uid },
                 data: { twoFactorSecret: secret }
             })
+            await redisManager().updateUserCred(updatedUserInfo.number.toString(), "user", JSON.stringify(updatedUserInfo))
         }
 
         return {
@@ -59,8 +65,11 @@ export const activate2fa = async (otp: string, twoFAType: "signInTwoFA" | "withD
         if (!session?.user?.uid) {
             return { message: "Unauthorized. Please login first", status: 401, }
         }
-
-        const isUserExist = await prisma.user.findFirst({ where: { id: session.user.uid } })
+        let isUserExist = await redisManager().getUserField(`${session.user.number}_userCred`, "user")
+        if (!isUserExist) {
+            isUserExist = await prisma.user.findFirst({ where: { id: session.user.uid } })
+            if (isUserExist) await redisManager().updateUserCred(isUserExist.number.toString(), "user", JSON.stringify(isUserExist))
+        }
         if (!isUserExist) {
             return { message: "Unauthorized User Not Found", status: 401 }
         }
@@ -75,7 +84,7 @@ export const activate2fa = async (otp: string, twoFAType: "signInTwoFA" | "withD
         if (twoFAType === "withDrawTwoFA") {
             let isWalletExist = await prisma.wallet.findFirst({ where: { userId: session.user.uid } })
             if (!isWalletExist) {
-                return { message: "Wallet associated with user not found", status: 401 }
+                return { message: "Wallet associated with this user not found", status: 401 }
             } else {
                 if (!isWalletExist.withDrawTwoFAActivated || !isWalletExist.withDrawTwoFASecret) {
                     return { message: "WithDrawTwoFA secret not present. Please try again", status: 500 }
@@ -84,16 +93,17 @@ export const activate2fa = async (otp: string, twoFAType: "signInTwoFA" | "withD
             secret = isWalletExist.withDrawTwoFASecret
         }
 
-        const tokenValid = authenticator.check(otp, secret);
+        const tokenValid = authenticator.check(otp, secret!);
         if (!tokenValid) {
             return { message: "Invalid OTP. Please try again", status: 400 }
         }
 
         if (twoFAType === "signInTwoFA") {
-            await prisma.user.update({
+            const updatedUserInfo = await prisma.user.update({
                 where: { id: session.user.uid },
                 data: { twoFactorActivated: true, otpVerified: true }
             })
+            await redisManager().updateUserCred(updatedUserInfo.number.toString(), "user", JSON.stringify(updatedUserInfo))
         }
         if (twoFAType === "withDrawTwoFA") {
             await prisma.wallet.update({
@@ -124,11 +134,15 @@ export const isTwoFAEnabled = async (): Promise<{ message: string, status: numbe
         if (!session?.user?.uid) {
             return { message: "Unauthorized. Please login first.", status: 401 }
         }
-        const isTwoFAEnable = await prisma.user.findFirst({ where: { id: session?.user?.uid } }) as user
-        if (!isTwoFAEnable.twoFactorSecret) {
+        let isUserExist = await redisManager().getUserField(`${session.user.number}_userCred`, "user")
+        if (!isUserExist) {
+            isUserExist = await prisma.user.findFirst({ where: { id: session?.user?.uid } }) as user
+            if (isUserExist) await redisManager().updateUserCred(isUserExist.number.toString(), "user", JSON.stringify(isUserExist))
+        }
+        if (!isUserExist.twoFactorSecret) {
             return { message: "success", status: 200, isTwoFAEnabled: false, isOTPVerified: false }
         }
-        return { message: "success", status: 200, isTwoFAEnabled: isTwoFAEnable.twoFactorActivated, isOTPVerified: isTwoFAEnable.otpVerified }
+        return { message: "success", status: 200, isTwoFAEnabled: isUserExist.twoFactorActivated, isOTPVerified: isUserExist.otpVerified }
     } catch (error: any) {
         console.log("===========================>", error.message);
         return { message: error.message || "Signup Failed. Something went wrong", status: 500 }
@@ -142,10 +156,15 @@ export const disable2fa = async (twoFAType: "signInTwoFA" | "withDrawTwoFA", uid
         if (!session?.user?.uid && !uid) {
             return
         }
-        const user = await prisma.user.findFirst({ where: { id: uid || session?.user?.uid } })
-        if (!user) return
-        if (user.otpVerified) {
-            await prisma.user.update({
+        let isUserExist = await redisManager().getUserField(`${session?.user?.number}_userCred`, "user")
+        if (!isUserExist) {
+            isUserExist = await prisma.user.findFirst({ where: { id: uid || session?.user?.uid } })
+            if (isUserExist) await redisManager().updateUserCred(isUserExist.number.toString(), "user", JSON.stringify(isUserExist))
+        }
+
+        if (!isUserExist) return;
+        if (isUserExist.otpVerified) {
+            const updatedUserInfo = await prisma.user.update({
                 where: {
                     id: uid || session?.user?.uid
                 },
@@ -153,6 +172,7 @@ export const disable2fa = async (twoFAType: "signInTwoFA" | "withDrawTwoFA", uid
                     otpVerified: false
                 }
             })
+            if (updatedUserInfo) await redisManager().updateUserCred(updatedUserInfo.number.toString(), "user", JSON.stringify(updatedUserInfo))
         }
     }
     else {
@@ -184,8 +204,11 @@ export const getWithDrawTwoFASecret = async (): Promise<{
         if (!session?.user?.uid) {
             return { message: "Unauthorized. Please login first", status: 401, }
         }
-
-        let isUserExist = await prisma.user.findFirst({ where: { id: session.user.uid } })
+        let isUserExist = await redisManager().getUserField(`${session.user.number}_userCred`, "user")
+        if (!isUserExist) {
+            isUserExist = await prisma.user.findFirst({ where: { id: session.user.uid } })
+            if (isUserExist) await redisManager().updateUserCred(isUserExist.number.toString(), "user", JSON.stringify(isUserExist))
+        }
         if (!isUserExist) {
             return { message: "Unauthorized User Not Found", status: 401 }
         }
@@ -247,9 +270,13 @@ export const remove2fa = async (twoFAType: "signInTwoFA" | "withDrawTwoFA"): Pro
         }
 
         if (twoFAType === "signInTwoFA") {
-            const user = await prisma.user.findFirst({ where: { id: session.user.uid } })
-            if (!user) return { message: "Unauthorized User Not Found", status: 401 }
-            await prisma.user.update({
+            let isUserExist = await redisManager().getUserField(`${session?.user?.number}_userCred`, "user")
+            if (!isUserExist) {
+                isUserExist = await prisma.user.findFirst({ where: { id: session.user.uid } })
+                if (isUserExist) await redisManager().updateUserCred(session.user.number.toString(), "user", JSON.stringify(isUserExist))
+            }
+            if (!isUserExist) return { message: "Unauthorized User Not Found", status: 401 }
+            const updatedUserInfo = await prisma.user.update({
                 where: {
                     id: session.user.uid
                 },
@@ -259,6 +286,7 @@ export const remove2fa = async (twoFAType: "signInTwoFA" | "withDrawTwoFA"): Pro
                     otpVerified: false
                 }
             })
+            await redisManager().updateUserCred(updatedUserInfo.number.toString(), "user", JSON.stringify(updatedUserInfo))
         }
         else {
             const wallet = await prisma.wallet.findFirst({ where: { userId: session.user.uid } })

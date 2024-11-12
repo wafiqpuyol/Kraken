@@ -9,6 +9,7 @@ import { randomBytes } from "crypto";
 import { sendEmergencyCodeMail } from "./mail"
 import { PINCODE_RESET_LIMIT } from "@repo/ui/constants"
 import { getNextDayDate, hoursLeft } from "./utils"
+import { redisManager } from "@repo/cache/redisManager"
 
 export const generatePincode = async (pincode: string) => {
     try {
@@ -17,7 +18,12 @@ export const generatePincode = async (pincode: string) => {
             return { message: "Unauthorized. Please login first", status: 401 }
         }
 
-        const isUserExist = await prisma.user.findFirst({ where: { id: session.user.uid } })
+        let isUserExist = await redisManager().getUserField(`${session.user.number}_userCred`, "user")
+        if (!isUserExist) {
+            isUserExist = await prisma.user.findFirst({ where: { id: session.user.uid } })
+            if (isUserExist) await redisManager().updateUserCred(session.user.number.toString(), "user", JSON.stringify(isUserExist))
+        }
+
         if (!isUserExist) {
             return { message: "User not found. Please login first", status: 401 }
         }
@@ -55,7 +61,16 @@ export const sendEmergencyCode = async (email: string) => {
             return { message: "Unauthorized. Please login first", status: 401 }
         }
 
-        const isUserExist = await prisma.user.findFirst({ where: { AND: [{ id: session.user.uid }, { email }] } })
+        let isUserExist = await redisManager().getUserField(`${session.user.number}_userCred`, "user")
+        if (isUserExist && (isUserExist.email !== email)) {
+            return { message: "User does not exist with this email", status: 401 }
+        }
+
+        if (!isUserExist) {
+            isUserExist = await prisma.user.findFirst({ where: { AND: [{ id: session.user.uid }, { email }] } })
+            if (isUserExist) await redisManager().updateUserCred(session.user.number.toString(), "user", JSON.stringify(isUserExist))
+        }
+
         if (!isUserExist) {
             return { message: "User does not exist with this email", status: 401 }
         }
@@ -77,7 +92,8 @@ export const sendEmergencyCode = async (email: string) => {
         }
         const emergencyCode = randomBytes(25).toString("hex");
         await prisma.wallet.update({
-            where: { userId: isUserExist.id }, data: {
+            where: { userId: isUserExist.id },
+            data: {
                 emergency_code: emergencyCode,
                 emergency_code_expiresAt: new Date(Date.now() + 1000 * 30),
             }
@@ -96,7 +112,12 @@ export const resetPin = async (emergency_code: string) => {
             return { message: "Unauthorized. Please login first", status: 401 }
         }
 
-        const isUserExist = await prisma.user.findFirst({ where: { id: session.user.uid } })
+        let isUserExist = await redisManager().getUserField(`${session.user.number}_userCred`, "user")
+        if (!isUserExist) {
+            isUserExist = await prisma.user.findFirst({ where: { id: session.user.uid } })
+            if (isUserExist) await redisManager().updateUserCred(session.user.number.toString(), "user", JSON.stringify(isUserExist))
+        }
+
         if (!isUserExist) {
             return { message: "User does not exist with this email", status: 401 }
         }

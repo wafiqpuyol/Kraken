@@ -5,6 +5,8 @@ import { authOptions } from "@repo/network"
 import { getServerSession } from "next-auth"
 import { generateRegistrationOptions, verifyRegistrationResponse, generateAuthenticationOptions, verifyAuthenticationResponse } from "@simplewebauthn/server"
 import type { VerifiedRegistrationResponse } from "@simplewebauthn/server"
+import { redisManager } from "@repo/cache/redisManager"
+
 import {
     AuthenticationResponseJSON, AuthenticatorTransportFuture,
     PublicKeyCredentialCreationOptionsJSON, PublicKeyCredentialRequestOptionsJSON,
@@ -18,8 +20,12 @@ export const verifyMasterKeyOTP = async (): Promise<{ masterKeyOTPVerified?: boo
         if (!session?.user?.uid) {
             return
         }
+        let isUserExist = await redisManager().getUserField(`${session.user.number}_userCred`, "user")
+        if (!isUserExist) {
+            isUserExist = await prisma.user.findFirst({ where: { id: session.user.uid } })
+            if (isUserExist) await redisManager().updateUserCred(session.user.number.toString(), "user", JSON.stringify(isUserExist))
+        }
 
-        let isUserExist = await prisma.user.findFirst({ where: { id: session.user.uid } })
         if (!isUserExist) {
             return
         }
@@ -47,7 +53,11 @@ export const createMasterKey = async (step: "generateRegistration" | "verifyRegi
             return { message: "Unauthorized. Please login first", status: 401, }
         }
 
-        const isUserExist = await prisma.user.findFirst({ where: { id: session.user.uid } })
+        let isUserExist = await redisManager().getUserField(`${session.user.number}_userCred`, "user")
+        if (!isUserExist) {
+            isUserExist = await prisma.user.findFirst({ where: { id: session.user.uid } })
+            if (isUserExist) await redisManager().updateUserCred(session.user.number.toString(), "user", JSON.stringify(isUserExist))
+        }
         if (!isUserExist) {
             return { message: "Unauthorized User Not Found", status: 401 }
         }
@@ -116,7 +126,11 @@ export const verifyPasskey = async (step: "generateAuthentication" | "verifyAuth
             return { message: "Unauthorized. Please login first", status: 401, }
         }
 
-        const isUserExist = await prisma.user.findFirst({ where: { id: session.user.uid } })
+        let isUserExist = await redisManager().getUserField(`${session.user.number}_userCred`, "user")
+        if (!isUserExist) {
+            isUserExist = await prisma.user.findFirst({ where: { id: session.user.uid } })
+            if (isUserExist) await redisManager().updateUserCred(session.user.number.toString(), "user", JSON.stringify(isUserExist))
+        }
         if (!isUserExist) {
             return { message: "Unauthorized User Not Found", status: 401 }
         }
@@ -135,8 +149,10 @@ export const verifyPasskey = async (step: "generateAuthentication" | "verifyAuth
             const res = await generateAuthenticationOptions({
                 rpID: 'localhost',
                 allowCredentials: [{
+                    // @ts-ignore
                     id: Uint8Array.from(Object.values((JSON.parse(isPasskeyExist.passKeyID!)))),
                     type: "public-key",
+                    // @ts-ignore
                     transports: JSON.parse(isPasskeyExist.transports) as AuthenticatorTransportFuture[],
                 }],
                 userVerification: "preferred"
@@ -189,7 +205,12 @@ export const isMasterKeyActiveAndVerified = async () => {
     try {
         const session = await getServerSession(authOptions)
         if (!session?.user?.uid) return res
-        const isUserExist = await prisma.user.findFirst({ where: { id: session.user.uid } })
+
+        let isUserExist = await redisManager().getUserField(`${session.user.number}_userCred`, "user")
+        if (!isUserExist) {
+            isUserExist = await prisma.user.findFirst({ where: { id: session.user.uid } })
+            if (isUserExist) await redisManager().updateUserCred(session.user.number.toString(), "user", JSON.stringify(isUserExist))
+        }
         if (!isUserExist) return res
         const isMasterKeyExist = await prisma.masterkey.findUnique({ where: { userId: session.user.uid } })
         if (!isMasterKeyExist) {
@@ -208,7 +229,12 @@ export const disableMasterKey = async (uid?: number) => {
     try {
         const session = await getServerSession(authOptions)
         if (!session?.user?.uid && !uid) return;
-        const isUserExist = await prisma.user.findFirst({ where: { id: uid || session?.user?.uid } })
+
+        let isUserExist = await redisManager().getUserField(`${session?.user?.number}_userCred`, "user")
+        if (!isUserExist) {
+            isUserExist = await prisma.user.findFirst({ where: { id: uid || session?.user?.uid } })
+            if (isUserExist) await redisManager().updateUserCred(isUserExist.number.toString(), "user", JSON.stringify(isUserExist))
+        }
         if (!isUserExist) return;
         const isMasterKeyExist = await prisma.masterkey.findUnique({ where: { userId: isUserExist.id } })
         if (!isMasterKeyExist) return;
