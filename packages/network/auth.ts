@@ -122,6 +122,11 @@ export const authOptions: NextAuthOptions = {
         strategy: 'jwt',
         maxAge: MAX_AGE,
     },
+    events: {
+        async signOut({ token, session }) {
+            await redisManager().deleteUser(token.sub!)
+        },
+    },
     callbacks: {
         async session({ token, session }) {
             let existUser: any = null;

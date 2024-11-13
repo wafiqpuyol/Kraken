@@ -159,7 +159,6 @@ export const disable2fa = async (twoFAType: "signInTwoFA" | "withDrawTwoFA", uid
         let isUserExist = await redisManager().getUserField(`${session?.user?.number}_userCred`, "user")
         if (!isUserExist) {
             isUserExist = await prisma.user.findFirst({ where: { id: uid || session?.user?.uid } })
-            if (isUserExist) await redisManager().updateUserCred(isUserExist.number.toString(), "user", JSON.stringify(isUserExist))
         }
 
         if (!isUserExist) return;

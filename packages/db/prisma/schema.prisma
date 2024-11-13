@@ -35,6 +35,7 @@ model onramptransaction {
   user         user                     @relation(fields: [userId], references: [id], map: "OnRampTransaction_userId_fkey")
 
   @@index([userId], map: "OnRampTransaction_userId_fkey")
+  @@index([token], map: "OnRampTransaction_token_fkey")
 }
 
 model p2ptransfer {
@@ -60,6 +61,7 @@ model p2ptransfer {
 
   @@index([fromUserId], map: "P2pTransfer_fromUserId_fkey")
   @@index([toUserId], map: "P2pTransfer_toUserId_fkey")
+  @@index([transactionID], map: "P2pTransfer_transactionID_fkey")
 }
 
 model user {
@@ -85,6 +87,9 @@ model user {
   preference                               preference?
   resetpassword                            resetpassword[]
   wallet                                   wallet?
+
+  @@index([email], map: "User_email_fkey")
+  @@index([number], map: "User_number_fkey")
 }
 
 model resetpassword {

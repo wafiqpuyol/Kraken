@@ -233,7 +233,6 @@ export const disableMasterKey = async (uid?: number) => {
         let isUserExist = await redisManager().getUserField(`${session?.user?.number}_userCred`, "user")
         if (!isUserExist) {
             isUserExist = await prisma.user.findFirst({ where: { id: uid || session?.user?.uid } })
-            if (isUserExist) await redisManager().updateUserCred(isUserExist.number.toString(), "user", JSON.stringify(isUserExist))
         }
         if (!isUserExist) return;
         const isMasterKeyExist = await prisma.masterkey.findUnique({ where: { userId: isUserExist.id } })
