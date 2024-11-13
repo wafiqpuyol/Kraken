@@ -46,7 +46,8 @@ export const updateLockStatus = async () => {
         if (await redisManager().getCache(`${session.user.uid}_walletLock`)) {
             await redisManager().deleteCache(`${session.user.uid}_walletLock`)
         }
-        await prisma.account.update({ where: { userId: session.user.uid }, data: { isLock: false, lock_expiresAt: null } })
+        const updatedAccountInfo = await prisma.account.update({ where: { userId: session.user.uid }, data: { isLock: false, lock_expiresAt: null } })
+        await redisManager().updateUserCred(session.user.number.toString(), "account", JSON.stringify(updatedAccountInfo))
         await prisma.wallet.update({ where: { userId: session.user.uid }, data: { wrongPincodeAttempts: 0 } })
     } catch (error) {
         console.log("updateLockStatus ===>", error);

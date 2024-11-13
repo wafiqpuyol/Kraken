@@ -31,9 +31,13 @@ export const updatePreference = async (payload: Partial<preference>): Promise<{
             return { message: "Please verify your email first.", statusCode: 401 }
         }
         const updatedPreference = await prisma.preference.update({ where: { id: isUserExist.preference?.id, userId: isUserExist.id }, data: payload })
+        redisManager().updateUserCred(session.user.number.toString(), "preference", JSON.stringify(updatedPreference))
+        if (Object.keys(payload).includes("notification_status")) {
+            await redisManager().deleteCache(`${isUserExist.id}_notifications`)
+        }
         return { message: "success", statusCode: 200, updatedPreference }
     } catch (error) {
-        console.log(error)
+        console.log("updatePreference ==>", error)
         return { message: "Something went wrong", statusCode: 500 }
     }
 }

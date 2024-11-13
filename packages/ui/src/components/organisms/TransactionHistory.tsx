@@ -1,11 +1,11 @@
 "use client"
 
-import { p2ptransfer, preference } from "@repo/db/type"
+import { p2ptransfer } from "@repo/db/type"
 import { useSession } from "next-auth/react"
 import { cn } from "../../lib/utils"
 import { TransactionModal } from "../molecules/TransactionModal"
 import { Skeleton } from "../molecules/Skeleton"
-import { useEffect, useState } from "react"
+import { useEffect, useState, memo } from "react"
 import { useTranslations } from "next-intl"
 import { Input } from "../atoms/Input"
 import { Button } from "../atoms/Button"
@@ -14,7 +14,7 @@ interface TransactionHistoryProps {
     p2pTransactionHistories: p2ptransfer[] | []
     getAllP2PTransactionByTrxnID: (trxn_id: string) => Promise<[]>
 }
-export const TransactionHistory: React.FC<TransactionHistoryProps> = ({ p2pTransactionHistories, getAllP2PTransactionByTrxnID }) => {
+export const TransactionHistory: React.FC<TransactionHistoryProps> = memo(({ p2pTransactionHistories, getAllP2PTransactionByTrxnID }) => {
     const [isSkeleton, setIsSkeleton] = useState(true)
     const [isLoading, setIsLoading] = useState(false)
     const [disableSearchBtn, setDisableSearchBtn] = useState(true)
@@ -22,7 +22,6 @@ export const TransactionHistory: React.FC<TransactionHistoryProps> = ({ p2pTrans
     const t = useTranslations("TransactionHistory")
     const [inputData, setInputData] = useState("")
     const [searchedTransactionHistory, setSearchedTransactionHistory] = useState<[p2ptransfer] | []>([])
-
 
     useEffect(() => {
         const timerId = setTimeout(() => setIsSkeleton(false), 2500)
@@ -58,7 +57,7 @@ export const TransactionHistory: React.FC<TransactionHistoryProps> = ({ p2pTrans
             <div className="bg-card p-4 rounded-lg shadow-md w-[720px] p-8">
                 <h2 className="text-2xl font-semibold text-foreground mb-8">{t("title")}</h2>
 
-                <div className="flex justify-start">
+                <div className="flex justify-start gap-4 mb-3">
                     <Input type="text" value={inputData} placeholder="Enter transaction ID" onChange={e => handleOnChange(e.target.value.trim())} disabled={isSkeleton} />
                     <Button className="bg-purple-600 text-white" onClick={handleSearchBtn} disabled={isSkeleton || isLoading || disableSearchBtn}>Search</Button>
                 </div>
@@ -87,7 +86,8 @@ export const TransactionHistory: React.FC<TransactionHistoryProps> = ({ p2pTrans
             </div>
         </div>
     )
-}
+})
+
 const TransactionHistoryCard = ({ p2pTransactionHistories, currentUserID, t }: { p2pTransactionHistories: p2ptransfer[], currentUserID: number, t: any }) => (
     p2pTransactionHistories.map(obj => {
 

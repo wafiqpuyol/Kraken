@@ -340,12 +340,23 @@ export const getAllP2PTransactionHistories = async (): Promise<p2ptransfer[] | [
 }
 
 export const getAllP2PTransactionByTrxnID = async (trxn_id: string) => {
-    let res: [] | [p2ptransfer] = []
+    let res: p2ptransfer[] = []
+    const session = await getServerSession(authOptions)
+    if (!session?.user?.uid) {
+        return res
+    }
     try {
-        const p2pTransactionHistory = await prisma.p2ptransfer.findFirst({ where: { transactionID: trxn_id } })
-        if (p2pTransactionHistory) {
-            res.push(p2pTransactionHistory)
+        let cachedP2pTransactionHistory = await redisManager().getCache(`${session.user.uid}_getAllP2PTransactions`) as p2ptransfer[] | null
+
+        if (cachedP2pTransactionHistory) {
+            res.push(...cachedP2pTransactionHistory.filter((t: p2ptransfer) => t.transactionID === trxn_id))
         }
+
+        if (!cachedP2pTransactionHistory) {
+            const data = await prisma.p2ptransfer.findFirst({ where: { transactionID: trxn_id } })
+            if (data) res.push(data)
+        }
+
         return res
     } catch (error) {
         console.log("getAllP2PTransactionByTrxnID =========>", error);
