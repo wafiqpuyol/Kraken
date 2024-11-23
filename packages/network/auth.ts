@@ -84,6 +84,7 @@ export const authOptions: NextAuthOptions = {
                     delete isUserExist.preference
                     delete isUserExist.balance
                     await redisManager().updateUserCred(phone_number.toString(), "user", JSON.stringify(isUserExist))
+                    await redisManager().setExpiry({ key: `${phone_number.toString()}_userCred`, ttl: MAX_AGE })
                 }
 
                 if (!isUserExist) {
@@ -123,9 +124,16 @@ export const authOptions: NextAuthOptions = {
         maxAge: MAX_AGE,
     },
     events: {
-        async signOut({ token, session }) {
-            await redisManager().deleteUser(token.sub!)
+
+        async signOut({ token }) {
+            await redisManager().setExpiry({ userId: token.sub!, ttl: 0 })
         },
+        async session({ session }) {
+            const cachedUserData = await redisManager().getUserField(`${session.user?.number}_userCred`, "user")
+            if (cachedUserData) {
+                await redisManager().setExpiry({ key: `${session.user?.number}_userCred`, ttl: MAX_AGE })
+            }
+        }
     },
     callbacks: {
         async session({ token, session }) {

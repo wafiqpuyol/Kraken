@@ -99,17 +99,6 @@ class RedisManager {
         await this.client.del(key)
     }
 
-    async deleteUser(userId: string) {
-        const user = await prisma.user.findFirst({
-            where: { id: parseInt(userId) },
-            select: { number: true }
-        }) as user
-
-        ["user", "preference", "account", "balance"].forEach(async (field) => {
-            await this.client.hDel(`+${parseInt(user.number)}_userCred`, field)
-        })
-    }
-
     async addUser(userCred: user) {
         return await this.client.hSet(`${userCred.number}_userCred`, {
             user: JSON.stringify(userCred),
@@ -126,6 +115,18 @@ class RedisManager {
     async getUserField(key: string, field: string) {
         const data = await this.client.hGet(key, field)
         return data ? JSON.parse(data) : null
+    }
+
+    async setExpiry(args: { key?: string, userId?: string, ttl: number }): Promise<void> {
+        if (args.userId) {
+            const user = await prisma.user.findFirst({
+                where: { id: parseInt(args.userId) },
+                select: { number: true }
+            }) as user
+            await this.client.expire(`+${parseInt(user.number)}_userCred`, args.ttl)
+        } if (args.key) {
+            await this.client.expire(args.key, args.ttl)
+        }
     }
 }
 export const redisManager = () => RedisManager.getInstance()
