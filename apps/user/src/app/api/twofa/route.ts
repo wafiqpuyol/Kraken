@@ -1,14 +1,13 @@
 import { disable2fa } from "../../../lib/twoFA"
 import { disableMasterKey } from "../../../lib/masterkey"
-import { redisManager } from "@repo/cache/redisManager"
 
 export async function POST(req: Request) {
     try {
         const body = await req.json()
+        console.log("_________________", body);
         await disable2fa("signInTwoFA", parseInt(body.sessionData?.sub))
         await disableMasterKey(parseInt(body.sessionData?.sub))
-        await redisManager().deleteUser(body.sessionData?.sub)
-        return new Response("Two disable successfully", { status: 201 })
+        return new Response("Two disable successfully", { status: 200 })
     } catch (error) {
         console.log(error);
         return new Response(

@@ -15,7 +15,12 @@ export default async function middleware(req: NextRequest) {
     await getSessionDataFromToken(req)
     if (!req.cookies.get("next-auth.session-token")) {
         try {
-            await axios.post(`${process.env.NEXT_PUBLIC_FRONTEND_URL}/api/twofa`, { sessionData })
+            if (sessionData !== null) {
+                const res = await axios.post(`${process.env.NEXT_PUBLIC_FRONTEND_URL}/api/twofa`, { sessionData })
+                if (res.status === 200 && res.data === "Two disable successfully") {
+                    sessionData = null
+                }
+            }
         } catch (error) {
             return intlMiddleware(req);
         }
