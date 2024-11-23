@@ -34,4 +34,15 @@ export class UserManager {
     public removeUser(userId: string) {
         this.users.delete(userId)
     }
+
+    public getAllUsers() {
+        if (this.users.size > 0) {
+            return Array.from(this.users.entries())
+        }
+        return []
+    }
+
+    public updateUser(userId: string, isAlive: boolean) {
+        this.users.set(userId, { ...this.getUser(userId), isAlive })
+    }
 }

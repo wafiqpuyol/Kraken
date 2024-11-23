@@ -31,7 +31,8 @@ export class SubscriptionManager {
             await Broker.getInstance().subscribe(async (message: MessageType) => {
                 redisManager().notification(`${message.receiver_id}_notifications`, JSON.stringify(message))
                 await SignalingManager.emit(JSON.stringify(message), message.receiver_id.toString(), "publish")
-            }, Topic.NOTIFICATION)
+            },
+                Topic.NOTIFICATION)
         }
         return this.instance
     }
@@ -54,11 +55,16 @@ export class SubscriptionManager {
     }
 
     public async unsubscribe(channelName: string) {
-        if (this.subscription.has(channelName)) {
+        if (this.subscription.has(channelName.toString())) {
             this.ws = null
             await this.redisPubSubClient.UNSUBSCRIBE(channelName)
             this.subscription.delete(channelName)
             return
         }
+        console.log("channel id does not exist", channelName);
+    }
+
+    public channelExists(channelName: string) {
+        return this.subscription.has(channelName)
     }
 }
