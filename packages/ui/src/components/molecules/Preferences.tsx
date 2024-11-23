@@ -103,11 +103,11 @@ const NotificationToggle = ({ notificationStatus, updatePreference }: {
                     let updatedSessionData: any
                     (() => setToggleNotification(!toggleNotification))()
                     if (toggleNotification) {
-                        SignallingManager.getInstance().closeConnection()
-                        updatedSessionData = { notification_status: !toggleNotification }
+                        updatedSessionData = { notification_status: false }
+                        SignallingManager.isConnected = false;
+                        SignallingManager.getInstance(session.data).closeConnection()
                     } else {
-                        SignallingManager.getInstance().sendMessage()
-                        updatedSessionData = { notification_status: toggleNotification }
+                        updatedSessionData = { notification_status: true }
                     }
 
                     session.update((data: Session) => {

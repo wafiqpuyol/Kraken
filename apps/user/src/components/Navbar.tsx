@@ -11,6 +11,8 @@ import { useTranslations, useLocale } from 'next-intl';
 import { ButtonSkeleton } from "@repo/ui/ButtonSkeleton"
 import { useEffect, useState } from 'react'
 import { disableMasterKey, isMasterKeyActiveAndVerified } from '../lib/masterkey'
+import { Notification } from "@repo/ui/Notification"
+import { SignallingManager } from "@repo/ui/utils"
 
 interface NavbarProps {
     disable2fa: (twoFAType: "signInTwoFA" | "withDrawTwoFA") => Promise<void>
@@ -47,8 +49,12 @@ export const Navbar: React.FC<NavbarProps> = ({ disable2fa, maserKeyVerification
     }, [session])
 
     const handleClick = async () => {
-        await disable2fa("signInTwoFA")
-        await disableMasterKey()
+        if (session.user.preference.notification_status) {
+            SignallingManager.isConnected = false
+            SignallingManager.getInstance(session).closeConnection()
+        }
+        disable2fa("signInTwoFA")
+        disableMasterKey()
         signOut({ callbackUrl: `/${locale}/login` })
     }
 
@@ -78,9 +84,12 @@ export const Navbar: React.FC<NavbarProps> = ({ disable2fa, maserKeyVerification
                                                 <Link href={`/${locale}/dashboard/portfolio`}>{t("my_account")}</Link>
                                             </Button>
                                             :
-                                            <Profile>
-                                                <Button className='bg-white font-medium text-slate-500 px-1 hover:bg-slate-100' onClick={handleClick}>{t("logout")}</Button>
-                                            </Profile>
+                                            <div className="flex items-center gap-10">
+                                                <Notification />
+                                                <Profile>
+                                                    <Button className='bg-white font-medium text-slate-500 px-1 hover:bg-slate-100' onClick={handleClick}>{t("logout")}</Button>
+                                                </Profile>
+                                            </div>
                                     )
                                     :
                                     (
@@ -92,9 +101,12 @@ export const Navbar: React.FC<NavbarProps> = ({ disable2fa, maserKeyVerification
                                                     <Link href={`/${locale}/dashboard/portfolio`}>{t("my_account")}</Link>
                                                 </Button>
                                                 :
-                                                <Profile>
-                                                    <Button className='bg-white font-medium text-slate-500 px-1 hover:bg-slate-100' onClick={handleClick}>{t("logout")}</Button>
-                                                </Profile>
+                                                <div className="flex items-center gap-10">
+                                                    <Notification />
+                                                    <Profile>
+                                                        <Button className='bg-white font-medium text-slate-500 px-1 hover:bg-slate-100' onClick={handleClick}>{t("logout")}</Button>
+                                                    </Profile>
+                                                </div>
                                             :
                                             pathName.endsWith(`/${locale}`)
                                                 ?
@@ -118,7 +130,12 @@ export const Navbar: React.FC<NavbarProps> = ({ disable2fa, maserKeyVerification
                                         ?
                                         <Button className="bg-white text-purple-600 px-4 py-2 rounded-lg hover:bg-zinc-200"><Link href={`/${locale}/dashboard/portfolio`}>{t("my_account")}</Link></Button>
                                         :
-                                        <Profile><Button className='bg-white font-medium text-slate-500 px-2 hover:bg-slate-100' onClick={handleClick}>{t("logout")}</Button></Profile>
+                                        <div className="flex items-center gap-10">
+                                            <Notification />
+                                            <Profile>
+                                                <Button className='bg-white font-medium text-slate-500 px-1 hover:bg-slate-100' onClick={handleClick}>{t("logout")}</Button>
+                                            </Profile>
+                                        </div>
                                     :
                                     (
                                         pathName.endsWith(`/${locale}`)
