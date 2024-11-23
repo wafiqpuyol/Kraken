@@ -1,3 +1,5 @@
+const bcrypt = require('bcrypt');
+
 export const generateTransactionId = () => {
     const characters = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
     let transactionId = "";
@@ -42,4 +44,14 @@ export const hoursLeft = () => {
     const deadline = new Date(getNextDayDate()).getTime();
 
     return countdown(deadline);
+}
+
+export const generateToken = async () => {
+    try {
+        const token = Math.random().toString(36).substring(2, 15);
+        const hashedToken = await bcrypt.hash(token, 10);
+        return hashedToken;
+    } catch (error) {
+        console.error('Error generating password reset token:', error);
+    }
 }

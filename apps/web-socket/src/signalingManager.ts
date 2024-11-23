@@ -1,9 +1,9 @@
-import { WebSocket } from "./types/ws.type"
+import { WebSocket, RawData } from "./types/ws.type"
 import { SubscriptionManager } from "./subscriptionManager"
 import { UserManager } from "./userManager"
+import { HEARTBEAT_VALUE, HEARTBEAT_INTERVAL } from "./utils/constant";
 
 export class SignalingManager {
-    private static instance: UserManager;
     private ws: WebSocket
 
     constructor(ws: WebSocket) {
@@ -24,7 +24,12 @@ export class SignalingManager {
 
     public static async emit(message: string, channelName?: string, messageType?: "publish", ws?: WebSocket) {
         if (messageType === "publish" && channelName) {
-            await SubscriptionManager.getInstance().then(res => res.publish(channelName, message))
+            await SubscriptionManager.getInstance().then(res => {
+                if (res.channelExists(channelName)) {
+                    console.log("channel doesn't exist");
+                }
+                res.publish(channelName, message)
+            })
         }
         if (ws) {
             ws.send(message)
@@ -32,15 +37,53 @@ export class SignalingManager {
     }
 
     private registerOnMessage(ws: WebSocket) {
-        ws.on("message", (message) => {
+        ws.on("message", async (message: RawData, isBinary) => {
             const userManagerInstance = UserManager.getInstance()
+            if (isBinary) {
+                const pongResponse = new Uint32Array(new Uint8Array((message as any)).buffer);
+                if (pongResponse[0] === HEARTBEAT_VALUE) {
+                    UserManager.getInstance().updateUser(`${pongResponse[1]}`, true)
+                    return
+                }
+            }
+
+            if (userManagerInstance.getUser(message.toString())?.instance?.readyState === 3) {
+                userManagerInstance.removeUser(message.toString())
+                const subscribeManagerInstance = await SubscriptionManager.getInstance()
+                await subscribeManagerInstance.unsubscribe(message.toString())
+            }
             if (!userManagerInstance.isUserExists(message.toString())) {
-                userManagerInstance.addUser(message.toString(), { instance: ws });
+                userManagerInstance.addUser(message.toString(), { instance: ws, isAlive: true });
             }
 
             if (userManagerInstance.isUserExists(message.toString())) {
                 SubscriptionManager.getInstance().then(res => res.subscribe(message.toString(), ws))
+                SignalingManager.sendPing()
             }
         });
+    }
+
+    public static sendPing = () => {
+        const timer = setInterval(async () => {
+            const allWSClients = UserManager.getInstance().getAllUsers();
+
+            if (allWSClients.length === 0) {
+                clearInterval(timer)
+                return
+            };
+
+            for (let [key, value] of allWSClients) {
+                if (value.instance) {
+                    if (!value.isAlive) {
+                        UserManager.getInstance().removeUser(key)
+                        const subscribeManagerInstance = await SubscriptionManager.getInstance()
+                        await subscribeManagerInstance.unsubscribe(key)
+                        return;
+                    }
+                    value.instance.send(HEARTBEAT_VALUE, { binary: true })
+                    UserManager.getInstance().updateUser(key, false)
+                }
+            }
+        }, HEARTBEAT_INTERVAL)
     }
 }

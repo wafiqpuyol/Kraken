@@ -7,6 +7,9 @@ import { Session } from "next-auth"
 import { toast, } from "../components/molecules/Toaster/use-toast"
 import { startAuthentication } from "@simplewebauthn/browser"
 import { PublicKeyCredentialRequestOptionsJSON } from "@simplewebauthn/types"
+import { notification } from "@repo/db/type"
+import { WS_SERVER_URL } from "./constant"
+import { HEARTBEAT_VALUE, SOCKET_CLOSE_CODE } from "./constant"
 
 export function cn(...inputs: ClassValue[]) {
     return twMerge(clsx(inputs))
@@ -64,6 +67,28 @@ export const calculateAmountOnDemand = (setAmountError?: Dispatch<SetStateAction
     return parseInt(amountWithExchangeRate.toString()) / 100
 }
 
+export const formatTimestamp = (timestamp: number) => {
+    const now = new Date().getTime();
+    const diff = now - timestamp;
+
+    const seconds = Math.floor(diff / 1000);
+
+    const minutes = Math.floor(seconds / 60);
+    const hours = Math.floor(minutes / 60);
+    const days = Math.floor(hours / 24);
+
+
+    if (days > 0) {
+        return `${days}d ago`;
+    } else if (hours > 0) {
+        return `${hours}h ago`;
+    } else if (minutes > 0) {
+        return `${minutes}m ago`;
+    } else {
+        return `${seconds}s   
+   ago`;
+    }
+}
 export const responseHandler = (res: any) => {
     switch (res.status) {
         case 200:
@@ -165,5 +190,88 @@ export const validatePasskey = async (verifyPasskey: (step: "generateAuthenticat
         }
     } catch (error) {
         return res
+    }
+}
+
+const isBinary = (obj: any) => {
+    return typeof obj === 'object' && Object.prototype.toString.call(obj) === '[object Blob]';
+}
+
+export class SignallingManager {
+    public ws: WebSocket;
+    private static instance: SignallingManager
+    public session: Session
+    public static isConnected: boolean;
+    private setTotalNotifications!: Dispatch<SetStateAction<notification[]>>
+    private setTotalNumberOfUnreadNotificationCount!: Dispatch<SetStateAction<number>>
+    private setUserTotalBalance!: Dispatch<SetStateAction<number>>
+
+    private constructor(session: Session) {
+        this.ws = new WebSocket(WS_SERVER_URL);
+        this.session = session
+    }
+
+    public static getInstance(session: Session) {
+        if (this.isConnected) {
+            this.instance = new SignallingManager(session);
+        }
+        return this.instance
+    }
+
+    public init(
+        setTotalNotifications: Dispatch<SetStateAction<notification[]>>,
+        setTotalNumberOfUnreadNotificationCount: Dispatch<SetStateAction<number>>,
+        setUserTotalBalance: Dispatch<SetStateAction<number>>
+    ) {
+        this.setTotalNotifications = setTotalNotifications
+        this.setTotalNumberOfUnreadNotificationCount = setTotalNumberOfUnreadNotificationCount
+        this.setUserTotalBalance = setUserTotalBalance
+
+        this.ws.onopen = () => {
+            this.sendMessage()
+        };
+
+        this.registerOnMessage()
+        this.registerOnClose()
+    }
+    private registerOnMessage() {
+        this.ws.onmessage = (msg: MessageEvent) => {
+            if (isBinary(msg.data)) {
+                this.sendPong()
+                return
+            }
+            const parsedData = JSON.parse(msg.data);
+            this.setTotalNotifications!((prev: any) => {
+                return [parsedData, ...prev]
+            })
+            this.setTotalNumberOfUnreadNotificationCount!((prev: any) => {
+                return prev + 1
+            })
+
+            this.setUserTotalBalance!(this.session?.user?.total_balance! + (JSON.parse(parsedData.message).amount))
+        };
+    }
+
+    private registerOnClose() {
+        this.ws.onclose = () => {
+            if (SignallingManager.isConnected) {
+                SignallingManager.getInstance(this.session).init(this.setTotalNotifications,
+                    this.setTotalNumberOfUnreadNotificationCount,
+                    this.setUserTotalBalance)
+            }
+        };
+    }
+
+    private sendPong() {
+        const binaryData = new Uint32Array([HEARTBEAT_VALUE, this.session?.user?.uid!])
+        this.ws.send(binaryData)
+    }
+
+    private async sendMessage() {
+        this.ws.send((this.session?.user?.uid!).toString())
+    }
+
+    public closeConnection() {
+        this.ws.close(SOCKET_CLOSE_CODE, (this.session?.user?.uid!).toString())
     }
 }

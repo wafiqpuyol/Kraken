@@ -342,3 +342,6 @@ export const LOCK_AMOUNT = {
 export const WRONG_PINCODE_ATTEMPTS = 3
 export const WRONG_PASSWORD_ATTEMPTS = 3
 export const PINCODE_RESET_LIMIT = 3
+export const WS_SERVER_URL = "ws://localhost:3010"
+export const HEARTBEAT_VALUE = 1;
+export const SOCKET_CLOSE_CODE = 1000

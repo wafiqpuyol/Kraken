@@ -60,7 +60,9 @@ export class Broker {
                 }
                 if (message.key && message.value) {
                     const inputMessage: MessageType = JSON.parse(message.value.toString());
-                    if (!UserManager.getInstance().getUser(inputMessage.receiver_id.toString())) {
+                    const clientWSInstance = UserManager.getInstance().getUser(inputMessage.receiver_id.toString())
+                    if (!clientWSInstance) {
+                        console.log("User not active");
                         return
                     }
                     await messageHandler(inputMessage)
