@@ -1,81 +1,107 @@
-# Turborepo starter
+# 🐙 Kraken - Modern Fiat Currency Wallet
 
-This is an official starter Turborepo.
+A secure, feature-rich fiat currency wallet system built with a microservices architecture and powered by a robust DevSecOps pipeline.
 
-## Using this example
+![Kraken Architecture]([https://github.com/yourusername/kraken-wallet/raw/main/docs/architecture.png](https://excalidraw.com/#json=mMzK5F5U3TBZ1KWkmY44K,hSSqRuemEl2HrF6tPss5NA))
 
-Run the following command:
+## 🏗️ Architecture Overview
 
-```sh
-npx create-turbo@latest
-```
+Kraken uses a microservices architecture with multiple interconnected components:
 
-## What's inside?
+- **Main App**: Core application for user interactions
+- **Bank App**: Interfaces with banking systems
+- **Webhook Service**: Manages callbacks and integrations
+- **Deposit Service**: Handles API requests and middleware
+- **Secondary Processor**: For efficient internal service communication
+- **Main Processor**: For message queuing and event streaming
+- **Notification Service**: Manages real-time alerts to users
+- **Fraud Service**: Monitors and flags suspicious activities
 
-This Turborepo includes the following packages/apps:
+The system utilizes both REST and gRPC communication protocols, with WebSocket for real-time data streaming.
 
-### Apps and Packages
+## ✨ Features
 
-- `docs`: a [Next.js](https://nextjs.org/) app
-- `web`: another [Next.js](https://nextjs.org/) app
-- `@repo/ui`: a stub React component library shared by both `web` and `docs` applications
-- `@repo/eslint-config`: `eslint` configurations (includes `eslint-config-next` and `eslint-config-prettier`)
-- `@repo/typescript-config`: `tsconfig.json`s used throughout the monorepo
+### Security
+- 🔐 Secure user registration & login via phone-number, email & password with magic link email verification
+- 🔒 Non-roaming TOTP based SignIn & Withdrawal 2FA via Google Authenticator
+- 🛡️ Additional security layers with soft-token & biometric FIDO2 based passkey authentication
+- 🔑 Master key for account recovery & 2FA reset
+- ⏱️ Instant Wallet/Account lock after consecutive wrong pincode/password attempts
+- 🚦 Rate limiting on critical endpoints
 
-Each package/app is 100% [TypeScript](https://www.typescriptlang.org/).
+### Transactions
+- 💸 Deposit from selective banks using webhook token
+- 💱 Transfer money in multiple currencies
+- 💹 Currency exchange with additional country-based charges
+- 🔄 Domestic & International P2P cross-wallet balance transfer with exchange rate fees
+- 📊 Row-Level-Lock to ensure smooth transactions & handle race-conditions
+- 📱 Pincode-based secure money transfers
+- 🔄 Pincode reset via interval-based Emergency Code
 
-### Utilities
+### Financial Management
+- 🏦 Lock desired amount of money for emergency balance
+- 📈 Track Daily & Monthly deposit limits
+- 📑 Downloadable transaction invoices
+- 📊 Detailed P2P transaction & Deposit history with Aria chart view
 
-This Turborepo has some additional tools already setup for you:
+### Notifications & Monitoring
+- 🔔 Instant notification of P2P transfers (In-house built)
+- 🌐 Custom Webhook + WS server (Downstream Service) & bank server (Upstream Service)
 
-- [TypeScript](https://www.typescriptlang.org/) for static type checking
-- [ESLint](https://eslint.org/) for code linting
-- [Prettier](https://prettier.io) for code formatting
+### User Experience
+- 🌍 I18N support with 7 different languages
+- 📧 Password reset & update via email confirmation & custom email templates
+- ✉️ Email update via both confirmation + authorization code
 
-### Build
+### Performance
+- ⚡ Unified Redis caching using (read & write aside pattern) for optimized performance
+- 📉 Reduced database transactions
 
-To build all apps and packages, run the following command:
+## 🛠️ Tech Stack
 
-```
-cd my-turborepo
-pnpm build
-```
+### Frontend
+- React
+- Next.js
+- TypeScript
 
-### Develop
+### Backend
+- Express.js
+- Node.js
+- Next-Auth
+- MySQL
+- Redis
+- Prisma
+- Kafka
+- WebSocket
+- Python
+- Flask
+- gRPC
+- REST
 
-To develop all apps and packages, run the following command:
+### DevOps & Tools
+- Turborepo
+- Docker
+- Husky
 
-```
-cd my-turborepo
-pnpm dev
-```
+### CI Pipeline
+- GitHub Actions
+- NPM
+- SonarQube
+- Trivy
+- Nexus
 
-### Remote Caching
+### Infrastructure as Code
+- Terraform
 
-Turborepo can use a technique known as [Remote Caching](https://turbo.build/repo/docs/core-concepts/remote-caching) to share cache artifacts across machines, enabling you to share build caches with your team and CI/CD pipelines.
-
-By default, Turborepo will cache locally. To enable Remote Caching you will need an account with Vercel. If you don't have an account you can [create one](https://vercel.com/signup), then enter the following commands:
-
-```
-cd my-turborepo
-npx turbo login
-```
-
-This will authenticate the Turborepo CLI with your [Vercel account](https://vercel.com/docs/concepts/personal-accounts/overview).
-
-Next, you can link your Turborepo to your Remote Cache by running the following command from the root of your Turborepo:
-
-```
-npx turbo link
-```
-
-## Useful Links
-
-Learn more about the power of Turborepo:
-
-- [Tasks](https://turbo.build/repo/docs/core-concepts/monorepos/running-tasks)
-- [Caching](https://turbo.build/repo/docs/core-concepts/caching)
-- [Remote Caching](https://turbo.build/repo/docs/core-concepts/remote-caching)
-- [Filtering](https://turbo.build/repo/docs/core-concepts/monorepos/filtering)
-- [Configuration Options](https://turbo.build/repo/docs/reference/configuration)
-- [CLI Usage](https://turbo.build/repo/docs/reference/command-line-reference)
+### CD Pipeline & Cloud Services
+- AWS Services:
+  - IAM
+  - EC2
+  - ACM
+  - Route53
+  - ALB
+  - EFS
+  - RDS
+  - CloudWatch
+  - S3
+  - NAT Gateway
