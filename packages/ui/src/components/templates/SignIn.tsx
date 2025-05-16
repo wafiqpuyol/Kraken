@@ -9,7 +9,7 @@ import { signIn } from "next-auth/react"
 import { useRouter } from "next/navigation"
 import Link from "next/link"
 import { TwoFAForm } from '../molecules/TwoFAForm'
-import { useState } from 'react'
+import { useRef, useState } from 'react'
 import { usePhoneInput, CountrySelector, } from 'react-international-phone';
 import 'react-international-phone/style.css';
 import { useTranslations } from 'next-intl';
@@ -19,6 +19,9 @@ import { SELECTED_COUNTRY } from "@repo/ui/constants"
 import { PublicKeyCredentialRequestOptionsJSON } from "@simplewebauthn/types"
 import { WRONG_PASSWORD_ATTEMPTS } from "../../lib/constant"
 import { AccountLock } from "../molecules/Lock"
+import { useAppState } from "../molecules/StateProvider"
+import ReCAPTCHA from "react-google-recaptcha";
+
 
 interface LoginProps {
     isTwoFAEnabledFunc: () => Promise<{
@@ -36,11 +39,19 @@ interface LoginProps {
         status: number;
         challenge?: PublicKeyCredentialRequestOptionsJSON;
     }>,
-    isAccountLocked: boolean
-    lockedAccountExpiresAt: Date | null
+    verifyCaptchaToken: (token: string | undefined | null) => Promise<{
+        message: string;
+        status: number;
+        success: boolean
+    }>
 }
 
-export const SignInForm: React.FC<LoginProps> = ({ isTwoFAEnabledFunc, activate2fa, verifyPasskey, isAccountLocked, lockedAccountExpiresAt }) => {
+export const SignInForm: React.FC<LoginProps> = ({ isTwoFAEnabledFunc, activate2fa, verifyPasskey, verifyCaptchaToken }) => {
+    const [isCaptchaSolved, setIsCaptchaSolved] = useState(false);
+    const [captchaBottomError, setCaptchaBottomError] = useState({
+        isError: false,
+        message: ""
+    });
     const [isTwoFAFormShow, setIsTwoFAFormShow] = useState(false)
     const [isOTPVerified, setIsOTPVerified] = useState(false)
     const [isLoading, setIsLoading] = useState(false)
@@ -56,19 +67,36 @@ export const SignInForm: React.FC<LoginProps> = ({ isTwoFAEnabledFunc, activate2
     })
     const [countryCode, setCountryCode] = useState(`+${country.dialCode}`)
     const t = useTranslations("SignInForm")
-    const [accountLocked, setAccountLocked] = useState(isAccountLocked)
-    const [lockExpiry, setLockExpiry] = useState<Date | null>(lockedAccountExpiresAt)
+    const { accountLocked, lockExpiry, setAccountLocked, setLockExpiry } = useAppState()
+    const recaptchaRef = useRef<ReCAPTCHA>(null);
 
     const submit = async (payload: loginPayload) => {
+        if (!isCaptchaSolved) {
+            setCaptchaBottomError({ message: "Please solve the captcha", isError: true })
+            return
+        }
+
         try {
             setIsLoading(true)
             signIn("credentials", { ...payload, redirect: false }).then(async (response) => {
                 if (response && (!response?.ok || response.error)) {
                     setIsLoading(false)
                     setIsBtnDisable(false)
+                    console.log(response);
                     const parsedError = JSON.parse(response.error as string);
-                    setAccountLocked(parsedError.failedAttempt === WRONG_PASSWORD_ATTEMPTS)
-                    setLockExpiry(parsedError.lockExpiresAt)
+                    console.log(parsedError);
+
+                    if (parsedError.failedAttempt === WRONG_PASSWORD_ATTEMPTS && parsedError.lockExpiresAt) {
+                        setAccountLocked(parsedError.failedAttempt === WRONG_PASSWORD_ATTEMPTS)
+                        setLockExpiry(parsedError.lockExpiresAt)
+                        // if (!(localStorage.getItem("account_status"))) {
+                        //     localStorage.setItem("account_status", JSON.stringify({
+                        //         isAccountLocked: parsedError.failedAttempt === WRONG_PASSWORD_ATTEMPTS,
+                        //         lockedAccountExpiresAt: parsedError.lockExpiresAt
+                        //     }))
+                        // }
+                    }
+
                     return toast({
                         title: parsedError.message || "Email or Password is incorrect",
                         variant: "destructive",
@@ -76,6 +104,13 @@ export const SignInForm: React.FC<LoginProps> = ({ isTwoFAEnabledFunc, activate2
                         duration: 3000
                     })
                 }
+
+                // if (localStorage.getItem("number")) {
+                //     localStorage.removeItem("number")
+                // }
+                // if (localStorage.getItem("account_status")) {
+                //     localStorage.removeItem("account_status")
+                // }
 
                 toast({
                     title: `Login Successful`,
@@ -102,6 +137,28 @@ export const SignInForm: React.FC<LoginProps> = ({ isTwoFAEnabledFunc, activate2
             })
         }
     }
+    const handleCaptchaSubmission = async (token: string | null) => {
+        console.log(token);
+        try {
+            if (token) {
+                const res = await verifyCaptchaToken(token)
+                console.log(res);
+                setIsCaptchaSolved(true);
+                setCaptchaBottomError({ isError: false, message: res.message })
+            }
+        } catch (err: any) {
+            setCaptchaBottomError({ isError: false, message: err.message })
+            setIsCaptchaSolved(false);
+        }
+    }
+    const handleChange = (token: string | null) => {
+        handleCaptchaSubmission(token);
+    };
+
+    const handleExpired = () => {
+        setIsCaptchaSolved(false);
+    }
+
     return (
 
         <div className="flex flex-col items-center justify-center h-screen p-4">
@@ -170,7 +227,13 @@ export const SignInForm: React.FC<LoginProps> = ({ isTwoFAEnabledFunc, activate2
                                             </FormItem>
                                         )}
                                     />
-
+                                    <ReCAPTCHA
+                                        sitekey={process.env.NEXT_PUBLIC_CAPTCHA_SITE_KEY || ""}
+                                        ref={recaptchaRef}
+                                        onChange={handleChange}
+                                        onExpired={handleExpired}
+                                    />
+                                    {captchaBottomError.isError && <small className='text-red-500 font-medium'>{captchaBottomError.message}</small>}
                                     <Button type="submit" disabled={isLoading || isBtnDisable}
                                         className="bg-purple-600 w-full text-white text-lg hover:bg-purple-700">{t("continue_button")}</Button>
                                 </form>
