@@ -117,8 +117,14 @@ export const createMasterKey = async (step: "generateRegistration" | "verifyRegi
     }
 }
 
-export const verifyPasskey = async (step: "generateAuthentication" | "verifyAuthentication",
-    regCred?: { challenge: PublicKeyCredentialRequestOptionsJSON, authResponseJSON: AuthenticationResponseJSON }) => {
+export const verifyPasskey = async (
+    step: "generateAuthentication" | "verifyAuthentication",
+    regCred?: { challenge: PublicKeyCredentialRequestOptionsJSON, authResponseJSON: AuthenticationResponseJSON })
+    : Promise<{
+        message: string
+        status: number
+        challenge?: PublicKeyCredentialRequestOptionsJSON
+    }> => {
 
     try {
         const session = await getServerSession(authOptions)
@@ -193,8 +199,9 @@ export const verifyPasskey = async (step: "generateAuthentication" | "verifyAuth
             })
             return { message: "Passkey verification successful", status: 200 }
         }
-    } catch (error) {
 
+        return { message: "Invalid step", status: 500 }
+    } catch (error) {
         console.log("verifyMasterKey ===>", error);
         return { message: "Something went wrong while verifying master key", status: 500 }
     }

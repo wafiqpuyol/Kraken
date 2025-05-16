@@ -46,10 +46,8 @@ export const authOptions: NextAuthOptions = {
                     status: DEFAULT_AUTH_ERROR_STATUS_CODE,
                     ok: false,
                 }
-                const cookieStore = await cookies()
-                const csrfToken = cookieStore.get('next-auth.csrf-token')?.value
 
-                const accountStatus = await redisManager().getCache(`${csrfToken}_accountLocked`)
+                const accountStatus = await redisManager().getCache(`${credentials.phone_number}_accountLocked`)
                 if (accountStatus) {
                     if (accountStatus.failedPasswordAttempt === WRONG_PASSWORD_ATTEMPTS) {
                         errObj = {
@@ -99,7 +97,7 @@ export const authOptions: NextAuthOptions = {
                 if (!isPasswordMatch) {
                     errObj = {
                         ...errObj,
-                        ...(await redisManager().accountLocked(`${csrfToken}_accountLocked`))
+                        ...(await redisManager().accountLocked(`${credentials.phone_number}_accountLocked`))
                     }
                     throw new Error(JSON.stringify(errObj))
                 }
@@ -107,8 +105,9 @@ export const authOptions: NextAuthOptions = {
                     { uid: isUserExist.id, email: isUserExist.email, number: isUserExist.number },
                     process.env.NEXTAUTH_SECRET || 'wafiqsuperSecret',
                 )
-                if (await redisManager().getCache(`${csrfToken}_accountLocked`)) {
-                    await redisManager().deleteCache(`${csrfToken}_accountLocked`)
+                
+                if (await redisManager().getCache(`${credentials.phone_number}_accountLocked`)) {
+                    await redisManager().deleteCache(`${credentials.phone_number}_accountLocked`)
                 }
                 return {
                     ...isUserExist,
