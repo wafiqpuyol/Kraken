@@ -87,9 +87,22 @@ model user {
   preference                               preference?
   resetpassword                            resetpassword[]
   wallet                                   wallet?
+  session                                  session[]
 
   @@index([email], map: "User_email_fkey")
   @@index([number], map: "User_number_fkey")
+}
+
+model session {
+  id        Int       @id @default(autoincrement())
+  userId    Int
+  userAgent String
+  createdAt DateTime  @default(now())
+  expiredAt DateTime?
+  user      user      @relation(fields: [userId], references: [id], map: "Session_userId_fkey")
+
+  @@index([userId], map: "Session_userId_fkey")
+  @@index([expiredAt], map: "Session_expiredAt_fkey")
 }
 
 model resetpassword {
