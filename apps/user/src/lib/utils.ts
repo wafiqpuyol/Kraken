@@ -55,3 +55,16 @@ export const generateToken = async () => {
         console.error('Error generating password reset token:', error);
     }
 }
+
+
+export class HttpError extends Error {
+    statusCode: number;
+
+    constructor(message: string, statusCode: number) {
+        super(message);
+        this.statusCode = statusCode;
+
+        Object.setPrototypeOf(this, HttpError.prototype);
+        this.name = this.constructor.name;
+    }
+}

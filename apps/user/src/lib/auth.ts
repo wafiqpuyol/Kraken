@@ -12,11 +12,12 @@ import { randomBytes } from "crypto";
 import { sendPasswordResetEmail, sendVerificationEmail, sendChangeEmailVerification } from "./mail"
 import { resetPasswordPayload } from "@repo/forms/resetPasswordSchema"
 import { PasswordMatchSchema } from "@repo/forms/changePasswordSchema"
-import { SUPPORTED_CURRENCY } from "@repo/ui/constants"
+import { SUPPORTED_CURRENCY, WRONG_PASSWORD_ATTEMPTS } from "@repo/ui/constants"
 import { verify, sign, JwtPayload } from "jsonwebtoken"
 import { generateToken } from "./utils"
 import { redisManager } from "@repo/cache/redisManager"
 import { user } from "@repo/db/type"
+import { HttpError } from "./utils"
 
 export const signUpAction = async (payload: signUpPayload, countryName: string): Promise<{ message: string, status: number }> => {
     try {
@@ -43,6 +44,24 @@ export const signUpAction = async (payload: signUpPayload, countryName: string):
 
         payload.password = await generateHash(payload.password);
         await prisma.$transaction(async () => {
+            const isUserAlreadyExist = await prisma.user.findFirst({
+                where: {
+                    OR: [
+                        { number: payload.phone_number },
+                        { email: payload.email }
+                    ]
+                }
+            })
+
+            if (isUserAlreadyExist) {
+                if (isUserAlreadyExist.number === payload.phone_number) {
+                    throw new HttpError("User already exist with this phone number", 409)
+                }
+                if (isUserAlreadyExist.email === payload.email) {
+                    throw new HttpError("User already exist with this email", 409)
+                }
+            }
+
             const user = await prisma.user.create({
                 data: {
                     id: generateRandomNumber(),
@@ -82,8 +101,7 @@ export const signUpAction = async (payload: signUpPayload, countryName: string):
         })
         return { message: "Signup Successful", status: 201 }
     } catch (error: any) {
-        console.log("===========================>", error.message);
-        return { message: error.message || "Signup Failed. Something went wrong", status: 500 }
+        return { message: error.message || "Signup Failed. Something went wrong", status: error.statusCode || 500 }
     }
 }
 
@@ -489,4 +507,11 @@ export const cancelConfirmMail = async (): Promise<{
         console.log("cancelConfirmMail -->", error);
         return { message: "Something went wrong while canceling email change request", status: 500 }
     }
-} 
+}
+
+export const getAccountLockStatus = async (number: string) => {
+    const accountLockedCache = await redisManager().getCache(`${number}_accountLocked`);
+    const isAccountLocked = accountLockedCache?.failedAttempt ? Number(accountLockedCache.failedAttempt) === WRONG_PASSWORD_ATTEMPTS : false
+    const lockedAccountExpiresAt = accountLockedCache?.lockExpiresAt ?? null
+    return { isAccountLocked, lockedAccountExpiresAt }
+}
