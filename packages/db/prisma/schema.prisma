@@ -3,7 +3,7 @@ generator client {
 }
 
 datasource db {
-  provider = "mysql"
+  provider = "postgresql"
   url      = env("DATABASE_URL")
 }
 
@@ -32,7 +32,7 @@ model onramptransaction {
   startTime    DateTime
   userId       Int
   lockedAmount Int
-  user         user                     @relation(fields: [userId], references: [id], map: "OnRampTransaction_userId_fkey")
+  user         user                     @relation(fields: [userId], references: [id])
 
   @@index([userId], map: "OnRampTransaction_userId_fkey")
   @@index([token], map: "OnRampTransaction_token_fkey")
@@ -56,12 +56,35 @@ model p2ptransfer {
   receiver_name                     String
   sender_name                       String
   fee_currency                      String
-  user_p2ptransfer_fromUserIdTouser user                   @relation("p2ptransfer_fromUserIdTouser", fields: [fromUserId], references: [id], map: "P2pTransfer_fromUserId_fkey")
-  user_p2ptransfer_toUserIdTouser   user                   @relation("p2ptransfer_toUserIdTouser", fields: [toUserId], references: [id], map: "P2pTransfer_toUserId_fkey")
+  user_p2ptransfer_fromUserIdTouser user                   @relation("p2ptransfer_fromUserIdTouser", fields: [fromUserId], references: [id])
+  user_p2ptransfer_toUserIdTouser   user                   @relation("p2ptransfer_toUserIdTouser", fields: [toUserId], references: [id])
 
   @@index([fromUserId], map: "P2pTransfer_fromUserId_fkey")
   @@index([toUserId], map: "P2pTransfer_toUserId_fkey")
   @@index([transactionID], map: "P2pTransfer_transactionID_fkey")
+}
+
+model transaction {
+  id                 String              @id
+  userId             Int
+  amount             Int
+  createdAt          DateTime            @default(now())
+  updatedAt          DateTime?           @updatedAt
+  status             transaction_status
+  risk               Int                 @default(0)
+  location           String
+  user               user                @relation(fields: [userId], references: [id])
+  transaction_outbox transaction_outbox?
+
+  @@index([userId], map: "Transaction_userId_fkey")
+}
+
+model transaction_outbox {
+  id            String      @id @default(uuid())
+  transactionId String      @unique
+  transaction   transaction @relation(fields: [transactionId], references: [id])
+
+  @@index([transactionId], map: "Transaction_outbox_transactionId_fkey")
 }
 
 model user {
@@ -86,8 +109,9 @@ model user {
   p2ptransfer_p2ptransfer_toUserIdTouser   p2ptransfer[]       @relation("p2ptransfer_toUserIdTouser")
   preference                               preference?
   resetpassword                            resetpassword[]
-  wallet                                   wallet?
   session                                  session[]
+  transaction                              transaction[]
+  wallet                                   wallet?
 
   @@index([email], map: "User_email_fkey")
   @@index([number], map: "User_number_fkey")
@@ -99,7 +123,7 @@ model session {
   userAgent String
   createdAt DateTime  @default(now())
   expiredAt DateTime?
-  user      user      @relation(fields: [userId], references: [id], map: "Session_userId_fkey")
+  user      user      @relation(fields: [userId], references: [id])
 
   @@index([userId], map: "Session_userId_fkey")
   @@index([expiredAt], map: "Session_expiredAt_fkey")
@@ -110,7 +134,7 @@ model resetpassword {
   userId      Int
   token       String?
   tokenExpiry DateTime?
-  user        user      @relation(fields: [userId], references: [id], map: "ResetPassword_userId_fkey")
+  user        user      @relation(fields: [userId], references: [id])
 
   @@index([userId], map: "ResetPassword_userId_fkey")
 }
@@ -122,7 +146,7 @@ model preference {
   currency            String  @default("USD")
   timezone            String  @default("[-04:00 EDT] New York, N. America")
   notification_status Boolean @default(false)
-  user                user    @relation(fields: [userId], references: [id], map: "Preference_userId_fkey")
+  user                user    @relation(fields: [userId], references: [id])
 
   @@index([userId], map: "Preference_userId_fkey")
 }
@@ -138,7 +162,7 @@ model account {
   isLock               Boolean   @default(false)
   lock_expiresAt       DateTime?
   dailyLimitExceed     Boolean   @default(false)
-  user                 user      @relation(fields: [userId], references: [id], map: "Account_userId_fkey")
+  user                 user      @relation(fields: [userId], references: [id])
 
   @@index([userId], map: "Account_userId_fkey")
 }
@@ -159,7 +183,7 @@ model wallet {
   wrongPincodeAttempts                 Int       @default(0)
   pincodeResetLimit                    Int       @default(0)
   pincodeResetLimitDailyLimitExpiresAt DateTime?
-  user                                 user      @relation(fields: [userId], references: [id], map: "Wallet_userId_fkey")
+  user                                 user      @relation(fields: [userId], references: [id])
 
   @@index([userId], map: "Wallet_userId_fkey")
 }
@@ -173,7 +197,7 @@ model masterkey {
   passKeyActivated Boolean @default(false)
   passKeyID        Json?
   passkeyVerified  Boolean @default(false)
-  user             user    @relation(fields: [userId], references: [id], map: "MasterKey_userId_fkey")
+  user             user    @relation(fields: [userId], references: [id])
 
   @@index([userId], map: "MasterKey_userId_fkey")
 }
@@ -184,7 +208,7 @@ model notification {
   message   Json?
   read      Boolean  @default(false)
   createdAt DateTime @default(now())
-  user      user     @relation(fields: [userId], references: [id], map: "Notification_userId_fkey")
+  user      user     @relation(fields: [userId], references: [id])
 
   @@index([userId], map: "Notification_userId_fkey")
 }
@@ -198,6 +222,7 @@ enum onramptransaction_status {
 enum p2p_transaction_status {
   Success
   Failed
+  Processing
 }
 
 enum merchant_auth_type {
@@ -213,4 +238,12 @@ enum transaction_type {
 enum transaction_category {
   Domestic
   International
+}
+
+enum transaction_status {
+  Completed
+  Pending
+  Failed
+  Flagged
+  Reviewing
 }
