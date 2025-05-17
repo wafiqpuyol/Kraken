@@ -130,6 +130,14 @@ export const responseHandler = (res: any) => {
                 duration: 3000
             })
             break;
+        case 405:
+            return toast({
+                title: `${res.message}`,
+                variant: "destructive",
+                className: "bg-red-500 text-white rounded-xl",
+                duration: 3000
+            })
+            break;
         case 409:
             return toast({
                 title: `${res.message}`,

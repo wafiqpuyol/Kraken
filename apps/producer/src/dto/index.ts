@@ -1,3 +1,5 @@
+import { notification } from "@repo/db/type"
+
 export interface IDepositPayload {
     amount: number
     userId: number
@@ -6,11 +8,4 @@ export interface IDepositPayload {
     lockedAmount: number
 }
 
-export interface INotificationTemplate {
-    transactionID: string
-    amount: number
-    currency: string
-    sender_number: string
-    sender_name: string
-    timestamp: Date
-}
+export type INotificationTemplate = notification & { receiver_id: number }

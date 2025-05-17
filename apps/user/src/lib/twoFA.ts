@@ -86,7 +86,8 @@ export const activate2fa = async (otp: string, twoFAType: "signInTwoFA" | "withD
             if (!isWalletExist) {
                 return { message: "Wallet associated with this user not found", status: 401 }
             } else {
-                if (!isWalletExist.withDrawTwoFAActivated || !isWalletExist.withDrawTwoFASecret) {
+                // if (!isWalletExist.withDrawTwoFAActivated || !isWalletExist.withDrawTwoFASecret) {
+                if (!isWalletExist.withDrawTwoFASecret) {
                     return { message: "WithDrawTwoFA secret not present. Please try again", status: 500 }
                 }
             }
