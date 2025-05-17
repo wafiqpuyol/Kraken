@@ -15,6 +15,7 @@ import { generateOTP } from "./utils"
 import { sendOTP } from "./mail"
 import { redisManager } from "@repo/cache/redisManager"
 import axios from "axios"
+import { v4 as uuidv4 } from 'uuid';
 
 class SendMoney {
     static instance: SendMoney
@@ -40,8 +41,8 @@ class SendMoney {
                 timestamp: new Date(),
                 transactionType: "Send",
                 transactionID: generateTransactionId(),
-                fromUserId: this.sender?.id,
-                toUserId: this.receiver?.id,
+                // fromUserId: this.sender?.id,
+                // toUserId: this.receiver?.id,
                 currency,
                 status,
                 receiver_number: this.receiver?.number!,
@@ -51,7 +52,17 @@ class SendMoney {
                 fee_currency: this?.fee_currency!,
                 transactionCategory: transactionDetail.additionalData.trxn_type,
                 domestic_trxn_fee: status === "Failed" ? "0" : transactionDetail.additionalData.domestic_trxn_fee,
-                international_trxn_fee: status === "Failed" ? "0" : transactionDetail.additionalData.international_trxn_fee
+                international_trxn_fee: status === "Failed" ? "0" : transactionDetail.additionalData.international_trxn_fee,
+                user_p2ptransfer_fromUserIdTouser: {
+                    connect: {
+                        id: this.sender?.id
+                    }
+                },
+                user_p2ptransfer_toUserIdTouser: {
+                    connect: {
+                        id: this.receiver?.id
+                    }
+                }
             },
             include: {
                 user_p2ptransfer_fromUserIdTouser: {
@@ -203,7 +214,7 @@ class SendMoney {
 
             /* ------------------- Create P2P Transfer -------------------*/
             await prisma.$transaction(async (tx) => {
-                await tx.$queryRaw`SELECT * FROM Balance WHERE userId=${isUserExist.id} FOR UPDATE`;
+                await tx.$queryRaw`SELECT * FROM Balance WHERE "userId" = ${isUserExist.id} FOR UPDATE`;
                 await tx.balance.update({
                     where: {
                         userId: this.sender?.id
@@ -231,7 +242,7 @@ class SendMoney {
                     await prisma.preference.update({ where: { userId: this?.sender?.id }, data: { currency: transactionDetail.additionalData.international_trxn_currency } })
                 }
                 this.currency = (await prisma.preference.findFirst({ where: { userId: this?.sender?.id } }) as preference)?.currency
-                this.p2pTransfer = await this.createP2PTransfer(transactionDetail, this.currency as string, "Success")
+                this.p2pTransfer = await this.createP2PTransfer(transactionDetail, this.currency as string, "Processing")
                 await redisManager().setCache(`${this.sender?.id}_getAllP2PTransactions`, this.p2pTransfer)
                 if (this.wallet && this.wallet.wrongPincodeAttempts > 0) {
                     this.wallet = await prisma.wallet.update({ where: { userId: this.sender?.id }, data: { wrongPincodeAttempts: 0 } })
@@ -240,21 +251,50 @@ class SendMoney {
                     await redisManager().deleteCache(`${this.sender?.id}_walletLock`)
                 }
 
-                if (this.p2pTransfer.status === "Success") {
-                    const notificationTemplate = await prisma.notification.create({
+                if (this.p2pTransfer.status === "Processing") {
+                    /* 
+                        ============          ============
+                        ============ OLD CODE ============
+                        ============          ============ 
+                    */
+                    // const notificationTemplate = await prisma.notification.create({
+                    //     data: {
+                    //         userId: this.receiver?.id!,
+                    //         message: JSON.stringify({
+                    //             transactionID: this.p2pTransfer.transactionID,
+                    //             amount: this.p2pTransfer.amount,
+                    //             currency: this.p2pTransfer.currency,
+                    //             sender_number: this.p2pTransfer.sender_number,
+                    //             sender_name: this.p2pTransfer.sender_name,
+                    //             timestamp: this.p2pTransfer.timestamp,
+                    //         }),
+                    //     }
+                    // })
+                    // await axios.post(`${process.env.NEXT_PUBLIC_PRODUCER_API_URL}/notifications`, { ...notificationTemplate, receiver_id: this.receiver?.id! })
+
+                    /* 
+                        ============          ============
+                        ============ NEW CODE ============
+                        ============          ============ 
+                    */
+                    console.log("-------- INIT ----------");
+                    const res = await prisma.transaction.create({
                         data: {
-                            userId: this.receiver?.id!,
-                            message: JSON.stringify({
-                                transactionID: this.p2pTransfer.transactionID,
-                                amount: this.p2pTransfer.amount,
-                                currency: this.p2pTransfer.currency,
-                                sender_number: this.p2pTransfer.sender_number,
-                                sender_name: this.p2pTransfer.sender_name,
-                                timestamp: this.p2pTransfer.timestamp,
-                            }),
+                            id: uuidv4(),
+                            amount: this.p2pTransfer.amount,
+                            createdAt: new Date(),
+                            userId: this.p2pTransfer.fromUserId,
+                            location: "Bangladesh",
+                            risk: 0,
+                            status: "Pending",
                         }
                     })
-                    await axios.post(`${process.env.NEXT_PUBLIC_PRODUCER_API_URL}/notifications`, { ...notificationTemplate, receiver_id: this.receiver?.id! })
+                    await prisma.transaction_outbox.create({
+                        data: {
+                            transactionId: res.id,
+                        }
+                    })
+                    console.log("-------- FINISH ----------");
                 }
             })
             return { message: "Sending money successful", status: 200, transaction: this.p2pTransfer }
