@@ -1,0 +1,20 @@
+syntax = "proto3";
+
+package user;
+
+option go_package = "proto/gen;userpb";
+
+
+service ProcessorService {
+  rpc processor(processorRequest) returns (processorResponse) {}
+}
+
+message Empty {}
+
+message processorRequest {
+  string payload = 1;
+}
+
+message processorResponse {
+  int32 id = 1;
+}

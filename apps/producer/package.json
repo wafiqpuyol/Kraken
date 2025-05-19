@@ -11,10 +11,13 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "@grpc/grpc-js": "^1.13.3",
+    "@grpc/proto-loader": "^0.7.15",
     "cors": "^2.8.5",
     "express": "^4.21.1",
     "kafkajs": "^2.2.4",
-    "nodemon": "^3.1.7"
+    "nodemon": "^3.1.7",
+    "producer": "file:"
   },
   "devDependencies": {
     "@types/cors": "^2.8.17",
