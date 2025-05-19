@@ -310,7 +310,8 @@ class SendMoney {
                 return { message: error.message, status: 422 }
             }
             if (error.message === "Cannot send money to yourself. Invalid recipient number" ||
-                error.message === "You're wallet does not have sufficient balance to make this transfer." || false
+                error.message === "You're wallet does not have sufficient balance to make this transfer." || error.message === "Both receiver & sender can not be same. Invalid recipient number"
+                || false
             ) {
                 return { message: error.message, status: 400 }
             }
