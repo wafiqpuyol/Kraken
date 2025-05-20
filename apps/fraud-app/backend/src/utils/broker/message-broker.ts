@@ -44,9 +44,10 @@ const subscribe = async (
             if (topic !== Topic.SENDMONEY) {
                 return;
             }
+            console.log("Received message:", message.value?.toString());
 
             if (message.key && message.value) {
-                const inputMessage: MessageType = JSON.parse(JSON.parse(message.value.toString()).payload);
+                const inputMessage: MessageType = JSON.parse(message.value.toString());
                 messageHandler(inputMessage);
                 await consumer.commitOffsets([
                     { topic, partition, offset: (Number(message.offset) + 1).toString() },
