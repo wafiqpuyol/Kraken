@@ -6,7 +6,7 @@ export type MessageType = ISendMoneyPayload
 
 export type TOPIC_TYPE = Topic.SENDMONEY;
 
-export type MessageHandler = (input: MessageType) => void;
+export type MessageHandler = (input: MessageType, channelName: string) => void;
 
 export type MessageBrokerType = {
     connectConsumer: <T>() => Promise<T>;
