@@ -1,3 +1,9 @@
+import { scheduleSchemaType } from "@repo/forms/schedulePaymentSchema";
+import { sendMoneySchemaType } from "@repo/forms/sendMoneySchema";
+import { ITransactionDetail } from "@repo/ui/types";
+import { ZodError } from "@repo/forms/types"
+
+
 const bcrypt = require('bcrypt');
 
 export const generateTransactionId = () => {
@@ -66,5 +72,53 @@ export class HttpError extends Error {
 
         Object.setPrototypeOf(this, HttpError.prototype);
         this.name = this.constructor.name;
+    }
+}
+
+
+export class ZodSchemaValidator {
+    private static instance: ZodSchemaValidator
+
+    private constructor() { }
+
+    public static getInstance() {
+        if (!this.instance) {
+            this.instance = new ZodSchemaValidator()
+        }
+        return this.instance
+    }
+
+    validateScheduleSchema(schema: scheduleSchemaType, payload: ITransactionDetail["formData"]) {
+        const validatedScheduledDetails = schema.safeParse(payload)
+        if (!validatedScheduledDetails.success) {
+            throw new ZodError(
+                [{
+                    message: (
+                        validatedScheduledDetails.error.format().payee_number?._errors[0] ||
+                        validatedScheduledDetails.error.format().payment_date?._errors[0]! ||
+                        validatedScheduledDetails.error.format().currency?._errors[0] ||
+                        validatedScheduledDetails.error.format().amount?._errors[0] ||
+                        validatedScheduledDetails.error.format().pincode?._errors[0]
+                    )
+                }]
+            )
+        }
+        return validatedScheduledDetails
+    }
+    validateSendMoneySchema(schema: sendMoneySchemaType, payload: ITransactionDetail["formData"]) {
+        const validatedScheduledDetails = schema.safeParse(payload)
+        if (!validatedScheduledDetails.success) {
+            throw new ZodError(
+                [{
+                    message: (
+                       validatedScheduledDetails.error.format().phone_number?._errors[0] || 
+                       validatedScheduledDetails.error.format().amount?._errors[0] || 
+                       validatedScheduledDetails.error.format().pincode?._errors[0] ||
+                       validatedScheduledDetails.error.format().currency?._errors[0]
+                    )
+                }]
+            )
+        }
+        return validatedScheduledDetails
     }
 }
