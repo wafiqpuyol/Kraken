@@ -106,6 +106,13 @@ export const responseHandler = (res: any) => {
                 className: "bg-green-500 text-white rounded-xl"
             })
             break;
+        case 204:
+            return toast({
+                title: `${res.message}`,
+                variant: "default",
+                className: "bg-green-500 text-white rounded-xl"
+            })
+            break;
         case 400:
             return toast({
                 title: `${res.message}`,
@@ -139,6 +146,14 @@ export const responseHandler = (res: any) => {
             })
             break;
         case 409:
+            return toast({
+                title: `${res.message}`,
+                variant: "destructive",
+                className: "bg-red-500 text-white rounded-xl",
+                duration: 3000
+            })
+            break;
+        case 410:
             return toast({
                 title: `${res.message}`,
                 variant: "destructive",
@@ -245,6 +260,7 @@ export class SignallingManager {
     private registerOnMessage() {
         this.ws.onmessage = (msg: MessageEvent) => {
             if (isBinary(msg.data)) {
+                console.log("received binary data");
                 this.sendPong()
                 return
             }
@@ -283,3 +299,113 @@ export class SignallingManager {
         this.ws.close(SOCKET_CLOSE_CODE, (this.session?.user?.uid!).toString())
     }
 }
+
+export const formateScheduledTrxnData = (payload: any[]) => {
+    return {
+        trxn_id: payload?.id,
+        amount: payload?.formData.amount,
+        payee_number: payload?.formData.payee_number,
+        execution_date: payload?.formData.payment_date,
+        remaining_time_of_execution: payload?.delay,
+        payer_number: payload?.additionalData.sender_number,
+        recieverName: payload.recieverName,
+        senderName: payload.senderName
+    }
+}   
+
+export const calculateRemainingTime = (targetDateISO: string): string | null => {
+    const now = Date.now();
+    const targetTime = new Date(targetDateISO).getTime();
+
+    let remainingMilliseconds = targetTime - now;
+
+    if (remainingMilliseconds < 0) {
+        return null;
+    }
+
+    // 1 second = 1000 milliseconds
+    // 1 minute = 60 seconds
+    // 1 hour = 60 minutes
+    // 1 day = 24 hours
+
+    const days = Math.floor(remainingMilliseconds / (1000 * 60 * 60 * 24));
+    if (days > 0) {
+        return `in ${days.toString()} days`
+    }
+    remainingMilliseconds %= (1000 * 60 * 60 * 24);
+
+
+    const hours = Math.floor(remainingMilliseconds / (1000 * 60 * 60));
+    if (hours > 0) {
+        return `in ${hours.toString()} hours`
+    }
+
+    remainingMilliseconds %= (1000 * 60 * 60);
+
+    const minutes = Math.floor(remainingMilliseconds / (1000 * 60));
+    if (minutes > 0) {
+        return `in ${minutes.toString()} minutes`
+    }
+    remainingMilliseconds %= (1000 * 60);
+
+    const seconds = Math.floor(remainingMilliseconds / 1000);
+    if (seconds > 0) {
+        return `in ${seconds.toString()} seconds`
+    }
+
+    return null
+}
+
+
+
+// {
+//     "name": "process-payment",
+//     "data": {
+//         "formData": {
+//             "pincode": "123456",
+//             "payee_number": "+8801962175677",
+//             "amount": "25",
+//             "currency": "BDT",
+//             "payment_date": "2025-07-05T03:00:00.000Z"
+//         },
+//         "additionalData": {
+//             "symbol": "৳",
+//             "sender_number": "+8801905333510",
+//             "receiver_number": "+8801962175677",
+//             "trxn_type": "Domestic",
+//             "domestic_trxn_fee": "4",
+//             "international_trxn_fee": null,
+//             "domestic_trxn_currency": "BDT",
+//             "international_trxn_currency": "BDT"
+//         },
+//         "executionTime": "2025-07-05T03:00:00.000Z",
+//         "scheduleId": "92af066e-fd53-435b-98c6-82c2b63a755a",
+//         "userId": 26506964
+//     },
+//     "opts": {
+//         "attempts": 3,
+//         "delay": 1326423137,
+//         "removeOnFail": {
+//             "count": 0
+//         },
+//         "jobId": "schedule_92af066e-fd53-435b-98c6-82c2b63a755a_cc98b850-cec8-4a66-9f0f-f6fba39c55af",
+//         "removeOnComplete": {
+//             "count": 0
+//         },
+//         "backoff": {
+//             "delay": 5000,
+//             "type": "exponential"
+//         }
+//     },
+//     "id": "schedule_92af066e-fd53-435b-98c6-82c2b63a755a_cc98b850-cec8-4a66-9f0f-f6fba39c55af",
+//     "progress": 0,
+//     "returnvalue": null,
+//     "stacktrace": [],
+//     "delay": 1326423137,
+//     "priority": 0,
+//     "attemptsStarted": 0,
+//     "attemptsMade": 0,
+//     "stalledCounter": 0,
+//     "timestamp": 1750357976863,
+//     "queueQualifiedName": "bull:payment-schedule-queue"
+// }

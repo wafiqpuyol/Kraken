@@ -1,5 +1,5 @@
 import { USD, EUR, USDLogo, YENLogo, EUROLogo, INRLogo, BDTLogo } from "../icons/index"
-import { ICharge, SUPPORTED_CURRENCY_ENUM, ExchangeRateType, WithdrawLimitType } from "./types"
+import { ICharge, SUPPORTED_CURRENCY_ENUM, ExchangeRateType, WithdrawLimitType,SendMoneyType } from "./types"
 
 export const BANK = [
     {
@@ -149,36 +149,43 @@ export const COUNTRY_MATCHED_CURRENCY = [
         name: "USD",
         symbol: "$",
         country: "United States",
+        numberType:"US"
     },
     {
         name: "BDT",
         symbol: "৳",
         country: "Bangladesh",
+         numberType:"USBangladeshi"
     },
     {
         name: "JPY",
         symbol: "¥",
         country: "Japan",
+         numberType:"Japanese"
     },
     {
         name: "EUR",
         symbol: "€",
         country: "Spain",
+         numberType:"Spanish"
     },
     {
         name: "EUR",
         symbol: "€",
         country: "France",
+         numberType:"French"
     },
     {
         name: "EUR",
         symbol: "€",
         country: "Portugal",
+         numberType:"Portuguese"
     },
     {
         name: "INR",
         symbol: "₹",
         country: "India",
+         numberType:"Indian"
     }
 ]
 
@@ -345,3 +352,11 @@ export const PINCODE_RESET_LIMIT = 3
 export const WS_SERVER_URL = "ws://localhost:3010"
 export const HEARTBEAT_VALUE = 1;
 export const SOCKET_CLOSE_CODE = 1000
+export const JOB_NAME = "process-payment"
+export const BUFFER_SCHEDULE_TIME=15
+export const ATTEMPT_VALUE = 3
+export const BACKOFF_DELAY = 5000
+export const SEND_MOANEY_TYPE= {
+    DIRECT:"DIRECT",
+    SCHEDULED:"SCHEDULED"
+} as SendMoneyType
