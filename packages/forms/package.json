@@ -32,6 +32,8 @@
     "./resetPassword": "./src/resetPassword.tsx",
     "./resetPasswordSchema": "./src/resetPasswordSchema.ts",
     "./confirmMail": "./src/confirmMail.tsx",
-    "./confirmMailSchema": "./src/confirmMailSchema.ts"
+    "./confirmMailSchema": "./src/confirmMailSchema.ts",
+    "./schedulePayment": "./src/schedulePayment.tsx",
+    "./schedulePaymentSchema": "./src/schedulePaymentSchema.ts"
   }
 }
