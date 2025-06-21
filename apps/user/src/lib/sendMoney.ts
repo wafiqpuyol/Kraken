@@ -16,6 +16,8 @@ import { sendOTP } from "./mail"
 import { redisManager } from "@repo/cache/redisManager"
 import axios from "axios"
 import { v4 as uuidv4 } from 'uuid';
+import { ZodSchemaValidator } from "./utils"
+import { SendMoneyType } from "@repo/ui/types"
 
 class SendMoney {
     static instance: SendMoney
@@ -97,17 +99,26 @@ class SendMoney {
         return prisma.user.findUnique({ where: { number: receiver_number } })
     }
 
-    async start(transactionDetail: ITransactionDetail) {
+    async start(transactionDetail: ITransactionDetail, opts?: { sendMoneyType: keyof SendMoneyType, jobId: string }) {
+        console.log(transactionDetail.formData.amount, opts)
+
         try {
             const session = await getServerSession(authOptions)
             if (!session?.user?.uid) {
                 return { message: "Unauthorized. Please login first", status: 401 }
             }
 
-            const validatedPayload = SendMoneySchema.safeParse(transactionDetail.formData)
-            if (!validatedPayload.success) {
-                throw new Error(validatedPayload.error.format().phone_number?._errors[0] || validatedPayload.error.format().amount?._errors[0] || validatedPayload.error.format().pincode?._errors[0])
-            }
+            // -------------- OLD CODE ---------------------
+            // const validatedPayload = SendMoneySchema.safeParse(transactionDetail.formData)
+            // if (!validatedPayload.success) {
+            //     throw new Error(
+            //         validatedPayload.error.format().phone_number?._errors[0] || 
+            //     validatedPayload.error.format().amount?._errors[0] ||
+            //      validatedPayload.error.format().pincode?._errors[0]
+            //     )
+            // }
+            // --------------- REFACTORED CODE ----------------------
+            opts ?? ZodSchemaValidator.getInstance().validateSendMoneySchema(SendMoneySchema, transactionDetail.formData)
 
             /* ------------------- Validate Sender -------------------*/
             const isUserExist = await this.validateSender(session.user.uid, transactionDetail.additionalData.sender_number)
@@ -118,6 +129,7 @@ class SendMoney {
                 throw new Error("Please verify your account first to send money")
             }
             this.sender = isUserExist
+            this.currency = (await prisma.preference.findFirst({ where: { userId: this?.sender?.id } }) as preference)?.currency
 
             /* ------------------- Check Account Lock status -------------------*/
             let account = await redisManager().getUserField(`${isUserExist.number}_userCred`, "account")
@@ -125,7 +137,7 @@ class SendMoney {
                 account = await prisma.account.findFirst({ where: { userId: isUserExist.id } }) as account
                 if (account) await redisManager().updateUserCred(isUserExist.number.toString(), "account", JSON.stringify(account))
             }
-            if (account.isLock) {
+            if (!opts && account.isLock) {
                 throw new Error("Your account is locked.")
             }
 
@@ -135,7 +147,7 @@ class SendMoney {
                 throw new Error("You're not verified to make a transaction.Please create a pincode or enter valid OTP sent to your mail")
             }
             if (!this.wallet.otpVerified) {
-                throw new Error("OTP verification falied. Enter valid OTP sent to your mail")
+                throw new Error("OTP verification failed. Enter valid OTP sent to your mail")
             }
             if (!this.wallet.pincode) {
                 throw new Error("Pincode not found. Pincode is required to send money")
@@ -165,7 +177,7 @@ class SendMoney {
                 throw new Error("Both receiver & sender can not be same. Invalid recipient number")
             }
 
-            /* ------------------- Validate Numbers ------------------- */
+            /* ------------------- Validate Reciver Numbers ------------------- */
             if (transactionDetail.additionalData.trxn_type === "Domestic") {
                 const recipientCountry = guessCountryByPartialPhoneNumber({ phone: transactionDetail.additionalData.receiver_number }).country?.name
                 if (isUserExist.country !== recipientCountry) {
@@ -174,7 +186,7 @@ class SendMoney {
             }
             if (transactionDetail.additionalData.trxn_type === "International") {
                 const recipientCountry = guessCountryByPartialPhoneNumber({ phone: transactionDetail.additionalData.receiver_number }).country?.name
-                if (isUserExist.country === recipientCountry) {
+                if (isUserExist.country === recipientCountry || isRecipientExist.country !== recipientCountry) {
                     return { message: "Invalid recipient number", status: 400 }
                 }
             }
@@ -190,41 +202,54 @@ class SendMoney {
                 throw new Error("Balance not found")
             }
 
+
             this.fee_currency = senderBalance.currency;
             const senderAmountWithFeeArg = {
                 amount: transactionDetail.formData.amount,
                 transactionType: transactionDetail.additionalData.trxn_type,
-                walletCurrency: senderBalance.currency,
+                walletCurrency: senderBalance.currency || isUserExist.preference?.currency,
                 selectedCurrency: transactionDetail.additionalData?.international_trxn_currency
             }
             const senderTotalAmount = senderAmountWithFee(senderAmountWithFeeArg) as number
 
-            if (senderBalance?.amount < senderTotalAmount) {
+            if (opts && opts.sendMoneyType === "SCHEDULED") {
+                if (senderBalance?.locked < senderTotalAmount) {
+                    console.log(senderBalance?.locked, senderTotalAmount)
+                    throw new Error("You're wallet does not have sufficient balance to make this scheduled transfer.")
+                }
+            }
+            if (!opts && senderBalance?.amount < senderTotalAmount) {
                 throw new Error("You're wallet does not have sufficient balance to make this transfer.")
             }
 
-            const deductedAmount = (senderBalance?.amount - senderTotalAmount)
+            let deductedAmount = 0;
+            if (!opts) {
+                deductedAmount = (senderBalance?.amount - senderTotalAmount)
+            } else {
+                deductedAmount = senderBalance.locked - senderTotalAmount
+            }
 
-            if (senderBalance.locked !== 0 && deductedAmount <= senderBalance.locked) {
+            // in this case deductedAmount is pointing to credited senderBalance?.amount amount
+            if (!opts && senderBalance.locked !== 0 && deductedAmount <= senderBalance.locked) {
                 throw new Error("The amount you're trying to send exceeds your locked amount. Please reduce the amount & try again")
             }
-            if (deductedAmount < 0) {
+            // in this case deductedAmount is pointing to credited senderBalance?.locked amount
+            if (opts && deductedAmount < 0) {
                 throw new Error("You're wallet does not have sufficient balance to make this transfer.")
             }
-
+            console.log("DEDUCTED ANMOUT ===>", deductedAmount, senderTotalAmount)
             /* ------------------- Create P2P Transfer -------------------*/
             await prisma.$transaction(async (tx) => {
                 await tx.$queryRaw`SELECT * FROM Balance WHERE "userId" = ${isUserExist.id} FOR UPDATE`;
-                await tx.balance.update({
+                const updatedSenderBalance = await tx.balance.update({
                     where: {
                         userId: this.sender?.id
                     },
-                    data: {
-                        amount: deductedAmount
-                    }
+                    data: opts ? { locked: deductedAmount } : { amount: deductedAmount }
+
 
                 })
-                await tx.balance.update({
+                const updatedRecieverBalance = await tx.balance.update({
                     where: {
                         userId: this.receiver?.id
                     },
@@ -241,8 +266,12 @@ class SendMoney {
                 ) {
                     await prisma.preference.update({ where: { userId: this?.sender?.id }, data: { currency: transactionDetail.additionalData.international_trxn_currency } })
                 }
-                this.currency = (await prisma.preference.findFirst({ where: { userId: this?.sender?.id } }) as preference)?.currency
+
+
                 this.p2pTransfer = await this.createP2PTransfer(transactionDetail, this.currency as string, "Processing")
+                /* ----------- Update all cache after successfull trxn -----------*/
+                await redisManager().updateUserCred(transactionDetail.additionalData.sender_number, "balance", JSON.stringify(updatedSenderBalance))
+                // await redisManager().updateUserCred(transactionDetail.additionalData.receiver_number, "balance", JSON.stringify(updatedRecieverBalance))
                 await redisManager().setCache(`${this.sender?.id}_getAllP2PTransactions`, this.p2pTransfer)
                 if (this.wallet && this.wallet.wrongPincodeAttempts > 0) {
                     this.wallet = await prisma.wallet.update({ where: { userId: this.sender?.id }, data: { wrongPincodeAttempts: 0 } })
@@ -296,6 +325,21 @@ class SendMoney {
                     })
                     console.log("-------- FINISH ----------");
                 }
+                if (opts && opts.jobId) {
+                    const isSchedulePaymentJobExist = await prisma.schedulePayment.findFirst({
+                        where: {
+                            AND: [
+                                { userId: this.sender?.id },
+                                { jobId: opts.jobId }
+                            ]
+                        }
+                    })
+                    await prisma.schedulePayment.delete({
+                        where: {
+                            id: isSchedulePaymentJobExist?.id
+                        }
+                    })
+                }
             })
             return { message: "Sending money successful", status: 200, transaction: this.p2pTransfer }
 
@@ -304,13 +348,17 @@ class SendMoney {
             if (error.message === "Your account is locked.") {
                 return { message: error.message, status: 403 }
             }
-            if (error.message === "Pincode not found. Pincode is required to send money" || error.message === "OTP verification failed. Enter valid OTP sent to your mail"
-                || error.message === "You're not verified to make a transaction.Please create a pincode or enter valid OTP sent to your mail" || false
+            if (error.message === "Pincode not found. Pincode is required to send money" ||
+                error.message === "OTP verification failed. Enter valid OTP sent to your mail" ||
+                error.message === "You're not verified to make a transaction.Please create a pincode or enter valid OTP sent to your mail" ||
+                error.message === "You're wallet does not have sufficient balance to make this transfer." ||
+                error.message === "You're wallet does not have sufficient balance to make this scheduled transfer." ||
+                false
             ) {
                 return { message: error.message, status: 422 }
             }
             if (error.message === "Cannot send money to yourself. Invalid recipient number" ||
-                error.message === "You're wallet does not have sufficient balance to make this transfer." || error.message === "Both receiver & sender can not be same. Invalid recipient number"
+                error.message === "Both receiver & sender can not be same. Invalid recipient    number"
                 || false
             ) {
                 return { message: error.message, status: 400 }
@@ -319,24 +367,29 @@ class SendMoney {
                 return { message: error.message, status: 400 }
             }
             if (error.message === "Unauthorized. Please login first" ||
-                error.message === "User not found" || error.message === "Please verify your account first to send money" ||
-                error.message === "Wrong pincode. Please enter the correct pincode" || error.message === "Recipient number not found. Please enter a valid recipient number" ||
+                error.message === "User not found" ||
+                error.message === "Please verify your account first to send money" ||
+                error.message === "Wrong pincode. Please enter the correct pincode" ||
+                error.message === "Recipient number not found. Please enter a valid recipient number" ||
                 error.message === "Balance not found"
             ) {
                 return { message: error.message, status: 401 }
             }
+
             this.p2pTransfer = await this.createP2PTransfer(transactionDetail, this.currency as string, "Failed")
             await redisManager().setCache(`${this.sender?.id}_getAllP2PTransactions`, this.p2pTransfer)
+
             if (this.wallet && this.wallet.wrongPincodeAttempts > 0) {
                 this.wallet = await prisma.wallet.update({ where: { userId: this.sender?.id }, data: { wrongPincodeAttempts: 0 } })
             }
+
             return { message: error.message || "Something went wrong on the bank server", status: 500 }
         }
     }
 
 }
 
-export const sendMoneyAction = async (transactionDetail: ITransactionDetail) => SendMoney.getInstance().start(transactionDetail)
+export const sendMoneyAction = async (transactionDetail: ITransactionDetail, opts?: { sendMoneyType: keyof SendMoneyType, jobId: string }) => SendMoney.getInstance().start(transactionDetail, opts)
 
 export const getAllP2PTransactionHistories = async (): Promise<p2ptransfer[] | []> => {
     try {

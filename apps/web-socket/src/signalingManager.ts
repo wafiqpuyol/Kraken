@@ -1,4 +1,5 @@
 import { WebSocket, RawData } from "./types/ws.type"
+import { CLOSED } from "ws"
 import { SubscriptionManager } from "./subscriptionManager"
 import { UserManager } from "./userManager"
 import { HEARTBEAT_VALUE, HEARTBEAT_INTERVAL } from "./utils/constant";
@@ -47,7 +48,7 @@ export class SignalingManager {
                 }
             }
 
-            if (userManagerInstance.getUser(message.toString())?.instance?.readyState === 3) {
+            if (userManagerInstance.getUser(message.toString())?.instance?.readyState === CLOSED) {
                 userManagerInstance.removeUser(message.toString())
                 const subscribeManagerInstance = await SubscriptionManager.getInstance()
                 await subscribeManagerInstance.unsubscribe(message.toString())
