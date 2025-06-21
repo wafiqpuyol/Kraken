@@ -4,7 +4,8 @@ import { useRedirectToLogin } from "../../../../../hooks/useRedirect"
 import { sendVerificationEmailAction } from "../../../../../lib/auth"
 import { generatePincode, sendEmergencyCode, resetPin } from "../../../../../lib/wallet"
 import { checkAccountLockStatus, updateLockStatus } from "../../../../../lib/account"
-
+import {sendMoneyAction,sendOTPAction,verifyOTP} from "../../../../../lib/sendMoney"
+import {addPaymentSchedule,cancelPaymentSchedule} from "../../../../../lib/scheduler/scheduler"
 
 interface PageProps {
     params: { locale: string }
@@ -15,8 +16,16 @@ async function page({ params }: PageProps) {
     // const isAccountLock = account.isLock ?? false
 
     return (
-        <PaymentScheduler
-            
+        <PaymentScheduler 
+        sendMoneyAction={sendMoneyAction}
+        sendOTPAction={sendOTPAction}
+        sendVerificationEmailAction={sendVerificationEmailAction}
+        verifyOTP={verifyOTP}
+        generatePincode={generatePincode}
+        resetPin={resetPin}
+        sendEmergencyCode={sendEmergencyCode}
+        addPaymentSchedule={addPaymentSchedule}
+        cancelPaymentSchedule={cancelPaymentSchedule}
         />
     )
 }
