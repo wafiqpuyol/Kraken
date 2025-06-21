@@ -112,6 +112,7 @@ model user {
   session                                  session[]
   transaction                              transaction[]
   wallet                                   wallet?
+  schedulePayment                          schedulePayment[]
 
   @@index([email], map: "User_email_fkey")
   @@index([number], map: "User_number_fkey")
@@ -211,6 +212,17 @@ model notification {
   user      user     @relation(fields: [userId], references: [id])
 
   @@index([userId], map: "Notification_userId_fkey")
+}
+
+model schedulePayment {
+  id            Int      @id
+  userId        Int      
+  jobId         String   @unique(map: "SchedulePayment_jobId")
+  amount        String
+  executionDate DateTime
+  user          user     @relation(fields: [userId], references: [id])
+
+  @@index([jobId], map: "schedulePayment_jobId_fkey")
 }
 
 enum onramptransaction_status {
