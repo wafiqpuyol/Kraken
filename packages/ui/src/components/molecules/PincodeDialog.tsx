@@ -9,6 +9,7 @@ import { useToast } from "../molecules/Toaster/use-toast"
 import { EMAIL_REGEX, EMERGENCY_CODE_MAX_LENGTH, PINCODE_MAX_LENGTH } from "../../lib/constant"
 import { useTranslations } from "next-intl";
 import { responseHandler } from "../../lib/utils"
+import {Phase} from "../../lib/types"
 
 const content = {
     pincode: {
@@ -28,11 +29,7 @@ const content = {
     }
 }
 
-enum Phase {
-    PINCODE = "pincode",
-    EMAIL = "email",
-    EMERGENCY = "eneergencyCode"
-}
+
 interface PincodeDialogProps {
     children: React.ReactNode
     generatePincode: (pincode: string) => Promise<{
@@ -56,20 +53,20 @@ export const PincodeDialog: React.FC<PincodeDialogProps> = ({ children, generate
     const [emailStatus, setEmailStatus] = useState("")
     const [emergencyCodeStatus, setEmergencyCodeStatus] = useState("")
     const [isForgot, setIsForgot] = useState(false)
-    const [phase, setPhase] = useState(Phase["PINCODE"])
+    const [currentPhase, setCurrentPhase] = useState<Exclude<Phase, Phase.OTP>>(Phase["PINCODE"])
     const { toast } = useToast()
     const [isLoading, setIsLoading] = useState(false)
     const [isBtnDisable, setIsBtnDisable] = useState(true)
 
 
     const handleClick = async () => {
-        if (phase === Phase.PINCODE) {
+        if (currentPhase === Phase.PINCODE) {
             await handlePincodeBtnClick()
         }
-        if (phase === Phase.EMAIL) {
+        if (currentPhase === Phase.EMAIL) {
             await handleEmailBtnClick()
         }
-        if (phase === Phase.EMERGENCY) {
+        if (currentPhase === Phase.EMERGENCY) {
             await handleEmergencyBtnClick()
         }
     }
@@ -109,7 +106,7 @@ export const PincodeDialog: React.FC<PincodeDialogProps> = ({ children, generate
                         variant: "default"
                     })
                     setEmail("")
-                    setPhase(Phase.EMERGENCY)
+                    setCurrentPhase(Phase.EMERGENCY)
                     setIsBtnDisable(true)
                     break;
             }
@@ -136,7 +133,7 @@ export const PincodeDialog: React.FC<PincodeDialogProps> = ({ children, generate
                     })
                     setEmergencyCode("")
                     setInput("")
-                    setPhase(Phase.PINCODE)
+                    setCurrentPhase(Phase.PINCODE)
                     setIsBtnDisable(true)
                     break;
             }
@@ -153,7 +150,7 @@ export const PincodeDialog: React.FC<PincodeDialogProps> = ({ children, generate
 
     const handleForgot = () => {
         setIsForgot(true)
-        setPhase(Phase.EMAIL)
+        setCurrentPhase(Phase.EMAIL)
     }
 
     const validateEmail = (e: ChangeEvent<HTMLInputElement>) => {
@@ -187,7 +184,7 @@ export const PincodeDialog: React.FC<PincodeDialogProps> = ({ children, generate
             setEmail("")
             setEmergencyCode("")
             setIsForgot(false)
-            setPhase(Phase.PINCODE)
+            setCurrentPhase(Phase.PINCODE)
             setIsBtnDisable(true)
             setEmailStatus("")
             setEmergencyCodeStatus("")
@@ -200,9 +197,9 @@ export const PincodeDialog: React.FC<PincodeDialogProps> = ({ children, generate
                 e.preventDefault();
             }}>
                 <DialogHeader>
-                    <DialogTitle className='text-2xl'>{t(`${phase}.title`)}</DialogTitle>
+                    <DialogTitle className='text-2xl'>{t(`${currentPhase}.title`)}</DialogTitle>
                     <DialogDescription className='text-slate-700'>
-                        {t(`${phase}.desc`)}
+                        {t(`${currentPhase}.desc`)}
                     </DialogDescription>
                 </DialogHeader>
                 <div className="flex items-center space-x-2 flex-col mt-4">
@@ -211,9 +208,9 @@ export const PincodeDialog: React.FC<PincodeDialogProps> = ({ children, generate
                             <Label htmlFor="link" className="sr-only">
                                 Link
                             </Label>
-                            {phase === Phase.PINCODE && <Pincode t={t} setIsBtnDisable={setIsBtnDisable} input={input} setInput={setInput} maxLength={PINCODE_MAX_LENGTH} />}
-                            {phase === Phase.EMAIL && <Email t={t} emailStatus={emailStatus} validateEmail={validateEmail} />}
-                            {phase === Phase.EMERGENCY && <EmergencyCode t={t} setIsBtnDisable={setIsBtnDisable} phase={phase} EMERGENCY_CODE_MAX_LENGTH={EMERGENCY_CODE_MAX_LENGTH} emergencyCodeStatus={emergencyCodeStatus} setEmergencyCode={setEmergencyCode} emergencyCode={emergencyCode} />}
+                            {currentPhase === Phase.PINCODE && <Pincode t={t} setIsBtnDisable={setIsBtnDisable} input={input} setInput={setInput} />}
+                            {currentPhase === Phase.EMAIL && <Email t={t} emailStatus={emailStatus} validateEmail={validateEmail} />}
+                            {currentPhase === Phase.EMERGENCY && <EmergencyCode t={t} setIsBtnDisable={setIsBtnDisable} currentPhase={currentPhase} EMERGENCY_CODE_MAX_LENGTH={EMERGENCY_CODE_MAX_LENGTH} emergencyCodeStatus={emergencyCodeStatus} setEmergencyCode={setEmergencyCode} emergencyCode={emergencyCode} />}
                         </div>
                         {!isForgot && <span className='text-purple-600 font-medium text-sm cursor-pointer ml-1' onClick={() => handleForgot()}>{t("forgot")}?</span>}
                     </div>
@@ -228,24 +225,24 @@ export const PincodeDialog: React.FC<PincodeDialogProps> = ({ children, generate
                     <Button
                         disabled={isLoading || isBtnDisable}
                         className="bg-purple-600 text-white rounded-xl py-2 font-medium hover:bg-purple-500"
-                        onClick={() => handleClick()}>{content[phase].btnText}</Button>
+                        onClick={() => handleClick()}>{content[currentPhase].btnText}</Button>
                 </DialogFooter>
             </DialogContent>
         </Dialog>
     )
 }
 
-const Pincode = ({ input, setInput, maxLength, setIsBtnDisable, t }: { input: string, setInput: Dispatch<SetStateAction<string>>, maxLength: number, setIsBtnDisable: Dispatch<SetStateAction<boolean>>, t: any }) => (
+const Pincode = ({ input, setInput, setIsBtnDisable, t }: { input: string, setInput: Dispatch<SetStateAction<string>>, maxLength: number, setIsBtnDisable: Dispatch<SetStateAction<boolean>>, t: any }) => (
     <Input
         type='number'
         value={input}
         placeholder={t("pincode_placeholder")}
         onChange={(e) => {
-            if (e.target.value.length <= maxLength) {
+            if (e.target.value.length <= PINCODE_MAX_LENGTH) {
                 setInput(e.target.value)
                 setIsBtnDisable(true)
             }
-            if (e.target.value.length >= maxLength) {
+            if (e.target.value.length >= PINCODE_MAX_LENGTH) {
                 setIsBtnDisable(false)
             }
         }}
@@ -263,7 +260,7 @@ const Email = ({ emailStatus, validateEmail, t }: { t: any, emailStatus: string,
     </div>
 )
 
-const EmergencyCode = ({ setIsBtnDisable, phase, emergencyCode, EMERGENCY_CODE_MAX_LENGTH, emergencyCodeStatus, setEmergencyCode, t }: { t: any, setIsBtnDisable: Dispatch<SetStateAction<boolean>>, emergencyCode: string, EMERGENCY_CODE_MAX_LENGTH: number, emergencyCodeStatus: string, setEmergencyCode: Dispatch<SetStateAction<string>>, phase: string }) => {
+const EmergencyCode = ({ setIsBtnDisable, currentPhase, emergencyCode, EMERGENCY_CODE_MAX_LENGTH, emergencyCodeStatus, setEmergencyCode, t }: { t: any, setIsBtnDisable: Dispatch<SetStateAction<boolean>>, emergencyCode: string, EMERGENCY_CODE_MAX_LENGTH: number, emergencyCodeStatus: string, setEmergencyCode: Dispatch<SetStateAction<string>>, currentPhase: string }) => {
     useEffect(() => {
         var expiryDate = new Date(Date.now() + 1000 * 32).getTime()
         let time = setInterval(() => {
@@ -294,13 +291,8 @@ const EmergencyCode = ({ setIsBtnDisable, phase, emergencyCode, EMERGENCY_CODE_M
             value={emergencyCode}
             placeholder={t("emergencyCode_placeholder")}
             onChange={(e) => {
-                if (e.target.value.length <= EMERGENCY_CODE_MAX_LENGTH) {
-                    setEmergencyCode(e.target.value)
-                    setIsBtnDisable(true)
-                }
-                if (e.target.value.length >= EMERGENCY_CODE_MAX_LENGTH) {
-                    setIsBtnDisable(false)
-                }
+                
+                
             }}
 
         />

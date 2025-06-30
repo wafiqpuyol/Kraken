@@ -156,7 +156,7 @@ export const OTPPrompt = ({
             <div className="flex flex-col items-center">
                 <form onSubmit={handleOTPSubmit} className="flex flex-col gap-4">
                     <p className="text-lg font-medium text-slate-00">
-                        We've sent you an 6 digit otp code your email.
+                        We've sent you an 6 digit otp code to your email.
                     </p>
                     <InputOTP maxLength={6} value={otp} onChange={setOtp} className="border-purple-500">
                         <InputOTPGroup>

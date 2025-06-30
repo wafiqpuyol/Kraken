@@ -1,7 +1,7 @@
 import { Lock } from "lucide-react"
 import { useTranslations } from "next-intl"
 import { Dispatch, SetStateAction, useEffect, useState } from 'react'
-
+import { useAppState } from "../molecules/StateProvider"
 
 interface LockProps {
     lockedAccountExpiresAt?: Date | null
@@ -18,13 +18,14 @@ interface LockProps {
 export const AccountLock: React.FC<LockProps> = ({ updateLockStatus, setAccountLock, checkAccountLockStatus, lockedAccountExpiresAt }) => {
     const t = useTranslations("AccountLock")
     const [lockExpiry, setLockExpiry] = useState<Date | null>(lockedAccountExpiresAt ?? null)
+    const { setLockExpiry: _setLockExpiry } = useAppState()
 
-    useEffect(() => {
+    useEffect(() => {   
         async function func() {
             const timer = (await checkAccountLockStatus()).lockExpiry ?? null
             setLockExpiry(timer)
         }
-        if (checkAccountLockStatus) func()
+        if (checkAccountLockStatus !== undefined) func()
     }, [])
 
     useEffect(() => {
@@ -43,9 +44,13 @@ export const AccountLock: React.FC<LockProps> = ({ updateLockStatus, setAccountL
                         + minutes + "m " + seconds + "s ";
 
                 } else {
-                    if (updateLockStatus) updateLockStatus()
-                    setAccountLock(false)
+                    if (updateLockStatus) {
+                        updateLockStatus()
+                    } else {
+                        _setLockExpiry(null)
+                    }
                     setLockExpiry(null)
+                    setAccountLock(false)
                     hours = 0; minutes = 0; seconds = 0
                 }
                 if (distance < 0) {

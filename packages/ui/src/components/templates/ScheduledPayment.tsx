@@ -13,7 +13,7 @@ import { Input } from "../atoms/Input";
 import { Label } from "../atoms/Label";
 import { Button } from "../atoms/Button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "../molecules/Tabs";
-import { format} from "date-fns";
+import { format } from "date-fns";
 import { CalendarIcon, Clock } from "lucide-react";
 import { cn, calculateRemainingTime } from "@/src/lib/utils";
 import { Popover, PopoverContent, PopoverTrigger } from "../molecules/Popover";
@@ -43,7 +43,7 @@ import {
     BUFFER_SCHEDULE_TIME,
     SEND_MOANEY_TYPE
 } from "../../lib/constant";
-import { formatAmount, calculateAmountOnDemand } from "../../lib/utils";
+import { formatAmount, calculateAmountOnDemand, formateExecutionTimestampAndCalculateDelay } from "../../lib/utils";
 import { SUPPORTED_CURRENCY_ENUM, TRANSACTION_TYPE } from "../../lib/types";
 import { PincodeDialog } from "../molecules/PincodeDialog";
 import { IScheduleDetails } from "@/src/lib/types";
@@ -54,12 +54,13 @@ import { ToggleTransactionType } from "../molecules/ToggleTransactionType"
 import { useLocale, useTranslations } from 'next-intl';
 import { SelectCurrency } from "../organisms/SelectCurrency"
 import { v4 as uuidv4 } from 'uuid';
-import { Dialog, DialogContent, DialogClose, DialogTrigger } from "../molecules/Dialog"
 import axios from 'axios';
 import { useToast } from "../molecules/Toaster/use-toast"
 import { EditSchedulePaymentModal } from "../organisms/EditSchedulePaymentModal"
 import { Badge } from "../atoms/Badge"
 import { SendMoneyProps } from "./SendMoneyPage"
+import { EarleyScheduleNotice } from "../organisms/EarleyScheduleNotice"
+import { AccountLock } from "../molecules/Lock"
 
 
 export interface PendingTransaction {
@@ -70,9 +71,9 @@ export interface PendingTransaction {
     remaining_time_of_execution: number
     payer_number: string
     recieverName: string,
-    senderName: string
+    senderName: string,
+    currency: string
 }
-
 
 interface IPaymentSchedulerProps {
     sendMoneyAction: SendMoneyProps["sendMoneyAction"]
@@ -110,9 +111,23 @@ interface IPaymentSchedulerProps {
         status: number;
         jobId: null | string;
     }>
+    editPaymentScheduleJob: (payload: IScheduleDetails) => Promise<{
+        message: string;
+        status: number;
+        updatedJob: any;
+        isAccountLock: boolean
+    }>
+    isAccountLock: boolean
+    updateLockStatus: () => Promise<void>,
+    checkAccountLockStatus(): Promise<{
+        message: string;
+        status: number;
+        isLock?: boolean;
+        lockExpiry?: Date | null;
+    }>
 }
 
-interface IPaymentSchedulerCardProps extends Omit<IPaymentSchedulerProps, "cancelPaymentSchedule"> {
+interface IPaymentSchedulerCardProps extends Omit<IPaymentSchedulerProps, "cancelPaymentSchedule" | "editPaymentScheduleJob"> {
     setPendingTransactions: Dispatch<SetStateAction<PendingTransaction[]>>;
     setTotalPendingTransaction: Dispatch<SetStateAction<number>>
 }
@@ -124,33 +139,17 @@ export interface IScheduleTabProps {
     totalcompletedTransaction: number;
     cancelPaymentSchedule: IPaymentSchedulerProps["cancelPaymentSchedule"]
     setTotalPendingTransaction: Dispatch<SetStateAction<number>>
-    setPendingTransactions: Dispatch<SetStateAction<PendingTransaction[]>>;
-}
-
-interface IEarleyScheduleNoticeProps {
-    setShowScheduleNotice: Dispatch<SetStateAction<boolean>>
-    showScheduleNotice: boolean
-}
-
-const EarleyScheduleNotice: React.FC<IEarleyScheduleNoticeProps> = ({ setShowScheduleNotice, showScheduleNotice }) => {
-    return (
-        <Dialog open={showScheduleNotice}>
-            <DialogContent className="bg-white text-slate-600 w-[1000px] flex flex-col">
-                🕐 Too Soon to Schedule
-                For your security and to ensure successful processing, payments must be scheduled at least 15 minutes in advance.
-
-                [Reschedule] [Send Now Instead]
-                <DialogClose>
-                    <Button onClick={() => setShowScheduleNotice(false)}>Cancel</Button>
-                </DialogClose>
-            </DialogContent>
-        </Dialog>
-    )
+    setPendingTransactions: Dispatch<SetStateAction<PendingTransaction[]>>
+    editPaymentScheduleJob: IPaymentSchedulerProps["editPaymentScheduleJob"]
+    sendOTPAction: IPaymentSchedulerProps["sendOTPAction"]
+    verifyOTP: IPaymentSchedulerProps["verifyOTP"]
 }
 
 export const PaymentScheduler: React.FC<IPaymentSchedulerProps> = ({
-    sendMoneyAction, sendVerificationEmailAction, sendOTPAction, verifyOTP, generatePincode,
-    resetPin, sendEmergencyCode, addPaymentSchedule,cancelPaymentSchedule
+    sendMoneyAction, sendVerificationEmailAction, sendOTPAction, verifyOTP,
+     generatePincode,isAccountLock,checkAccountLockStatus,
+    resetPin, sendEmergencyCode, addPaymentSchedule, cancelPaymentSchedule, 
+    editPaymentScheduleJob,updateLockStatus
 }) => {
     const [pendingTransactions, setPendingTransactions] = useState<PendingTransaction[]>([]);
     const [completedTransactions, setCompletedTransactions] = useState<PendingTransaction[]>([]);
@@ -207,12 +206,12 @@ export const PaymentScheduler: React.FC<IPaymentSchedulerProps> = ({
     //     }
     // }, [session.status])
 
-    useEffect(() => {
-        (async () => {
-            const res = await axios.get("/api/findJob?jobId=schedule_727c7852-0b35-4722-830b-ca2c6093c699_0426d41a-af12-4ba0-84de-d3f03f29b769")
-            console.log("*******************", res.data)
-        })()
-    }, [])
+    // useEffect(() => {
+    //     (async () => {
+    //         const res = await axios.get("/api/findJob?jobId=schedule_727c7852-0b35-4722-830b-ca2c6093c699_0426d41a-af12-4ba0-84de-d3f03f29b769")
+    //         console.log("*******************", res.data)
+    //     })()
+    // }, [])
 
     return (
         <div className="min-h-screen flex items-start px-3 w-screen mt-20 gap-x-28">
@@ -227,6 +226,9 @@ export const PaymentScheduler: React.FC<IPaymentSchedulerProps> = ({
                 sendEmergencyCode={sendEmergencyCode}
                 addPaymentSchedule={addPaymentSchedule}
                 setTotalPendingTransaction={setTotalPendingTransaction}
+                isAccountLock={isAccountLock}
+                checkAccountLockStatus={checkAccountLockStatus}
+                updateLockStatus={updateLockStatus}
             />
             <ScheduleTab
                 totalpendingTransaction={totalpendingTransaction}
@@ -236,165 +238,10 @@ export const PaymentScheduler: React.FC<IPaymentSchedulerProps> = ({
                 cancelPaymentSchedule={cancelPaymentSchedule}
                 setTotalPendingTransaction={setTotalPendingTransaction}
                 setPendingTransactions={setPendingTransactions}
+                editPaymentScheduleJob={editPaymentScheduleJob}
+                sendOTPAction={sendOTPAction}
+                verifyOTP={verifyOTP}
             />
-        </div>
-    );
-};
-
-const ScheduleTab: React.FC<IScheduleTabProps> = ({
-    pendingTransactions,
-    completedTransactions,
-    totalcompletedTransaction,
-    totalpendingTransaction,
-    cancelPaymentSchedule,
-    setPendingTransactions,
-    setTotalPendingTransaction
-}) => {
-    const [selectedTab, setSelectedTab] = useState("pending");
-    const t = useTranslations("ScheduleTab")
-
-    return (
-        <div className="bg-white px-4 rounded-lg shadow-md w-[560px] p-8">
-            <Tabs defaultValue="pending" className="w-full">
-                <TabsList className="grid w-full grid-cols-2 border h-[60px] px-4">
-                    <TabsTrigger
-                        value="pending"
-                        onClick={() => setSelectedTab("pending")}
-                        className={cn(
-                            "text-xl font-medium",
-                            selectedTab === "pending"
-                                ? "bg-purple-600 text-white"
-                                : "bg-white text-black/85"
-                        )}
-                    >
-                        {t("pending")}
-                        <p className="ml-4 text-white">{totalpendingTransaction}</p>
-                    </TabsTrigger>
-                    <TabsTrigger
-                        value="completed"
-                        onClick={() => setSelectedTab("completed")}
-                        className={cn(
-                            "text-xl font-medium",
-                            selectedTab === "completed"
-                                ? "bg-purple-600 text-white"
-                                : "bg-white text-black/85"
-                        )}
-                    >
-                        {t("completed")}
-                    </TabsTrigger>
-                </TabsList>
-                <TabsContent value="pending" className="mt-4">
-                    <Card>
-                        <CardHeader className="border-b">
-                            <CardTitle>{t("pending_transaction")}</CardTitle>
-                            <CardDescription className="text-slate-500">
-                                {t("pending_transaction_text1")}
-                            </CardDescription>
-                        </CardHeader>
-                        <CardContent>
-                            {pendingTransactions.length === 0 ? (
-                                <div className="space-y-4 mt-5 h-[300px] w-full">
-                                    <p className="text-center text-muted-foreground py-4">
-                                        {t("pending_transaction_text2")}
-                                    </p>
-                                </div>
-                            ) : (
-                                <ScrollArea className="space-y-4 mt-5 h-[300px] w-full">
-                                    {pendingTransactions.map((transaction) => (
-                                        <EditSchedulePaymentModal 
-                                        pendingScheduleTransaction={transaction}
-                                        cancelPaymentSchedule={cancelPaymentSchedule}
-                                        setPendingTransactions={setPendingTransactions}
-                                        setTotalPendingTransaction={setTotalPendingTransaction}
-                                        >
-                                            <div
-                                                key={transaction.trxn_id ?? ""}
-                                                className="flex items-center justify-between border-b p-8 rounded-lg shadow-md"
-                                            >
-                                                <div className="flex flex-col gap-5">
-                                                    <div className="flex justify-between">
-                                                        <div>
-                                                            <p className="font-medium text-lg justify-self-start">{transaction.recieverName}</p>
-                                                            <p className="text-sm text-muted-foreground">{transaction.payer_number}</p>
-                                                            <p className="text-xs text-muted-foreground">{new Date(transaction.execution_date).toLocaleString()}</p>
-                                                        </div>
-                                                        <div className="text-right">
-                                                            <Badge className="p-1 rounded-xl bg-orange-600 text-white">
-                                                                <Clock className="h-3 w-3 mr-1" />
-                                                                Pending
-                                                            </Badge>
-                                                            <p className="font-medium">
-                                                                ${transaction.amount}
-                                                            </p>
-                                                        </div>
-                                                    </div>
-                                                    <div className="flex gap-2">
-                                                        <div className="flex flex-col justify item-start">
-                                                            <Label className="text-sm text-muted-foreground self-start">Scheduled Date</Label>
-                                                            <p>{new Date(transaction.execution_date).toLocaleString()}</p>
-                                                        </div>
-                                                        <div className="flex flex-col justify item-start">
-                                                            <Label className="text-sm text-muted-foreground self-start">Time Remain</Label>
-                                                            <p>{calculateRemainingTime(transaction.execution_date)}</p>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </EditSchedulePaymentModal>
-                                    ))}
-                                    <ScrollBar orientation="vertical" />
-                                </ScrollArea>
-                            )}
-                        </CardContent>
-                    </Card>
-                </TabsContent>
-                <TabsContent value="completed" className="mt-4">
-                    <Card>
-                        <CardHeader>
-                            <CardTitle>{t("completed_transaction")}</CardTitle>
-                            <CardDescription className="text-slate-500">
-                                {t("completed_transaction_text1")}
-                            </CardDescription>
-                        </CardHeader>
-                        <CardContent>
-                            {pendingTransactions.length === 0 ? (
-                                <div className="space-y-4 mt-5 h-[300px] w-full">
-                                    <p className="text-center text-muted-foreground py-4">
-                                        {t("completed_transaction_text2")}
-                                    </p>
-                                </div>
-                            ) : (
-                                <ScrollArea className="space-y-4 mt-5 h-[300px] w-full">
-                                    {pendingTransactions.map((transaction) => (
-                                        <div
-                                            key={transaction.trxn_id ?? ""}
-                                            className="flex items-center justify-between border-b p-8 rounded-lg shadow-md"
-                                        >
-                                            <div>
-                                                <p className="font-medium">{transaction.amount}</p>
-                                                <p className="text-xs text-muted-foreground">
-                                                    {/* {format(transaction.execution_data, "PPP")} */}
-                                                    {new Date(transaction.execution_date).toLocaleString()}
-                                                </p>
-                                            </div>
-                                            <div className="text-right">
-                                                <p className="font-medium">
-                                                    ${transaction.amount}
-                                                </p>
-                                                <div className="flex items-center text-xs text-amber-600">
-                                                    <Clock className="h-3 w-3 mr-1" />
-                                                    {t("completed")}
-                                                </div>
-                                            </div>
-                                        </div>
-                                    ))}
-                                    <ScrollBar orientation="vertical" />
-                                </ScrollArea>
-                            )}
-                        </CardContent>
-                    </Card>
-                </TabsContent>
-            </Tabs>
         </div>
     );
 };
@@ -409,8 +256,10 @@ const PaymentSchedulerCard: React.FC<IPaymentSchedulerCardProps> = ({
     resetPin,
     sendEmergencyCode,
     addPaymentSchedule,
-    setTotalPendingTransaction
-
+    setTotalPendingTransaction,
+    isAccountLock,
+    checkAccountLockStatus,
+    updateLockStatus
 }) => {
     const session = useSession();
     const t = useTranslations("ScheduledPayment")
@@ -424,8 +273,7 @@ const PaymentSchedulerCard: React.FC<IPaymentSchedulerCardProps> = ({
         defaultCountry: "us",
         value: "+1 (234)",
     });
-    const { handleSubmit, control, formState, ...form } =
-        userFormSchedulePayment();
+    const { handleSubmit, control, formState, ...form } = userFormSchedulePayment();
     const [countryCode, setCountryCode] = useState(`+${country.dialCode}`);
     const currentCurrency = session?.data?.user?.preference.selected_currency || "";
     const walletCurrency = session?.data?.user?.wallet_currency || "";
@@ -433,24 +281,11 @@ const PaymentSchedulerCard: React.FC<IPaymentSchedulerCardProps> = ({
     const CurrencyLogo = CURRENCY_LOGO[currency]?.Logo;
     const [payload, setPayload] = useState<IScheduleDetails | null>(null);
     const [modalOpen, setModalOpen] = useState(false)
+        const [accountLock, setAccountLock] = useState<boolean>(isAccountLock)
+    
     const locale = useLocale()
 
-
-    const formateExecutionTimestampAndCalculateDelay = (executionDate: Date) => {
-        const executionTimestamp = new Date(executionDate)
-        executionTimestamp.setHours(parseInt(selectedTime.split(":")[0]!))
-        executionTimestamp.setMinutes(parseInt(selectedTime.split(":")[1]!))
-        executionTimestamp.setSeconds(0)
-        const currentTimestamp = new Date(Date.now());
-        currentTimestamp.setMinutes(currentTimestamp.getMinutes() + BUFFER_SCHEDULE_TIME)
-        const delay = executionTimestamp.getTime() - currentTimestamp.getTime();
-        if (delay <= 0) {
-            form.setError("payment_date", { message: "Invalid Date wafiq" })
-            setShowScheduleNotice(true)
-            return null
-        }
-        return executionTimestamp
-    }
+    console.log(formState)
 
     const submit = async (payload: schedulePaymentPayload) => {
         let recipientNumberType: string | undefined;
@@ -468,9 +303,8 @@ const PaymentSchedulerCard: React.FC<IPaymentSchedulerCardProps> = ({
             return;
         }
 
-        const formatedPayment_date = formateExecutionTimestampAndCalculateDelay(payload.payment_date)
+        const formatedPayment_date = formateExecutionTimestampAndCalculateDelay(payload.payment_date, selectedTime, form.setError, setShowScheduleNotice)
         if (!formatedPayment_date) return;
-
 
         const scheduleId = uuidv4()
         const transaction_type = currentCurrency === walletCurrency ? "Domestic" : "International";
@@ -577,6 +411,14 @@ const PaymentSchedulerCard: React.FC<IPaymentSchedulerCardProps> = ({
                                                                         onChange={(e) => {
                                                                             setCountryCode(field.value);
                                                                             field.onChange(e.target.value);
+                                                                            if (session.data?.user?.number === e.target.value) {
+                                                                                form.setError("payee_number", {
+                                                                                    message: "Both receiver & sender can not be same. Invalid recipient number",
+                                                                                });
+                                                                            }
+                                                                            if (e.target.value.length === 0) {
+                                                                                form.clearErrors("payee_number");
+                                                                            }
                                                                         }}
                                                                     />
                                                                 </div>
@@ -659,6 +501,7 @@ const PaymentSchedulerCard: React.FC<IPaymentSchedulerCardProps> = ({
                                                                     )}
                                                                 </div>
                                                             </FormControl>
+                                                            <FormMessage className="text-red-500" />
 
                                                             {amountError ? (
                                                                 <p className="text-sm font-medium text-red-500">
@@ -702,41 +545,44 @@ const PaymentSchedulerCard: React.FC<IPaymentSchedulerCardProps> = ({
                                                             <FormItem>
                                                                 <FormLabel>{t("payment_date")}</FormLabel>
                                                                 <FormControl>
-                                                                    <Popover>
-                                                                        <PopoverTrigger asChild disabled={isLoading}>
-                                                                            <Button
-                                                                                variant="outline"
-                                                                                className={cn(
-                                                                                    "w-full justify-start text-left font-normal",
-                                                                                    !date && "text-slate-500"
-                                                                                )}
-                                                                            >
-                                                                                <CalendarIcon className="mr-2 h-4 w-4 text-slate-500" />
-                                                                                {field.value
-                                                                                    ? format(field.value, "PPP")
-                                                                                    : t("select_date")
-                                                                                }
-                                                                            </Button>
-                                                                        </PopoverTrigger>
-                                                                        <PopoverContent className="w-auto p-0" align="start">
-                                                                            <Calendar
-                                                                                {...field}
-                                                                                mode="single"
-                                                                                selected={field.value}
-                                                                                onSelect={(val) => {
-                                                                                    console.log("selected value ===>", val)
-                                                                                    field.onChange(val);
-                                                                                }}
-                                                                                initialFocus
-                                                                                className="bg-white rounded-2xl"
-                                                                            />
-                                                                        </PopoverContent>
-                                                                    </Popover>
+                                                                    <div className="flex">
+                                                                        <Popover>
+                                                                            <PopoverTrigger asChild disabled={isLoading}>
+                                                                                <Button
+                                                                                    variant="outline"
+                                                                                    className={cn(
+                                                                                        "w-full justify-start text-left font-normal",
+                                                                                        !date && "text-slate-500"
+                                                                                    )}
+                                                                                >
+                                                                                    <CalendarIcon className="mr-2 h-4 w-4 text-slate-500" />
+                                                                                    {field.value
+                                                                                        ? format(field.value, "PPP")
+                                                                                        : t("select_date")
+                                                                                    }
+                                                                                </Button>
+                                                                            </PopoverTrigger>
+                                                                            <PopoverContent className="w-auto p-0" align="start">
+                                                                                <Calendar
+                                                                                    {...field}
+                                                                                    mode="single"
+                                                                                    selected={field.value}
+                                                                                    onSelect={(val) => {
+                                                                                        console.log("selected value ===>", val)
+                                                                                        field.onChange(val);
+                                                                                    }}
+                                                                                    initialFocus
+                                                                                    className="bg-white rounded-2xl"
+                                                                                />
+                                                                            </PopoverContent>
+                                                                        </Popover>
+                                                                        <div className="self-end"><Input type="time" value={selectedTime} className="w-full"
+                                                                            onChange={(e) => {
+                                                                                setSelectedTime(e.target.value)
+                                                                            }} /></div>
+                                                                    </div>
                                                                 </FormControl>
                                                                 <FormMessage className="text-red-500" />
-                                                                <div className="self-end"><Input type="time" value={selectedTime} onChange={(e) => {
-                                                                    setSelectedTime(e.target.value)
-                                                                }} className="w-full" /></div>
                                                             </FormItem>
                                                         </div>
                                                     );
@@ -788,7 +634,7 @@ const PaymentSchedulerCard: React.FC<IPaymentSchedulerCardProps> = ({
                                                 <Button
                                                     className="w-full mt-6 bg-purple-600 text-white"
                                                     type="submit"
-                                                    disabled={!(formState.isValid && (Object.keys(formState.errors).length === 0) && (amountError === null)) || formState.isSubmitting}
+                                                    disabled={!formState.isValid || !(Object.keys(formState.errors).length === 0) || !(amountError === null) || formState.isSubmitting}
                                                 >
                                                     {formState.isSubmitting
                                                         ? "Scheduling..."
@@ -805,7 +651,173 @@ const PaymentSchedulerCard: React.FC<IPaymentSchedulerCardProps> = ({
                                 <GetVerified sendVerificationEmailAction={sendVerificationEmailAction} title="Complete verification to enable p2p money transfer" />
                     }
                 </CardContent>
+                {accountLock && <AccountLock updateLockStatus={updateLockStatus} checkAccountLockStatus={checkAccountLockStatus} setAccountLock={setAccountLock} />}
             </Card>
+        </div>
+    );
+};
+
+const ScheduleTab: React.FC<IScheduleTabProps> = ({
+    pendingTransactions,
+    completedTransactions,
+    totalcompletedTransaction,
+    totalpendingTransaction,
+    cancelPaymentSchedule,
+    setPendingTransactions,
+    setTotalPendingTransaction,
+    editPaymentScheduleJob,
+    sendOTPAction,
+    verifyOTP
+}) => {
+    const [selectedTab, setSelectedTab] = useState("pending");
+    const t = useTranslations("ScheduleTab")
+    return (
+        <div className="bg-white px-4 rounded-lg shadow-md w-[560px] p-8">
+            <Tabs defaultValue="pending" className="w-full">
+                <TabsList className="grid w-full grid-cols-2 border h-[60px] px-4">
+                    <TabsTrigger
+                        value="pending"
+                        onClick={() => setSelectedTab("pending")}
+                        className={cn(
+                            "text-xl font-medium",
+                            selectedTab === "pending"
+                                ? "bg-purple-600 text-white"
+                                : "bg-white text-black/85"
+                        )}
+                    >
+                        {t("pending")}
+                        <p className="ml-4 text-white">{totalpendingTransaction}</p>
+                    </TabsTrigger>
+                    <TabsTrigger
+                        value="completed"
+                        onClick={() => setSelectedTab("completed")}
+                        className={cn(
+                            "text-xl font-medium",
+                            selectedTab === "completed"
+                                ? "bg-purple-600 text-white"
+                                : "bg-white text-black/85"
+                        )}
+                    >
+                        {t("completed")}
+                    </TabsTrigger>
+                </TabsList>
+                <TabsContent value="pending" className="mt-4">
+                    <Card>
+                        <CardHeader className="border-b">
+                            <CardTitle>{t("pending_transaction")}</CardTitle>
+                            <CardDescription className="text-slate-500">
+                                {t("pending_transaction_text1")}
+                            </CardDescription>
+                        </CardHeader>
+                        <CardContent>
+                            {pendingTransactions.length === 0 ? (
+                                <div className="space-y-4 mt-5 h-[300px] w-full">
+                                    <p className="text-center text-muted-foreground py-4">
+                                        {t("pending_transaction_text2")}
+                                    </p>
+                                </div>
+                            ) : (
+                                <ScrollArea className="space-y-4 mt-5 h-[300px] w-full">
+                                    {pendingTransactions.map((transaction) => (
+                                        <EditSchedulePaymentModal
+                                            key={transaction.trxn_id}
+                                            pendingScheduleTransaction={transaction}
+                                            cancelPaymentSchedule={cancelPaymentSchedule}
+                                            setPendingTransactions={setPendingTransactions}
+                                            setTotalPendingTransaction={setTotalPendingTransaction}
+                                            editPaymentScheduleJob={editPaymentScheduleJob}
+                                            sendOTPAction={sendOTPAction}
+                                            verifyOTP={verifyOTP}
+                                        >
+                                            <div
+                                                key={transaction.trxn_id ?? ""}
+                                                className="flex items-center justify-between border-b p-8 rounded-lg shadow-md"
+                                            >
+                                                <div className="flex flex-col gap-5">
+                                                    <div className="flex justify-between">
+                                                        <div>
+                                                            <p className="font-medium text-lg justify-self-start">{transaction.recieverName}</p>
+                                                            <p className="text-sm text-muted-foreground">{transaction.payer_number}</p>
+                                                            <p className="text-xs text-muted-foreground">{new Date(transaction.execution_date).toLocaleString()}</p>
+                                                        </div>
+                                                        <div className="text-right">
+                                                            <Badge className="p-1 rounded-xl bg-orange-600 text-white">
+                                                                <Clock className="h-3 w-3 mr-1" />
+                                                                Pending
+                                                            </Badge>
+                                                            <p className="font-medium flex items-center gap-1">
+                                                                {transaction.amount}
+                                                                <p>{transaction.currency}</p>
+                                                            </p>
+                                                        </div>
+                                                    </div>
+                                                    <div className="flex gap-2">
+                                                        <div className="flex flex-col justify item-start">
+                                                            <Label className="text-sm text-muted-foreground self-start">Scheduled Date</Label>
+                                                            <p>{new Date(transaction.execution_date).toLocaleString()}</p>
+                                                        </div>
+                                                        <div className="flex flex-col justify item-start">
+                                                            <Label className="text-sm text-muted-foreground self-start">Time Remain</Label>
+                                                            <p>{calculateRemainingTime(transaction.execution_date)}</p>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </EditSchedulePaymentModal>
+                                    ))}
+                                    <ScrollBar orientation="vertical" />
+                                </ScrollArea>
+                            )}
+                        </CardContent>
+                    </Card>
+                </TabsContent>
+                <TabsContent value="completed" className="mt-4">
+                    <Card>
+                        <CardHeader>
+                            <CardTitle>{t("completed_transaction")}</CardTitle>
+                            <CardDescription className="text-slate-500">
+                                {t("completed_transaction_text1")}
+                            </CardDescription>
+                        </CardHeader>
+                        <CardContent>
+                            {pendingTransactions.length === 0 ? (
+                                <div className="space-y-4 mt-5 h-[300px] w-full">
+                                    <p className="text-center text-muted-foreground py-4">
+                                        {t("completed_transaction_text2")}
+                                    </p>
+                                </div>
+                            ) : (
+                                <ScrollArea className="space-y-4 mt-5 h-[300px] w-full">
+                                    {pendingTransactions.map((transaction) => (
+                                        <div
+                                            key={transaction.trxn_id ?? ""}
+                                            className="flex items-center justify-between border-b p-8 rounded-lg shadow-md"
+                                        >
+                                            <div>
+                                                <p className="font-medium">{transaction.amount}</p>
+                                                <p className="text-xs text-muted-foreground">
+                                                    {/* {format(transaction.execution_data, "PPP")} */}
+                                                    {new Date(transaction.execution_date).toLocaleString()}
+                                                </p>
+                                            </div>
+                                            <div className="text-right">
+                                                <p className="font-medium">
+                                                    ${transaction.amount}
+                                                </p>
+                                                <div className="flex items-center text-xs text-amber-600">
+                                                    <Clock className="h-3 w-3 mr-1" />
+                                                    {t("completed")}
+                                                </div>
+                                            </div>
+                                        </div>
+                                    ))}
+                                    <ScrollBar orientation="vertical" />
+                                </ScrollArea>
+                            )}
+                        </CardContent>
+                    </Card>
+                </TabsContent>
+            </Tabs>
         </div>
     );
 };
