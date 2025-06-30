@@ -11,3 +11,4 @@ export const SendMoneySchema = z.object({
 });
 
 export type sendMoneyPayload = z.infer<typeof SendMoneySchema>
+export type sendMoneySchemaType = typeof SendMoneySchema

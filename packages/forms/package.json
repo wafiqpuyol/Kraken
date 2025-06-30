@@ -34,6 +34,8 @@
     "./confirmMail": "./src/confirmMail.tsx",
     "./confirmMailSchema": "./src/confirmMailSchema.ts",
     "./schedulePayment": "./src/schedulePayment.tsx",
-    "./schedulePaymentSchema": "./src/schedulePaymentSchema.ts"
+    "./schedulePaymentSchema": "./src/schedulePaymentSchema.ts",
+    "./editSchedulePaymentSchema": "./src/editSchedulePaymentSchema.ts",
+    "./editSchedulePayment": "./src/editSchedulePayment.tsx"
   }
 }
