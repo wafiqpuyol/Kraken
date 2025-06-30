@@ -209,7 +209,8 @@
     "phone_number": "Phone number",
     "password": "Password",
     "continue_button": "Continue",
-    "forgot": "Forgot"
+    "forgot": "Forgot",
+    "captcha_error": "Please solve the captcha"
   },
   "TwoFAForm": {
     "title": "Authenticator app",
@@ -420,6 +421,10 @@
   "OnRampTransaction": {
     "title": "Recent Transaction",
     "view_transaction_button": "View Transaction"
+  },
+  "SendMoney": {
+    "sendMoney_tab":"Send Money",
+    "scheduledPayment_tab":"Schedule Payment"
   },
   "SendMoneyPage": {
     "title": "Send Money",
@@ -635,7 +640,7 @@
     "email_placeholder": "Enter your email",
     "emergencyCode_placeholder": "Enter your emergency code"
   },
-  "FinalCard": {
+  "FinalCardForDirectPayment": {
     "title": "Send Money",
     "receiver_number": "Receiver Number",
     "sender_number": "Sender Number",
@@ -645,5 +650,41 @@
     "category": "Category",
     "converted_amount": "Converted Amount",
     "fee": "Fee"
-  }
+  },
+  "FinalCardForSchedulePayment": {
+    "title": "Schedule Payment",
+    "receiver_number": "Receiver Number",
+    "sender_number": "Sender Number",
+    "amount": "Amount",
+    "proceed": "Proceed",
+    "proceeding": "Proceeding",
+    "category": "Category",
+    "converted_amount": "Converted Amount",
+    "fee": "Fee",
+    "execution_time":"Execution Time"
+  }, 
+  "ScheduledPayment" :{
+    "cardTitle":"Schedule Your Payment",
+    "cardDesc":"Set up your next payment by filling out the details below",
+    "submiButtonSubmitText":"Scheduling...",
+    "submiButtonDefaultText":"Schedule Payment",
+    "payee_number":"Enter payee number",
+    "payee_number_input_placeholder":"Enter payee number",
+    "amount":"Amount",
+    "payment_date":"Payment Date",
+    "pincode": "Pincode",
+    "pindcode_text1":"Create Pindcode",
+    "pindcode_text2":"Don't have a pincode?",
+    "select_date":"Select Date"
+ },
+  "ScheduleTab":{
+    "pending":"Pending",
+    "completed":"Completed",
+    "pending_transaction":"Pending Transactions",
+    "pending_transaction_text1":"Payments scheduled for the future",
+    "pending_transaction_text2":"No pending transactions",
+    "completed_transaction":"Completed Transactions",
+    "completed_transaction_text1":" Payments that have been processed",
+    "completed_transaction_text2":"No completed transactions"
+ }
 }

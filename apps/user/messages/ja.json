@@ -410,6 +410,10 @@
     "title": "最近のトランザクション",
     "view_transaction_button": "トランザクションを表示"
   },
+  "SendMoney": {
+      "sendMoney_tab": "送金する",
+      "scheduledPayment_tab": "支払いをスケジュール"
+  },    
   "SendMoneyPage": {
     "title": "送金",
     "desc": "別のユーザーに安全に資金を転送します。",
@@ -644,5 +648,29 @@
     "category": "カテゴリ",
     "converted_amount": "換算額",
     "fee": "手数料"
-  }
+  },
+   "ScheduledPayment": {
+      "cardTitle": "お支払いをスケジュールする",
+      "cardDesc": "以下の詳細を入力して、次回のお支払いを設定してください",
+      "submiButtonSubmitText": "スケジューリング中...",
+      "submiButtonDefaultText": "支払いをスケジュール",
+      "payee_number": "受取人番号を入力してください",
+      "payee_number_input_placeholder": "受取人番号を入力してください",
+      "amount": "金額",
+      "payment_date": "支払日",
+      "pincode": "暗証番号",
+      "pindcode_text1": "暗証番号を作成",
+      "pindcode_text2": "暗証番号をお持ちではありませんか？",
+      "select_date": "日付を選択"
+    },
+    "ScheduleTab": {
+      "pending": "保留中",
+      "completed": "完了",
+      "pending_transaction": "保留中の取引",
+      "pending_transaction_text1": "将来に予定されている支払い",
+      "pending_transaction_text2": "保留中の取引はありません",
+      "completed_transaction": "完了した取引",
+      "completed_transaction_text1": "処理済みの支払い",
+      "completed_transaction_text2": "完了した取引はありません"
+    }
 }

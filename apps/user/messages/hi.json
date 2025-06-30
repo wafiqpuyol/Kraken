@@ -410,6 +410,10 @@
     "title": "हाल का लेनदेन",
     "view_transaction_button": "लेनदेन देखें"
   },
+  "SendMoney": {
+      "sendMoney_tab": "पैसे भेजें",
+      "scheduledPayment_tab": "भुगतान शेड्यूल करें"
+  },
   "SendMoneyPage": {
     "title": "पैसा भेजें",
     "desc": "किसी अन्य उपयोगकर्ता को सुरक्षित रूप से धन स्थानांतरित करें।",
@@ -644,5 +648,29 @@
     "category": "श्रेणी",
     "converted_amount": "रूपांतरित राशि",
     "fee": "शुल्क"
-  }
+  },
+  "ScheduledPayment": {
+      "cardTitle": "अपने भुगतान को शेड्यूल करें",
+      "cardDesc": "नीचे दिए गए विवरण भरकर अपना अगला भुगतान सेट करें",
+      "submiButtonSubmitText": "शेड्यूल किया जा रहा है...",
+      "submiButtonDefaultText": "भुगतान शेड्यूल करें",
+      "payee_number": "आदाता संख्या दर्ज करें",
+      "payee_number_input_placeholder": "आदाता संख्या दर्ज करें",
+      "amount": "राशि",
+      "payment_date": "भुगतान तिथि",
+      "pincode": "पिनकोड",
+      "pindcode_text1": "पिनकोड बनाएं",
+      "pindcode_text2": "पिनकोड नहीं है?",
+      "select_date": "तिथि चुनें"
+    },
+    "ScheduleTab": {
+      "pending": "लंबित",
+      "completed": "पूर्ण",
+      "pending_transaction": "लंबित लेनदेन",
+      "pending_transaction_text1": "भविष्य के लिए निर्धारित भुगतान",
+      "pending_transaction_text2": "कोई लंबित लेनदेन नहीं",
+      "completed_transaction": "पूर्ण लेनदेन",
+      "completed_transaction_text1": " संसाधित किए गए भुगतान",
+      "completed_transaction_text2": "कोई पूर्ण लेनदेन नहीं"
+    }
 }

@@ -410,6 +410,10 @@
     "title": "Transação recente",
     "view_transaction_button": "Ver transação"
   },
+  "SendMoney": {
+      "sendMoney_tab": "Enviar Dinheiro",
+      "scheduledPayment_tab": "Agendar Pagamento"
+  },
   "SendMoneyPage": {
     "title": "Enviar dinheiro",
     "desc": "Transfira fundos para outro usuário com segurança.",
@@ -604,7 +608,7 @@
     "continue": "Continuar",
     "email_placeholder": "Insira o novo e-mail",
     "authCode_desc": "Enviamos um código de autorização para o seu e-mail atual. Insira-o aqui.",
-    "confirmCode_desc:": "Também enviamos um código de confirmação para o seu novo e-mail -",
+    "confirmCode_desc": "Também enviamos um código de confirmação para o seu novo e-mail -",
     "confirmCode_placeHolder": "Código de confirmação",
     "authCode_desc_placeHolder": "Código de autorização",
     "footer": "Se você não recebeu esses e-mails, verifique sua pasta de lixo/spam ou pode reenviar os e-mails.",
@@ -635,7 +639,7 @@
     "emergencyCode_placeholder": "Insira seu código de emergência"
   },
   "FinalCard": {
-    "Send": "Enviar dinheiro",
+    "title": "Enviar dinheiro",
     "receiver_number": "Número do destinatário",
     "sender_number": "Número do remetente",
     "amount": "Montante",
@@ -644,5 +648,29 @@
     "category": "Categoria",
     "converted_amount": "Valor convertido",
     "fee": "Taxa"
-  }
+  },
+  "ScheduledPayment": {
+      "cardTitle": "Agende seu pagamento",
+      "cardDesc": "Configure seu próximo pagamento preenchendo os detalhes abaixo",
+      "submiButtonSubmitText": "Agendando...",
+      "submiButtonDefaultText": "Agendar pagamento",
+      "payee_number": "Digite o número do beneficiário",
+      "payee_number_input_placeholder": "Digite o número do beneficiário",
+      "amount": "Valor",
+      "payment_date": "Data de pagamento",
+      "pincode": "Código PIN",
+      "pindcode_text1": "Criar código PIN",
+      "pindcode_text2": "Não tem um código PIN?",
+      "select_date": "Selecione a data"
+    },
+    "ScheduleTab": {
+      "pending": "Pendente",
+      "completed": "Concluído",
+      "pending_transaction": "Transações pendentes",
+      "pending_transaction_text1": "Pagamentos agendados para o futuro",
+      "pending_transaction_text2": "Nenhuma transação pendente",
+      "completed_transaction": "Transações concluídas",
+      "completed_transaction_text1": "Pagamentos que foram processados",
+      "completed_transaction_text2": "Nenhuma transação concluída"
+    }
 }

@@ -407,6 +407,10 @@
     "title": "সাম্প্রতিক লেনদেন",
     "view_transaction_button": "লেনদেন দেখুন"
   },
+  "SendMoney": {
+      "sendMoney_tab": "টাকা পাঠান",
+      "scheduledPayment_tab": "পেমেন্টের সময়সূচী করুন"
+  },
   "SendMoneyPage": {
     "title": "টাকা পাঠান",
     "desc": "নিরাপদে অন্য ব্যবহারকারীর কাছে তহবিল স্থানান্তর করুন।",
@@ -642,5 +646,29 @@
     "category": "বিভাগ",
     "converted_amount": "রূপান্তরিত পরিমাণ",
     "fee": "ফি"
+  },
+  "ScheduledPayment": {
+    "cardTitle": "আপনার পেমেন্টের সময়সূচী করুন",
+    "cardDesc": "নীচের বিবরণগুলি পূরণ করে আপনার পরবর্তী পেমেন্ট সেট আপ করুন",
+    "submiButtonSubmitText": "শিডিউল করা হচ্ছে...",
+    "submiButtonDefaultText": "পেমেন্টের সময়সূচী করুন",
+    "payee_number": "প্রাপকের নম্বর লিখুন",
+    "payee_number_input_placeholder": "প্রাপকের নম্বর লিখুন",
+    "amount": "টাকার পরিমাণ",
+    "payment_date": "পেমেন্টের তারিখ",
+    "pincode": "পিনকোড",
+    "pindcode_text1": "পিনকোড তৈরি করুন",
+    "pindcode_text2": "পিনকোড নেই?",
+    "select_date":"তারিখ নির্বাচন করুন"
+  },
+  "ScheduleTab": {
+    "pending": "অমীমাংসিত",
+    "completed": "সম্পন্ন",
+    "pending_transaction": "অমীমাংসিত লেনদেন",
+    "pending_transaction_text1": "ভবিষ্যতের জন্য নির্ধারিত পেমেন্ট",
+    "pending_transaction_text2": "কোনো অমীমাংসিত লেনদেন নেই",
+    "completed_transaction": "সম্পন্ন লেনদেন",
+    "completed_transaction_text1": "প্রক্রিয়াকৃত পেমেন্ট",
+    "completed_transaction_text2": "কোনো সম্পন্ন লেনদেন নেই"
   }
 }

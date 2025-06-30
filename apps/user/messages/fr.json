@@ -410,6 +410,10 @@
     "title": "Transaction récente",
     "view_transaction_button": "Voir la transaction"
   },
+   "SendMoney": {
+      "sendMoney_tab": "Envoyer de l'argent",
+      "scheduledPayment_tab": "Planifier le paiement"
+    },
   "SendMoneyPage": {
     "title": "Envoyer de l'argent",
     "desc": "Transférez des fonds à un autre utilisateur en toute sécurité.",
@@ -644,5 +648,29 @@
     "category": "Catégorie",
     "converted_amount": "Montant converti",
     "fee": "Frais"
+  },
+  "ScheduledPayment": {
+      "cardTitle": "Planifiez votre paiement",
+      "cardDesc": "Configurez votre prochain paiement en remplissant les détails ci-dessous",
+      "submiButtonSubmitText": "Planification...",
+      "submiButtonDefaultText": "Planifier le paiement",
+      "payee_number": "Entrez le numéro du bénéficiaire",
+      "payee_number_input_placeholder": "Entrez le numéro du bénéficiaire",
+      "amount": "Montant",
+      "payment_date": "Date de paiement",
+      "pincode": "Code PIN",
+      "pindcode_text1": "Créer un code PIN",
+      "pindcode_text2": "Vous n'avez pas de code PIN ?",
+      "select_date": "Sélectionner une date"
+    },
+  "ScheduleTab": {
+      "pending": "En attente",
+      "completed": "Terminé",
+      "pending_transaction": "Transactions en attente",
+      "pending_transaction_text1": "Paiements prévus pour une date ultérieure",
+      "pending_transaction_text2": "Aucune transaction en attente",
+      "completed_transaction": "Transactions terminées",
+      "completed_transaction_text1": "Paiements qui ont été traités",
+      "completed_transaction_text2": "Aucune transaction terminée"
   }
 }

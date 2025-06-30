@@ -410,6 +410,10 @@
     "title": "Transação recente",
     "view_transaction_button": "Ver transação"
   },
+  "SendMoney": {
+    "sendMoney_tab":"Send Money",
+    "scheduledPayment_tab":"Schedule Payment"
+  },
   "SendMoneyPage": {
     "title": "Enviar dinero",
     "desc": "Transfiera fondos a otro usuario de forma segura.",
@@ -644,5 +648,29 @@
     "category": "Categoría",
     "converted_amount": "Monto convertido",
     "fee": "Cuota"
-  }
+  },
+  "ScheduledPayment": {
+      "cardTitle": "Programe su pago",
+      "cardDesc": "Configure su próximo pago completando los detalles a continuación",
+      "submiButtonSubmitText": "Programando...",
+      "submiButtonDefaultText": "Programar pago",
+      "payee_number": "Ingrese el número de beneficiario",
+      "payee_number_input_placeholder": "Ingrese el número de beneficiario",
+      "amount": "Monto",
+      "payment_date": "Fecha de pago",
+      "pincode": "Código PIN",
+      "pindcode_text1": "Crear código PIN",
+      "pindcode_text2": "¿No tiene un código PIN?",
+      "select_date": "Seleccione fecha"
+    },
+    "ScheduleTab": {
+      "pending": "Pendiente",
+      "completed": "Completado",
+      "pending_transaction": "Transacciones pendientes",
+      "pending_transaction_text1": "Pagos programados para el futuro",
+      "pending_transaction_text2": "No hay transacciones pendientes",
+      "completed_transaction": "Transacciones completadas",
+      "completed_transaction_text1": "Pagos que han sido procesados",
+      "completed_transaction_text2": "No hay transacciones completadas"
+    }
 }
