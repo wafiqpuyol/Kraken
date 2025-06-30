@@ -14,7 +14,7 @@ export const TrxnToolTip = ({ children }: { children: React.ReactNode }) => {
                 <TooltipTrigger asChild>
                     {children}
                 </TooltipTrigger>
-                <TooltipContent className="bg-white rounded-lg font-medium text-slate-600">
+                <TooltipContent className="bg-white rounded-lg font-medium text-slate-600 w-[200px] p-3">
                     <p>{t("tooltip_text")}</p>
                 </TooltipContent>
             </Tooltip>
