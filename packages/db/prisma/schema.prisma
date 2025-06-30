@@ -215,12 +215,18 @@ model notification {
 }
 
 model schedulePayment {
-  id            Int      @id
-  userId        Int      
-  jobId         String   @unique(map: "SchedulePayment_jobId")
+  id            Int                    @id
+  userId        Int
+  jobId         String                 @unique(map: "SchedulePayment_jobId")
   amount        String
   executionDate DateTime
-  user          user     @relation(fields: [userId], references: [id])
+  user          user                   @relation(fields: [userId], references: [id])
+  editCount     Int                    @default(0)
+  payee_number  String
+  status        schedulePayment_status @default(Pending)
+  isLocked      Boolean                @default(false)
+  createdAt     DateTime               @default(now())
+  updatedAt     DateTime               @default(now())
 
   @@index([jobId], map: "schedulePayment_jobId_fkey")
 }
@@ -258,4 +264,12 @@ enum transaction_status {
   Failed
   Flagged
   Reviewing
+}
+
+enum schedulePayment_status {
+  Completed
+  Pending
+  Failed
+  Processing
+  Cancelled
 }

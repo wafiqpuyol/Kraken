@@ -2,6 +2,7 @@
   "name": "@repo/db",
   "version": "0.0.0",
   "devDependencies": {
+    "@types/pg": "^8.15.2",
     "prisma": "^5.19.1"
   },
   "exports": {
@@ -9,6 +10,8 @@
     "./type": "./type.ts"
   },
   "dependencies": {
-    "@prisma/client": "^5.19.1"
+    "@prisma/client": "^5.19.1",
+    "pg": "^8.16.0",
+    "server-only": "^0.0.1"
   }
 }
