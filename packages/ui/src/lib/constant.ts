@@ -85,6 +85,7 @@ export const SUPPORTED_TIMEZONE = [
 export const EMAIL_REGEX = /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/;
 export const PINCODE_MAX_LENGTH = 6
 export const EMERGENCY_CODE_MAX_LENGTH = 50
+export const OTP_CODE=6
 export const SELECTED_COUNTRY = [
     [
         "United States",
@@ -353,10 +354,12 @@ export const WS_SERVER_URL = "ws://localhost:3010"
 export const HEARTBEAT_VALUE = 1;
 export const SOCKET_CLOSE_CODE = 1000
 export const JOB_NAME = "process-payment"
-export const BUFFER_SCHEDULE_TIME=15
+export const BUFFER_SCHEDULE_TIME=20
 export const ATTEMPT_VALUE = 3
 export const BACKOFF_DELAY = 5000
 export const SEND_MOANEY_TYPE= {
     DIRECT:"DIRECT",
     SCHEDULED:"SCHEDULED"
 } as SendMoneyType
+export const TOTAL_EDITCOUNT = 3
+export const MIN_GAP_MINUTES = 15

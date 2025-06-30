@@ -8,8 +8,10 @@ import { toast, } from "../components/molecules/Toaster/use-toast"
 import { startAuthentication } from "@simplewebauthn/browser"
 import { PublicKeyCredentialRequestOptionsJSON } from "@simplewebauthn/types"
 import { notification } from "@repo/db/type"
-import { WS_SERVER_URL } from "./constant"
-import { HEARTBEAT_VALUE, SOCKET_CLOSE_CODE } from "./constant"
+import { WS_SERVER_URL, BUFFER_SCHEDULE_TIME, HEARTBEAT_VALUE, SOCKET_CLOSE_CODE, COUNTRY_MATCHED_CURRENCY } from "./constant"
+import { FieldValues, UseFormSetError } from "@repo/forms/types";
+import { schedulePaymentPayload } from "@repo/forms/schedulePaymentSchema";
+import { guessCountryByPartialPhoneNumber } from "react-international-phone";
 
 export function cn(...inputs: ClassValue[]) {
     return twMerge(clsx(inputs))
@@ -300,7 +302,7 @@ export class SignallingManager {
     }
 }
 
-export const formateScheduledTrxnData = (payload: any[]) => {
+export const formateScheduledTrxnData = (payload: any) => {
     return {
         trxn_id: payload?.id,
         amount: payload?.formData.amount,
@@ -309,9 +311,11 @@ export const formateScheduledTrxnData = (payload: any[]) => {
         remaining_time_of_execution: payload?.delay,
         payer_number: payload?.additionalData.sender_number,
         recieverName: payload.recieverName,
-        senderName: payload.senderName
+        senderName: payload.senderName,
+        currency: payload.formData.currency
+
     }
-}   
+}
 
 export const calculateRemainingTime = (targetDateISO: string): string | null => {
     const now = Date.now();
@@ -356,56 +360,32 @@ export const calculateRemainingTime = (targetDateISO: string): string | null => 
     return null
 }
 
+export const formateExecutionTimestampAndCalculateDelay = <T extends Date>(executionDate: T,
+    executeTime: string, setFormError: UseFormSetError<schedulePaymentPayload>, setShowScheduleNotice: Dispatch<SetStateAction<boolean>>
+): (Date | null) => {
+    const executionTimestamp = new Date(executionDate)
+    executionTimestamp.setHours(parseInt(executeTime.split(":")[0]!))
+    executionTimestamp.setMinutes(parseInt(executeTime.split(":")[1]!))
+    executionTimestamp.setSeconds(0)
 
+    const currentTimestamp = new Date(Date.now());
+    currentTimestamp.setMinutes(currentTimestamp.getMinutes() + BUFFER_SCHEDULE_TIME)
+    const delay = executionTimestamp.getTime() - currentTimestamp.getTime();
+    if (delay <= 0) {
+        setFormError("payment_date", { message: "Invalid Date wafiq" })
+        setShowScheduleNotice(true)
+        return null
+    }
+    return executionTimestamp
+}
 
-// {
-//     "name": "process-payment",
-//     "data": {
-//         "formData": {
-//             "pincode": "123456",
-//             "payee_number": "+8801962175677",
-//             "amount": "25",
-//             "currency": "BDT",
-//             "payment_date": "2025-07-05T03:00:00.000Z"
-//         },
-//         "additionalData": {
-//             "symbol": "৳",
-//             "sender_number": "+8801905333510",
-//             "receiver_number": "+8801962175677",
-//             "trxn_type": "Domestic",
-//             "domestic_trxn_fee": "4",
-//             "international_trxn_fee": null,
-//             "domestic_trxn_currency": "BDT",
-//             "international_trxn_currency": "BDT"
-//         },
-//         "executionTime": "2025-07-05T03:00:00.000Z",
-//         "scheduleId": "92af066e-fd53-435b-98c6-82c2b63a755a",
-//         "userId": 26506964
-//     },
-//     "opts": {
-//         "attempts": 3,
-//         "delay": 1326423137,
-//         "removeOnFail": {
-//             "count": 0
-//         },
-//         "jobId": "schedule_92af066e-fd53-435b-98c6-82c2b63a755a_cc98b850-cec8-4a66-9f0f-f6fba39c55af",
-//         "removeOnComplete": {
-//             "count": 0
-//         },
-//         "backoff": {
-//             "delay": 5000,
-//             "type": "exponential"
-//         }
-//     },
-//     "id": "schedule_92af066e-fd53-435b-98c6-82c2b63a755a_cc98b850-cec8-4a66-9f0f-f6fba39c55af",
-//     "progress": 0,
-//     "returnvalue": null,
-//     "stacktrace": [],
-//     "delay": 1326423137,
-//     "priority": 0,
-//     "attemptsStarted": 0,
-//     "attemptsMade": 0,
-//     "stalledCounter": 0,
-//     "timestamp": 1750357976863,
-//     "queueQualifiedName": "bull:payment-schedule-queue"
-// }
+export const getRecipientNumberTypeAndCountry = (currency: string, recipientNumber: string) => {
+    let recipientNumberType = "";
+    if (currency) {
+        recipientNumberType = COUNTRY_MATCHED_CURRENCY.find(c => c.name === currency)!.numberType
+    }
+    const recipientCountry = guessCountryByPartialPhoneNumber({
+        phone: recipientNumber,
+    })?.country?.name;
+    return { recipientNumberType, recipientCountry }
+}

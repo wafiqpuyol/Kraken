@@ -1,3 +1,4 @@
+import { cn } from "../lib/utils"
 
 export const HomeIcon = () => {
     return <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" className="w-6 h-6">
@@ -120,4 +121,10 @@ export const Hourglass = () => (
         <path d="M5 22h14" /><path d="M5 2h14" /><path d="M17 22v-4.172a2 2 0 0 0-.586-1.414L12 12l-4.414 4.414A2 2 0 0 0 7 17.828V22" />
         <path d="M7 2v4.172a2 2 0 0 0 .586 1.414L12 12l4.414-4.414A2 2 0 0 0 17 6.172V2" />
     </svg>
+)
+
+export const BellIcon = ({ className }: { className?: string }) => (
+    <svg width="33" height="33" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"
+        className={cn("ms-ds-0 me-ds-0 mt-ds-0 mb-ds-0 w-ds-icon-md h-ds-icon-md text-white cursor-pointer", className)} name="Bell">
+        <path d="M15.9999 18.25C15.3267 20.0159 13.7891 21.25 11.9999 21.25C10.2108 21.25 8.67321 20.0159 7.99994 18.25M5.84837 18.25H18.1515C19.3832 18.25 20.3221 17.1475 20.126 15.9315L18.9553 8.67345C18.4047 5.2596 15.4579 2.75 11.9999 2.75C8.54197 2.75 5.59516 5.2596 5.04454 8.67345L3.87389 15.9315C3.67777 17.1475 4.61673 18.25 5.84837 18.25Z" strokeWidth="2" className="fill-transparent stroke-current"></path></svg>
 )

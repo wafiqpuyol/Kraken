@@ -1,8 +1,7 @@
-import { scheduleSchemaType } from "@repo/forms/schedulePaymentSchema";
 import { sendMoneySchemaType } from "@repo/forms/sendMoneySchema";
 import { ITransactionDetail } from "@repo/ui/types";
-import { ZodError } from "@repo/forms/types"
-
+import { ZodError, ZodTypeAny } from "@repo/forms/types"
+import {MIN_GAP_MINUTES} from "@repo/ui/constants"
 
 const bcrypt = require('bcrypt');
 
@@ -76,49 +75,83 @@ export class HttpError extends Error {
 }
 
 
-export class ZodSchemaValidator {
-    private static instance: ZodSchemaValidator
+// export class ZodSchemaValidator {
+//     private static instance: ZodSchemaValidator
 
-    private constructor() { }
+//     private constructor() { }
 
-    public static getInstance() {
-        if (!this.instance) {
-            this.instance = new ZodSchemaValidator()
-        }
-        return this.instance
-    }
+//     public static getInstance() {
+//         if (!this.instance) {
+//             this.instance = new ZodSchemaValidator()
+//         }
+//         return this.instance
+//     }
 
-    validateScheduleSchema(schema: scheduleSchemaType, payload: ITransactionDetail["formData"]) {
-        const validatedScheduledDetails = schema.safeParse(payload)
-        if (!validatedScheduledDetails.success) {
-            throw new ZodError(
-                [{
-                    message: (
-                        validatedScheduledDetails.error.format().payee_number?._errors[0] ||
-                        validatedScheduledDetails.error.format().payment_date?._errors[0]! ||
-                        validatedScheduledDetails.error.format().currency?._errors[0] ||
-                        validatedScheduledDetails.error.format().amount?._errors[0] ||
-                        validatedScheduledDetails.error.format().pincode?._errors[0]
-                    )
-                }]
-            )
+//     validateScheduleSchema<T extends ZodTypeAny>(schema: T, payload: ITransactionDetail["formData"]) {
+//         const validatedScheduledDetails = schema.safeParse(payload)
+//         if (!validatedScheduledDetails.success) {
+//             throw new ZodError(
+//                 [{
+//                     message: returnZodErrorMsg(payload,validatedScheduledDetails )
+//                 }]
+//             )
+//         }
+//         return validatedScheduledDetails
+//     }
+//     validateSendMoneySchema(schema: sendMoneySchemaType, payload: ITransactionDetail["formData"]) {
+//         const validatedScheduledDetails = schema.safeParse(payload)
+
+//         if (!validatedScheduledDetails.success) {
+//             throw new ZodError(
+//                 [{
+//                     message: returnZodErrorMsg(payload, validatedScheduledDetails)
+//                 }]
+//             )
+//         }
+//         return validatedScheduledDetails
+//     }
+// }
+
+const returnZodErrorMsg = (items: any, a: any) => {
+    for (const t of Object.keys(items)) {
+        var msg = a.error?.format()[t]?._errors[0]
+        if (msg) {
+            break
         }
-        return validatedScheduledDetails
     }
-    validateSendMoneySchema(schema: sendMoneySchemaType, payload: ITransactionDetail["formData"]) {
-        const validatedScheduledDetails = schema.safeParse(payload)
-        if (!validatedScheduledDetails.success) {
-            throw new ZodError(
-                [{
-                    message: (
-                       validatedScheduledDetails.error.format().phone_number?._errors[0] || 
-                       validatedScheduledDetails.error.format().amount?._errors[0] || 
-                       validatedScheduledDetails.error.format().pincode?._errors[0] ||
-                       validatedScheduledDetails.error.format().currency?._errors[0]
-                    )
-                }]
-            )
-        }
-        return validatedScheduledDetails
+    return msg
+}
+
+export const zodSchemaValidator = <T extends ZodTypeAny>(schema: T, payload: ITransactionDetail["formData"]) => {
+    const validatedScheduledDetails = schema.safeParse(payload)
+    if (!validatedScheduledDetails.success) {
+        throw new ZodError(
+            [{
+                message: returnZodErrorMsg(payload, validatedScheduledDetails)
+            }]
+        )
     }
+    return validatedScheduledDetails
+}
+
+export const calculateDelay = (executionTime: Date) => {
+    const executionTimestamp = new Date(executionTime).getTime();
+    const currentTimestamp = Date.now();
+    return executionTimestamp - currentTimestamp;
+}
+
+export const isScheduleTimeValid = (executionTime: Date): boolean=>{
+  const currentTime: Date = new Date();
+  const minGapInMs: number = MIN_GAP_MINUTES * 60 * 1000;
+  const differenceInMs: number = new Date(executionTime).getTime() - currentTime.getTime();
+
+  if (differenceInMs > minGapInMs) {
+    console.log(`✅ VALID: The time ${executionTime.toISOString()} is valid.`);
+    return true;
+  } else {
+    console.log(
+      `❌ INVALID: The time ${executionTime.toISOString()} is too soon.`
+    );
+    return false;
+  }
 }
