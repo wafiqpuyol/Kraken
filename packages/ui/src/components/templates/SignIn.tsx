@@ -71,10 +71,10 @@ export const SignInForm: React.FC<LoginProps> = ({ isTwoFAEnabledFunc, activate2
     const recaptchaRef = useRef<ReCAPTCHA>(null);
 
     const submit = async (payload: loginPayload) => {
-        if (!isCaptchaSolved) {
-            setCaptchaBottomError({ message: "Please solve the captcha", isError: true })
-            return
-        }
+        // if (!isCaptchaSolved) {
+        //     setCaptchaBottomError({ message: "Please solve the captcha", isError: true })
+        //     return
+        // }
 
         try {
             setIsLoading(true)
@@ -227,13 +227,13 @@ export const SignInForm: React.FC<LoginProps> = ({ isTwoFAEnabledFunc, activate2
                                             </FormItem>
                                         )}
                                     />
-                                    <ReCAPTCHA
+                                    {/* <ReCAPTCHA
                                         sitekey={process.env.NEXT_PUBLIC_CAPTCHA_SITE_KEY || ""}
                                         ref={recaptchaRef}
                                         onChange={handleChange}
                                         onExpired={handleExpired}
                                     />
-                                    {captchaBottomError.isError && <small className='text-red-500 font-medium'>{captchaBottomError.message}</small>}
+                                    {captchaBottomError.isError && <small className='text-red-500 font-medium'>{captchaBottomError.message}</small>} */}
                                     <Button type="submit" disabled={isLoading || isBtnDisable}
                                         className="bg-purple-600 w-full text-white text-lg hover:bg-purple-700">{t("continue_button")}</Button>
                                 </form>

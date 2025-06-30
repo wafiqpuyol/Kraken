@@ -1,5 +1,8 @@
 import { cn } from "@/src/lib/utils";
 import { ControllerRenderProps } from "@repo/forms/types";
+import { sendMoneyPayload } from "@repo/forms/sendMoneySchema";
+import { schedulePaymentPayload } from "@repo/forms/schedulePaymentSchema";
+import { editSchdulePaymentPayload } from "@repo/forms/editSchedulePaymentSchema";
 import { Dispatch, SetStateAction } from "react";
 import { CURRENCY_LOGO, EXCHANGE_RATE } from "../../lib/constant";
 import {
@@ -12,12 +15,7 @@ import {
 } from "../atoms/Select";
 
 interface SelectCurrencyProps {
-    field: ControllerRenderProps<{
-        amount: string;
-        phone_number: string;
-        pincode: string;
-        currency?: string | undefined;
-    }, "currency">,
+    field: ControllerRenderProps<schedulePaymentPayload|sendMoneyPayload|editSchdulePaymentPayload,  "currency">,
     current_selected_currency: string,
     wallet_currency: string | undefined,
     form: any,
