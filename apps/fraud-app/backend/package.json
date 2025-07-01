@@ -10,14 +10,18 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "@repo/db": "^0.0.0",
     "cors": "^2.8.5",
     "express": "^5.1.0",
     "kafkajs": "^2.2.4",
-    "nodemon": "^3.1.10"
+    "nodemon": "^3.1.10",
+    "redis": "^5.0.1",
+    "ws": "^8.18.2"
   },
   "devDependencies": {
     "@types/cors": "^2.8.18",
     "@types/express": "^5.0.2",
-    "@types/node": "^22.15.19"
+    "@types/node": "^22.15.19",
+    "@types/ws": "^8.18.1"
   }
 }

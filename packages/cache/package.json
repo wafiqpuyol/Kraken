@@ -10,6 +10,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "@repo/cache": "file:",
     "redis": "^4.7.0"
   },
   "exports": {
