@@ -100,7 +100,7 @@ const P2PTooltip = ({ active, payload, nameKey, t }: { t: any, active: boolean, 
     return null;
 };
 
-const PortfolioBalance = ({ totalBalance = "0", currency = "$", t }: { totalBalance: string | undefined, currency: string, t: any }) => {
+const PortfolioBalance = ({ totalBalance = 0, currency = "$", t }: { totalBalance: number | undefined, currency: string, t: any }) => {
     const router = useRouter()
     const locale = useLocale()
     return (<div className="bg-white shadow-md flex justify-between rounded-2xl p-9 font-medium text-slate-600 mb-7">
@@ -139,9 +139,10 @@ const OnRamp = ({ onRamps, children, onRampConfig }: { onRamps: onramptransactio
                     <CartesianGrid vertical={false} />
                     <XAxis
                         dataKey="date"
-                        tickLine={false}
-                        axisLine={false}
+                        tickLine={true}
+                        axisLine={true}
                         tickMargin={8}
+                        minTickGap={32}
                         className="font-bold text-[10px]"
                         tickFormatter={(value) => {
                             const date = new Date(value)
