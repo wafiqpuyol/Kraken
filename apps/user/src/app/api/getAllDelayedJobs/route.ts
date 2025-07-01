@@ -15,7 +15,8 @@ export const GET = async () => {
             remaining_time_of_execution: job?.delay || 0,
             payer_number: job?.data.additionalData.sender_number || "N/A",
             recieverName: job.data.recieverName,
-            senderName: job.data.senderName
+            senderName: job.data.senderName,
+            currency:job?.data.formData.currency
         }))
     return new Response(JSON.stringify([pendingJobs[0], fiteredPendingJobs]), { status: 200 })
 }
