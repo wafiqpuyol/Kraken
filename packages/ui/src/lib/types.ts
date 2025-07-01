@@ -1,13 +1,14 @@
 import { sendMoneyPayload } from "@repo/forms/sendMoneySchema"
+import { schedulePaymentPayload } from "@repo/forms/schedulePaymentSchema"
+import { editSchdulePaymentPayload } from "@repo/forms/editSchedulePaymentSchema"
 
 export interface ITransactionDetail {
-    formData: sendMoneyPayload
+    formData: sendMoneyPayload | schedulePaymentPayload | editSchdulePaymentPayload
     additionalData: {
         symbol: string
         sender_number: string,
         receiver_number: string,
         trxn_type: TRANSACTION_TYPE.DOMESTIC | TRANSACTION_TYPE.INTERNATIONAL,
-        trxn_charge: string
         domestic_trxn_currency: string
         international_trxn_currency: string
         domestic_trxn_fee: string | null
@@ -15,7 +16,13 @@ export interface ITransactionDetail {
     }
 }
 
-enum TRANSACTION_TYPE {
+export interface IScheduleDetails extends ITransactionDetail {
+    scheduleId: string
+    executionTime: Date
+    jobOptions?: any
+}
+
+export enum TRANSACTION_TYPE {
     INTERNATIONAL = "International",
     DOMESTIC = "Domestic"
 }
@@ -52,4 +59,16 @@ export type WithdrawLimitType = {
             month: string
         }
     }
-} 
+}
+
+export interface SendMoneyType  {
+    DIRECT:"DIRECT",
+    SCHEDULED:"SCHEDULED"
+}
+
+export enum Phase {
+    PINCODE = "pincode",
+    EMAIL = "email",
+    EMERGENCY = "eneergencyCode",
+    OTP= "otp"
+}

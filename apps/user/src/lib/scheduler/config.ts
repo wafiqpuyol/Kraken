@@ -1,15 +1,20 @@
-import { Queue, Worker, ConnectionOptions, Job, QueueEvents } from "bullmq";
+import { Queue, Worker, ConnectionOptions, Job, QueueEvents, QueueEventsListener } from "bullmq";
 import { redisConfig } from "../config"
-import {SchedulerMap} from "./schedulerMap"
-import { ATTEMPT_VALUE,BACKOFF_DELAY } from "@repo/ui/constants"
+import { SchedulerMap } from "./schedulerMap"
+import { ATTEMPT_VALUE, BACKOFF_DELAY } from "@repo/ui/constants"
+import {CustomEvent} from "./event"
 
-
-export const paymentScheduleQueueConfig = {
+export interface CustomEventPayload {
+  eventName: string;
+  data: object;
+}
+const paymentScheduleQueueConfig = {
   queuename: process.env.PAYMENT_QUEUE_NAME || "payment-schedule-queue",
 };
+const connection = { host: redisConfig.host, port: Number(redisConfig.port) };
 
 export const paymentScheduleQueue = new Queue(paymentScheduleQueueConfig.queuename, {
-  connection: { host: redisConfig.host, port: Number(redisConfig.port) },
+  connection,
   defaultJobOptions: {
     attempts: ATTEMPT_VALUE,
     backoff: {
@@ -36,7 +41,59 @@ console.log(
   `BullMQ Queue "${paymentScheduleQueueConfig.queuename}" initialized.`
 );
 
-export const gracefullShutdown= (worker:Worker)=> {
+
+/* ------------------- Custom bullMQ event configure  ------------------- */
+declare global {
+  var __queueEvents: QueueEvents | undefined;
+}
+
+let queueEvents: QueueEvents;
+
+if (process.env.NODE_ENV === 'production') {
+  // In production, always create a new instance.
+  // In production, each Server Action runs in a separate, stateless environment.
+  queueEvents = new QueueEvents('customEventQueue', { connection });
+} else {
+  // In development, the 'global' object is preserved across module reloads.
+  // In development, use the global singleton.
+  if (!global.__queueEvents) {
+    console.log('✨ Creating a NEW singleton instance of QueueEvents for development.');
+    global.__queueEvents = new QueueEvents('customEventQueue', { connection });
+  }
+  queueEvents = global.__queueEvents;
+}
+
+
+// IMPORTANT: You should only attach listeners ONCE.
+// A simple flag can prevent re-attaching listeners on every hot-reload.
+if (!(queueEvents as any)._listenersAttached) {
+  interface CustomListener extends QueueEventsListener {
+    job_update: (args: { returnvalue: object,  jobId:object; }, id:string) => void;
+  }
+  // Here payload only takes strings as argument i donno why. Thats why i sent whole data as stringified.
+  queueEvents.on<CustomListener>('job_update', async (payload: any) => {
+    try {
+      console.log("*******************", await CustomEvent.updateJobCallback(payload));
+    } catch (error) {
+      throw error
+    }
+    // console.log("✅ Custom event 'job_update' received!", payload);
+  }); 
+
+  // Add any other listeners here...
+  queueEvents.on('completed', ({ jobId }) => {
+    console.log(`🎉 Built-in event "completed" received for job ${jobId}`);
+  });
+
+  (queueEvents as any)._listenersAttached = true;
+  console.log('Attaching BullMQ event listeners.');
+}
+
+
+
+export { queueEvents, paymentScheduleQueueConfig};
+
+export const gracefullShutdown = (worker: Worker) => {
   const signals = ['SIGINT', 'SIGTERM', 'SIGQUIT'];
   signals.forEach(signal => {
     process.on(signal, async () => {
@@ -56,10 +113,12 @@ export const gracefullShutdown= (worker:Worker)=> {
         }
         // Close Redis connections if manually managed
         if (typeof SchedulerMap.getInstance().redisClient !== 'undefined' && SchedulerMap.getInstance().redisClient.quit) {
-            await SchedulerMap.getInstance().redisClient.quit();
-            console.log('Redis mapping client closed.');
+          await SchedulerMap.getInstance().redisClient.quit();
+          console.log('Redis mapping client closed.');
         }
-
+        if (typeof queueEvents !== "undefined" && queueEvents.close) {
+          await queueEvents.close()
+        }
         console.log('Graceful shutdown complete.');
         process.exit(0);
       } catch (err) {
@@ -67,5 +126,5 @@ export const gracefullShutdown= (worker:Worker)=> {
         process.exit(1);
       }
     });
-})
+  })
 }
