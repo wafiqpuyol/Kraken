@@ -8,7 +8,11 @@ import { disable2fa } from "../../lib/twoFA"
 import { NextIntlClientProvider } from 'next-intl';
 import { getMessages } from 'next-intl/server';
 import { isMasterKeyActiveAndVerified } from '../../lib/masterkey'
-
+import { AppStateProvider } from "@repo/ui/StateProvider"
+import { getAccountLockStatus } from "../../lib/auth"
+import { getAllNotifications, getNextUnreadNotifications, totalUnreadNotificationCount, totalNotificationCount, updateNotification } from "../../lib/notification"
+import { cookies } from "next/headers";
+import Script from "next/script";
 
 const geistSans = localFont({
   src: "./fonts/GeistVF.woff",
@@ -33,15 +37,32 @@ export default async function RootLayout({
 }>) {
   const messages = await getMessages()
   const maserKeyVerificationStatus = await isMasterKeyActiveAndVerified()
-  console.log(maserKeyVerificationStatus);
+  const cookieStore = await cookies()
+  const cookieValue = cookieStore.get("account_status")
+  console.log("ikoes ==>", cookieValue);
+  let isAccountLocked = false;
+  let lockedAccountExpiresAt = null;
+  if (cookieValue) {
+    const parsedData = JSON.parse(cookieValue.value)
+    isAccountLocked = parsedData.isAccountLocked
+    lockedAccountExpiresAt = parsedData.lockedAccountExpiresAt
+  }
+
   return (
     <html lang="en">
       <body className={`${geistSans.variable} bg-[#F6F5F9] ${geistMono.variable} relative overflow-x-hidden`}>
         <SessionProvider>
           <NextIntlClientProvider messages={messages} locale={locale}>
-            <Navbar disable2fa={disable2fa} maserKeyVerificationStatus={maserKeyVerificationStatus} />
-            {children}
-            <Toaster />
+            <AppStateProvider getAllNotifications={getAllNotifications}
+              getNextUnreadNotifications={getNextUnreadNotifications} updateNotification={updateNotification}
+              totalUnreadNotificationCount={totalUnreadNotificationCount} totalNotificationCount={totalNotificationCount}
+              isAccountLocked={isAccountLocked}
+              lockedAccountExpiresAt={lockedAccountExpiresAt}
+            >
+              <Navbar disable2fa={disable2fa} maserKeyVerificationStatus={maserKeyVerificationStatus} />
+              {children}
+              <Toaster />
+            </AppStateProvider>
           </NextIntlClientProvider>
         </SessionProvider>
       </body>

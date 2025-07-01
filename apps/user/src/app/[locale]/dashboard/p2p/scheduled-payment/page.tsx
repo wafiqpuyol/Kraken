@@ -5,15 +5,16 @@ import { sendVerificationEmailAction } from "../../../../../lib/auth"
 import { generatePincode, sendEmergencyCode, resetPin } from "../../../../../lib/wallet"
 import { checkAccountLockStatus, updateLockStatus } from "../../../../../lib/account"
 import {sendMoneyAction,sendOTPAction,verifyOTP} from "../../../../../lib/sendMoney"
-import {addPaymentSchedule,cancelPaymentSchedule} from "../../../../../lib/scheduler/scheduler"
+import {addPaymentSchedule,cancelPaymentSchedule,editPaymentScheduleJob} from "../../../../../lib/scheduler/scheduler"
+
 
 interface PageProps {
     params: { locale: string }
 }
 async function page({ params }: PageProps) {
-    // await useRedirectToLogin(params.locale, "/login")
-    // const account = await checkAccountLockStatus()
-    // const isAccountLock = account.isLock ?? false
+    await useRedirectToLogin(params.locale, "/login")
+    const account = await checkAccountLockStatus()
+    const isAccountLock = account.isLock ?? false
 
     return (
         <PaymentScheduler 
@@ -26,6 +27,10 @@ async function page({ params }: PageProps) {
         sendEmergencyCode={sendEmergencyCode}
         addPaymentSchedule={addPaymentSchedule}
         cancelPaymentSchedule={cancelPaymentSchedule}
+        editPaymentScheduleJob={editPaymentScheduleJob}
+        checkAccountLockStatus={checkAccountLockStatus}
+        updateLockStatus={updateLockStatus}
+        isAccountLock={isAccountLock}
         />
     )
 }

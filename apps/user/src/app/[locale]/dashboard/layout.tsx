@@ -1,25 +1,15 @@
-"use client"
-
 import { SideBar } from "@repo/ui/Sidebar";
-import { useSession } from "next-auth/react"
-import { redirect } from "next/navigation";
+import { useRedirectToLogin } from "../../../hooks/useRedirect"
 
-export default function Layout({ children, params }: { children: React.ReactNode, params: { locale: string } }) {
-    const session = useSession()
 
+export default async function Layout({ children, params }: { children: React.ReactNode, params: { locale: string } }) {
+    await useRedirectToLogin(params.locale, "/login")
     return (
-        <div >
-            {
-                (session.status === "unauthenticated")
-                    ?
-                    redirect(`/${params.locale}/login`) :
-                    <>
-                        <SideBar />
-                        <div className="pl-72 pt-10">
-                            {children}
-                        </div>
-                    </>
-            }
-        </div >
+        <>
+            <SideBar />
+            <div className="pl-72 pt-10">
+                {children}
+            </div>
+        </ >
     );
 }
