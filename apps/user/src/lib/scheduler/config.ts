@@ -9,7 +9,7 @@ export interface CustomEventPayload {
   data: object;
 }
 const paymentScheduleQueueConfig = {
-  queuename: process.env.PAYMENT_QUEUE_NAME || "payment-schedule-queue",
+  queuename: process.env.NEXT_PUBLIC_PAYMENT_QUEUE_NAME || "payment-schedule-queue",
 };
 const connection = { host: redisConfig.host, port: Number(redisConfig.port) };
 

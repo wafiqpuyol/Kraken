@@ -138,7 +138,7 @@ export const authOptions: NextAuthOptions = {
                 }
                 const jwtToken = sign(
                     { uid: isUserExist.id, email: isUserExist.email, number: isUserExist.number },
-                    process.env.NEXTAUTH_SECRET || 'wafiqsuperSecret',
+                    process.env.NEXTAUTH_SECRET || 'wafiq123',
                 )
 
                 if (await redisManager().getCache(`${credentials.phone_number}_accountLocked`)) {

@@ -264,6 +264,7 @@ enum transaction_status {
   Failed
   Flagged
   Reviewing
+  Processing
 }
 
 enum schedulePayment_status {
