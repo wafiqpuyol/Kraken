@@ -128,5 +128,15 @@ class RedisManager {
             await this.client.expire(args.key, args.ttl)
         }
     }
+
+    async setRequestPaymentTempCodeCache(key:string, value:string) {
+        return await this.client.set(key, value, {NX:true, EX:180})
+    }
+    async getRequestPaymentTempCodeCache(key:string) {
+        return await this.client.get(key)
+    }
+    async delRequestPaymentTempCodeCache(key:string) {
+        return await this.client.del(key)
+    }
 }
 export const redisManager = () => RedisManager.getInstance()

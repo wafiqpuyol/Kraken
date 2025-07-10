@@ -113,6 +113,7 @@ model user {
   transaction                              transaction[]
   wallet                                   wallet?
   schedulePayment                          schedulePayment[]
+  push_subscription                        Json?
 
   @@index([email], map: "User_email_fkey")
   @@index([number], map: "User_number_fkey")
