@@ -1,7 +1,8 @@
 import { sendMoneySchemaType } from "@repo/forms/sendMoneySchema";
 import { ITransactionDetail } from "@repo/ui/types";
 import { ZodError, ZodTypeAny } from "@repo/forms/types"
-import {MIN_GAP_MINUTES} from "@repo/ui/constants"
+import { MIN_GAP_MINUTES } from "@repo/ui/constants"
+import crypto from "crypto"
 
 const bcrypt = require('bcrypt');
 
@@ -140,18 +141,27 @@ export const calculateDelay = (executionTime: Date) => {
     return executionTimestamp - currentTimestamp;
 }
 
-export const isScheduleTimeValid = (executionTime: Date): boolean=>{
-  const currentTime: Date = new Date();
-  const minGapInMs: number = MIN_GAP_MINUTES * 60 * 1000;
-  const differenceInMs: number = new Date(executionTime).getTime() - currentTime.getTime();
+export const isScheduleTimeValid = (executionTime: Date): boolean => {
+    const currentTime: Date = new Date();
+    const minGapInMs: number = MIN_GAP_MINUTES * 60 * 1000;
+    const differenceInMs: number = new Date(executionTime).getTime() - currentTime.getTime();
 
-  if (differenceInMs > minGapInMs) {
-    console.log(`✅ VALID: The time ${executionTime.toISOString()} is valid.`);
-    return true;
-  } else {
-    console.log(
-      `❌ INVALID: The time ${executionTime.toISOString()} is too soon.`
-    );
-    return false;
-  }
+    if (differenceInMs > minGapInMs) {
+        console.log(`✅ VALID: The time ${executionTime.toISOString()} is valid.`);
+        return true;
+    } else {
+        console.log(
+            `❌ INVALID: The time ${executionTime.toISOString()} is too soon.`
+        );
+        return false;
+    }
+}
+
+export const generateShortCode = (): string => {
+    const num1 = crypto.randomInt(1000).toString().padStart(3, '0');
+    const num2 = crypto.randomInt(1000).toString().padStart(3, '0');
+    const num3 = crypto.randomInt(1000).toString().padStart(3, '0');
+    const num4 = crypto.randomInt(1000).toString().padStart(3, '0');
+    const code = `${num1}-${num2}-${num3}-${num4}`;
+    return code;
 }

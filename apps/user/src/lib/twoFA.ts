@@ -77,7 +77,9 @@ export const activate2fa = async (otp: string, twoFAType: "signInTwoFA" | "withD
         let secret: string | null = null;
         if (twoFAType === "signInTwoFA" || twoFAType === "masterKeyTwoFA") {
             if (!isUserExist.twoFactorSecret) {
-                return { message: "2FA secret not present. Please try again", status: 500 }
+                // To enable/activate master key, user must enable signin 2fa
+                // return { message: "2FA secret not present. Please try again", status: 500 } //Previous message
+                return { message: "Please enable signin 2FA to activate master key", status: 401 } //Updated message
             }
             secret = isUserExist.twoFactorSecret
         }

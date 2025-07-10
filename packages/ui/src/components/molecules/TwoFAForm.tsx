@@ -70,7 +70,7 @@ export const TwoFAForm: React.FC<TwoFAFormProps> = ({ activate2fa, verifyPasskey
     const handlePasskey = async () => {
         if (session.data && !session.data.user?.isMasterKeyActivated) {
             toast({
-                title: "Passkey is not activated. Please activate your master key first",
+                title: "Master key is not activated. Please activate your master key first",
                 variant: "destructive",
                 className: "bg-red-500 text-white rounded-xl",
                 duration: 3000
@@ -108,7 +108,7 @@ export const TwoFAForm: React.FC<TwoFAFormProps> = ({ activate2fa, verifyPasskey
     return (
         <div>
             <div>
-                <img src="../authenticator-app.light.png" alt="authenticator app" className="w-72 ml-11" />
+                <img src="../master-key-authenticator.webp" alt="authenticator app" className="w-[230px] h-[230px] ml-20" />
             </div>
             <div className="flex flex-col items-center">
                 <form onSubmit={handleOTPSubmit} className="flex flex-col gap-2">
