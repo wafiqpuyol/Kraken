@@ -129,14 +129,17 @@ class RedisManager {
         }
     }
 
-    async setRequestPaymentTempCodeCache(key:string, value:string) {
-        return await this.client.set(key, value, {NX:true, EX:180})
+    async setRequestPaymentTempCodeCache(key: string, value: string) {
+        return await this.client.set(key, value, { NX: true, EX: 180 })
     }
-    async getRequestPaymentTempCodeCache(key:string) {
+    async getRequestPaymentTempCodeCache(key: string) {
         return await this.client.get(key)
     }
-    async delRequestPaymentTempCodeCache(key:string) {
+    async delRequestPaymentTempCodeCache(key: string) {
         return await this.client.del(key)
+    }
+    async updateRequestPaymentTempCodeCache(key: string, value: string) {
+        return await this.client.set(key, value, { XX: true, KEEPTTL: true });
     }
 }
 export const redisManager = () => RedisManager.getInstance()
